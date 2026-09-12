@@ -1,0 +1,20 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BPTZSRKF7870H6KD2T96XR",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "apps/web/lib/diligence/sandbox.ts",
+    "apps/web/lib/diligence/store.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ]
+}

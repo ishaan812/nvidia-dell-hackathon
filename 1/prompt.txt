@@ -1,0 +1,48 @@
+Setmit up on the dell db 10 box download all dependancies for me and make teh project run end to end with enotron 3.5 lightning on ollama 
+To connect use  ssh dell@10.158.158.1 with password 123456
+
+I ahve already git cloned there ion nvidia-dell-hackathon run it fully and localhost should be live with everthign running test before coming back to me
+
+---
+
+Use @docs/GB10.md
+
+---
+
+permission denied bro
+
+---
+
+what teh fuck if ollama already running why are we installing is tehre an issue with current ollama install then only install new like I noticed running nemotron with a prompt is not running
+
+---
+
+can you test some chats with it and see if its running properly
+
+---
+
+can you fix this
+
+---
+
+nooo donr install a new one just copy our installed model form local machine to there that will be faster for sure
+
+---
+
+does my max even have a thunderbolt it should right? i think usb c is connected to tehor thunderbolt port
+
+---
+
+nwo connected to thunderbolt on mac see what port its connected on gb10 i think its on the 20gb port
+
+---
+
+so hwo do i make it work on linux can you dirver bound and transfer quickly usinng it
+
+---
+
+make a .md of this log on how to transfer using usb
+
+---
+
+nwo can you connect our entire server surface and everythign to gemma for now so we have something wrunning please

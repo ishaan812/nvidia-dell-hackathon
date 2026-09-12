@@ -1,0 +1,181 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BA0M3R6CPKZ5FP3T86KDQY",
+  "session_id": "1d4f9c31-c509-4e4c-925b-da94e1fb44a1",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T17:18:04.321339Z",
+  "branch": "main",
+  "checkpoints_count": 12,
+  "save_step_count": 11,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/deck/route.ts",
+    "apps/web/app/api/deals/[id]/slides/route.ts",
+    "apps/web/app/api/health/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/app/page.tsx",
+    "apps/web/components/DealPicker.tsx",
+    "apps/web/components/DealRoom.tsx",
+    "apps/web/components/DeckViewer.tsx",
+    "apps/web/components/FilePreview.tsx",
+    "apps/web/components/PptxViewer.tsx",
+    "apps/web/components/RoomGraph.tsx",
+    "apps/web/lib/diligence/annotate.ts",
+    "apps/web/lib/diligence/checklist.ts",
+    "apps/web/lib/diligence/evidence.ts",
+    "apps/web/lib/diligence/ingest.ts",
+    "apps/web/lib/diligence/metrics.ts",
+    "apps/web/lib/diligence/ocr.ts",
+    "apps/web/lib/diligence/pptx.ts",
+    "apps/web/lib/diligence/textMatch.ts",
+    "apps/web/lib/diligence/types.ts",
+    "apps/web/lib/diligence/view.ts",
+    "apps/web/package.json",
+    "apps/web/pnpm-lock.yaml",
+    "apps/web/scripts/check-metrics.ts",
+    "apps/web/scripts/refresh-flags.ts",
+    "apps/web/scripts/verify-annotations.mjs",
+    "apps/web/scripts/verify-citations.mjs",
+    "apps/web/scripts/verify-pptx.mjs",
+    "docs/USB-TRANSFER.md"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "2a94af876019",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 204328,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 12763072,
+    "output_tokens": 51997,
+    "api_call_count": 8
+  },
+  "session_metrics": {
+    "turn_count": 12,
+    "context_tokens": 238717,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T17:18:04.286375Z",
+    "agent_lines": 1918,
+    "agent_removed": 97,
+    "human_added": 4353,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 6271,
+    "total_lines_changed": 6390,
+    "agent_percentage": 31.533646322378715,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 379,
+      "agent_lines_removed": 25,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 618,
+      "agent_lines_removed": 45,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1322,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1517,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

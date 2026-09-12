@@ -1,5 +1,1 @@
-Okay our USB setup is back, have downlaoded muse glimmer locally transfer using USB to the dell GB 10 and make it work, test befor ecoming back to me
-
----
-
-to connect using ssh also use dell@10.48.2.160 now we changed teh network password is istill 123456
+teh UI still says gemma3 i just took a pull push all chnages for ui through github after that ill take pull to see glimmer work there now

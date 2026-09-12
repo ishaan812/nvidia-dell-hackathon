@@ -1,0 +1,726 @@
+BUILD A FULL-STACK VC INVESTMENT INTELLIGENCE PLATFORM.
+
+The product is for a VC who manages multiple startup deals simultaneously.
+
+The VC has a configurable investment thesis, but thesis alignment must NEVER be used as an automatic rejection gate. A startup outside the preferred thesis can still become an attractive investment. The system should flag a thesis mismatch or thesis exception and continue evaluating the opportunity.
+
+The product must model the complete deal lifecycle using these 9 stages:
+
+1. SOURCE
+2. TRIAGE
+3. PROCESS
+4. NUMBERS
+5. WORLD
+6. PEOPLE + PRODUCT
+7. FOUNDER LOOP
+8. IC
+9. CLOSE / PASS
+
+The nine stages are the user-facing workflow layer.
+
+The analytical engines operate continuously across stages.
+
+CORE PRODUCT LOOP:
+
+Deal enters
+→ stage assigned
+→ documents / meetings / data added
+→ claims extracted
+→ evidence linked
+→ checks run
+→ market / benchmark analysis
+→ risk updated
+→ uncertainty updated
+→ thesis fit updated
+→ opportunity quality updated
+→ valuation updated
+→ investment conviction updated
+→ next best action generated
+→ new information arrives
+→ relevant analyses rerun
+→ investment case evolves.
+
+--------------------------------
+1. VC THESIS ENGINE
+--------------------------------
+
+Allow the investor to define:
+
+- Preferred sectors
+- Avoided sectors
+- Preferred stages
+- Preferred geographies
+- Check-size range
+- Business model preferences
+- Founder preferences
+- Market preferences
+- Growth preferences
+- Capital-efficiency preferences
+- Hard constraints
+- Soft preferences
+- Investment criteria weights
+- Kill criteria
+- Thesis exceptions
+
+Hard constraints should produce WARNING / THESIS EXCEPTION, not automatic rejection.
+
+Store all thesis settings historically.
+
+--------------------------------
+2. DEAL PIPELINE
+--------------------------------
+
+Dashboard showing all deals:
+
+- Company
+- Current stage
+- Thesis fit
+- Opportunity quality
+- Risk
+- Uncertainty
+- Evidence confidence
+- Valuation attractiveness
+- Investment conviction
+- Next best action
+- Last activity
+
+Allow filtering and sorting.
+
+--------------------------------
+3. STAGE ENGINE
+--------------------------------
+
+Each stage must contain:
+
+- Entry criteria
+- Expected inputs
+- Expected documents
+- AI checks
+- Open questions
+- Required actions
+- Exit criteria
+- Possible next states
+
+The system must always know the current stage and show the deal progression visually.
+
+--------------------------------
+4. SOURCE
+--------------------------------
+
+Capture inbound opportunities and automatically create the deal.
+
+Extract:
+
+- Company
+- Founders
+- Sector
+- Geography
+- Stage
+- Fundraise
+- Product
+- Business model
+- Initial traction
+- Referral/source
+
+Generate an initial profile.
+
+--------------------------------
+5. TRIAGE
+--------------------------------
+
+Do not make a final investment decision.
+
+Analyze:
+
+- Initial thesis fit
+- Initial market attractiveness
+- Founder signals
+- Initial traction
+- Raise
+- Obvious risks
+
+Output:
+
+- Initial opportunity score
+- Thesis fit
+- Initial risk
+- Evidence confidence
+- Recommended next step
+
+Possible outcomes:
+
+- Take meeting
+- Request information
+- Watch
+- Decline
+
+--------------------------------
+6. PROCESS
+--------------------------------
+
+Track the operational workflow:
+
+- Meetings
+- Owners
+- Tasks
+- Questions
+- Document requests
+- Deadlines
+- Waiting items
+- Next meeting
+- Stage changes
+
+Show exactly what the VC is waiting for and who owns each item.
+
+--------------------------------
+7. NUMBERS
+--------------------------------
+
+Implement five core diligence checks:
+
+1. Claim-to-evidence verification
+2. Cross-document contradiction detection
+3. Stated-vs-recomputed
+4. Forward-vs-backward consistency
+5. Population completeness
+
+In addition implement a Plausibility / Benchmark Engine.
+
+For every material quantitative claim such as:
+
+- TAM
+- SAM
+- customer count
+- ACV
+- ARR
+- revenue
+- growth
+- margin
+- CAC
+- churn
+- retention
+- market share
+- forecast
+
+compare:
+
+- Management value
+- Raw supporting data
+- Recomputed value
+- External benchmark
+- Comparable companies
+- Historical trend
+- Reasonable range
+- Scenario distribution
+
+Never invent statistical certainty.
+
+If enough evidence exists, produce a distribution/range.
+
+Example:
+
+Management:
+$30M revenue forecast
+
+Agent base case:
+$19M
+
+80% range:
+$14M–$24M
+
+90% range:
+$11M–$27M
+
+Assessment:
+Management forecast is above the 90th percentile.
+
+Clearly distinguish:
+
+- Fact
+- Management assumption
+- External benchmark
+- Agent estimate
+- Scenario
+
+--------------------------------
+8. WORLD
+--------------------------------
+
+Use external information to test the company story.
+
+Analyze:
+
+- Market
+- TAM
+- Growth
+- Competition
+- Customers
+- Pricing
+- Public signals
+- News
+- Hiring
+- Public filings
+- Founder history
+
+For important claims show:
+
+- Management claim
+- Independent evidence
+- Evidence against
+- Evidence missing
+- Assessment
+- Confidence
+
+--------------------------------
+9. PEOPLE + PRODUCT
+--------------------------------
+
+Analyze PEOPLE:
+
+- Founder-market fit
+- Experience
+- Execution
+- Team capability
+- Hiring gaps
+- Key person dependency
+- Founder dynamics
+- References
+
+Analyze PRODUCT:
+
+- Differentiation
+- Product maturity
+- Product-market fit
+- Technical feasibility
+- Technical moat
+- Switching costs
+- Roadmap
+- Scalability
+- Technical debt
+
+Separate claims from verified evidence.
+
+--------------------------------
+10. FOUNDER LOOP
+--------------------------------
+
+Automatically generate questions from unresolved findings.
+
+Question object:
+
+- Question
+- Related finding
+- Related claim
+- Risk
+- Reason
+- Evidence required
+- Owner
+- Status
+- Deadline
+
+When the founder responds or uploads new evidence:
+
+→ rerun relevant checks
+→ update finding
+→ update risk
+→ update uncertainty
+→ update confidence
+→ update scores
+→ update next action
+→ record change in timeline.
+
+Track response completeness, evidence quality and consistency.
+
+--------------------------------
+11. EVIDENCE ENGINE
+--------------------------------
+
+Every important claim must contain:
+
+- Claim
+- Source document
+- Page/location
+- Source type
+- Date
+- Verification status
+- Confidence
+- Supporting evidence
+- Contradicting evidence
+
+Source hierarchy:
+
+Primary
+Secondary
+Management-provided
+Unverified
+
+Never treat a pitch deck as equivalent to primary evidence.
+
+--------------------------------
+12. RISK ENGINE
+--------------------------------
+
+Risk must be separate from opportunity quality.
+
+Each risk contains:
+
+- Category
+- Description
+- Probability
+- Impact
+- Materiality
+- Evidence confidence
+- Persistence
+- Time horizon
+- Mitigation
+- Status
+- Owner
+- Evidence
+
+Risk categories:
+
+- Market
+- Product
+- Commercial
+- Financial
+- Team
+- Legal / regulatory
+- Thesis
+- Execution
+- Competitive
+
+Cluster correlated risks so multiple symptoms do not get double-counted.
+
+--------------------------------
+13. UNCERTAINTY ENGINE
+--------------------------------
+
+Separate:
+
+- Confirmed risk
+- Potential risk
+- Knowledge gap
+- Contradiction
+- Verified strength
+
+Measure:
+
+- Missing documents
+- Unverified claims
+- Open questions
+- Weak evidence
+- Conflicting evidence
+
+Output Evidence Confidence 0–100.
+
+--------------------------------
+14. OPPORTUNITY QUALITY
+--------------------------------
+
+Score:
+
+- Market
+- Product
+- Team
+- Traction
+- Business model
+- Financial quality
+- Competitive position
+- Scalability
+- Exit potential
+
+Output 0–100.
+
+--------------------------------
+15. THESIS FIT
+--------------------------------
+
+Output 0–100.
+
+Always show:
+
+- What matches the thesis
+- What doesn't
+- Thesis exceptions
+- Why this mismatch may or may not matter
+
+Do not use thesis fit as a rejection gate.
+
+--------------------------------
+16. VALUATION ENGINE
+--------------------------------
+
+Analyze:
+
+- Entry valuation
+- Revenue multiple
+- Comparable companies
+- Growth-adjusted valuation
+- Ownership
+- Dilution
+- Future financing
+- Exit valuation
+- Potential returns
+
+Distinguish:
+
+Company quality
+vs
+Investment attractiveness at current price.
+
+--------------------------------
+17. RETURN SCENARIOS
+--------------------------------
+
+Build:
+
+- Bear
+- Base
+- Bull
+- Outlier scenario if applicable
+
+Calculate where possible:
+
+- Expected MOIC
+- IRR
+- probability of capital loss
+- probability of 3x+
+- probability of 10x+
+
+All assumptions must be visible.
+
+--------------------------------
+18. INVESTMENT CONVICTION
+--------------------------------
+
+Do NOT present this as probability that the VC will invest.
+
+Instead create:
+
+Investment Conviction: 0–100
+
+Based on:
+
+- Opportunity quality
+- Thesis fit
+- Risk
+- Uncertainty
+- Evidence confidence
+- Valuation
+- Portfolio fit
+
+Show full component breakdown and explanations.
+
+--------------------------------
+19. PORTFOLIO FIT
+--------------------------------
+
+Compare each deal against the existing portfolio:
+
+- Sector exposure
+- Stage exposure
+- Geography
+- Capital allocation
+- Portfolio concentration
+- Correlation
+- Follow-on needs
+
+Surface portfolio-level consequences.
+
+--------------------------------
+20. NEXT BEST ACTION
+--------------------------------
+
+At every stage determine the action with the highest expected decision value.
+
+Examples:
+
+- Request customer data
+- Conduct reference call
+- Technical diligence
+- Financial clarification
+- Partner meeting
+- Legal diligence
+
+Prioritize using:
+
+- Decision impact
+- Information value
+- Cost
+- Time
+- Urgency
+
+--------------------------------
+21. IC
+--------------------------------
+
+Generate an IC packet containing:
+
+- Executive summary
+- Company overview
+- Thesis fit
+- Opportunity quality
+- Risks
+- Uncertainties
+- Evidence confidence
+- Valuation
+- Return scenarios
+- Portfolio fit
+- Bull case
+- Bear case
+- Key assumptions
+- Open questions
+- Recommendation
+- Next best action
+
+Recommendation options:
+
+- Advance
+- Advance with conditions
+- Watch
+- Pass
+- Thesis exception
+- Term sheet
+
+--------------------------------
+22. WHAT CHANGED MY MIND
+--------------------------------
+
+Maintain a timeline of conviction.
+
+Every material score change must have:
+
+- Previous value
+- New value
+- Reason
+- Supporting evidence
+- Date
+- Source
+
+Example:
+
+Initial conviction: 64
+
+Customer references: +8
+Revenue discrepancy: -10
+Retention evidence: +7
+
+Current conviction: 69
+
+--------------------------------
+23. VERSION CONTROL
+--------------------------------
+
+Track:
+
+- Pitch deck versions
+- Financial model versions
+- Founder answers
+- Document history
+
+Detect changed values and claims.
+
+--------------------------------
+24. DATA MODEL
+--------------------------------
+
+Core entities:
+
+VC
+InvestmentThesis
+Deal
+Stage
+Document
+DocumentVersion
+Meeting
+Claim
+Evidence
+Finding
+Risk
+Question
+Metric
+Assumption
+Benchmark
+Scenario
+Valuation
+Score
+ScoreChange
+Task
+ICMemo
+PortfolioExposure
+TimelineEvent
+
+All analytical conclusions must be traceable to evidence.
+
+--------------------------------
+25. USER EXPERIENCE
+--------------------------------
+
+Main Dashboard:
+
+Deal pipeline + scores + next actions
+
+Deal Page:
+
+Overview
+Thesis
+Stage
+Documents
+Claims
+Evidence
+Findings
+Risks
+Questions
+Numbers
+World
+People + Product
+Valuation
+Timeline
+IC
+
+Stage indicator must always be visible:
+
+SOURCE → TRIAGE → PROCESS → NUMBERS → WORLD → PEOPLE + PRODUCT → FOUNDER LOOP → IC → CLOSE/PASS
+
+--------------------------------
+26. IMPORTANT PRODUCT RULES
+--------------------------------
+
+1. Never automatically reject solely because of thesis mismatch.
+2. Never treat management claims as facts without evidence.
+3. Never fabricate probability.
+4. Never hide uncertainty.
+5. Separate opportunity quality from risk.
+6. Separate risk from uncertainty.
+7. Separate company quality from investment attractiveness.
+8. Separate company quality from valuation.
+9. Every important conclusion must have traceable evidence.
+10. Every score change must be explainable.
+11. New evidence must be able to trigger re-analysis.
+12. Preserve all document and score history.
+13. Allow VC override of AI conclusions.
+14. Record overrides and reasons.
+15. The AI recommends; the VC makes the decision.
+
+Build the MVP with realistic seed/sample data for at least 5 simultaneous startup deals at different stages so the complete workflow can be demonstrated end-to-end.
+
+
+Compare to what we have now and plan on what to build, plan in stages so we have checkpoint since we have a time limit
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+We need to make teh UI much more simpler and cleaenr please, needs ot ebe usable add a light mode and make colours brighter in dark mdoe as well, reduce number of fields and keep only what will be useful for a demo
+
+---
+
+put symbol bro instead of etxt for light dark
+
+---
+
+Lot of alignment iussues and unclean UI can you please fdi xall that

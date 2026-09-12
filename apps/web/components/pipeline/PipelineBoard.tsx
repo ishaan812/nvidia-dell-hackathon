@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { DealSummary } from "@/lib/diligence/types";
@@ -112,7 +111,7 @@ export function PipelineBoard({ deals }: Props) {
                 <span>Next</span>
               </div>
               {rows.map((deal) => (
-                <Link key={deal.id} href={`/deals/${deal.id}`} className="pipe-row">
+                <a key={deal.id} href={`/deals/${deal.id}`} className="pipe-row">
                   <span className="pipe-name">
                     {deal.company || deal.name}
                     {deal.live ? <span className="pipe-flag">Live</span> : null}
@@ -123,7 +122,7 @@ export function PipelineBoard({ deals }: Props) {
                     <ScoreValue key={row.key} value={row.value} label={row.label} />
                   ))}
                   <span className="pipe-next">{plainAction(deal.nextAction)}</span>
-                </Link>
+                </a>
               ))}
             </div>
           </div>

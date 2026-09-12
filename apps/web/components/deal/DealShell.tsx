@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
@@ -66,19 +66,11 @@ type Props = {
 
 export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<TabId>(() => resolveTab(tabProp));
-  const [pane, setPane] = useState<DiligencePane>(() => resolvePane(paneProp));
+  const tab = resolveTab(tabProp);
+  const pane = resolvePane(paneProp);
   const stage = normalizeStage(intel.stage);
   const validated = deal.flags.length > 0 || intel.claims.length > 0;
   const decided = Boolean(intel.ic && !intel.pendingGate && stage === "decision_room");
-
-  useEffect(() => {
-    setTab(resolveTab(tabProp));
-  }, [tabProp]);
-
-  useEffect(() => {
-    setPane(resolvePane(paneProp));
-  }, [paneProp]);
 
   useEffect(() => {
     let stamp = `${deal.updatedAt}:${intel.stage}:${intel.pendingGate?.id ?? ""}`;
@@ -100,16 +92,6 @@ export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: 
     }, 3000);
     return () => window.clearInterval(tick);
   }, [deal.id, deal.updatedAt, intel.pendingGate?.id, intel.stage, router]);
-
-  function open(id: TabId, nextPane?: DiligencePane) {
-    setTab(id);
-    const diligencePane = nextPane ?? pane;
-    if (nextPane) setPane(nextPane);
-    router.replace(
-      id === "diligence" ? `/deals/${deal.id}?tab=diligence&pane=${diligencePane}` : `/deals/${deal.id}?tab=${id}`,
-      { scroll: false },
-    );
-  }
 
   const waiting = intel.pendingGate
     ? intel.pendingGate.id === "founder"
@@ -134,14 +116,17 @@ export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: 
         </header>
         <nav className="deal-tabs" aria-label="Deal sections">
           {TABS.slice(0, 3).map((item) => (
-            <button
+            <a
               key={item.id}
-              type="button"
+              href={
+                item.id === "diligence"
+                  ? `/deals/${deal.id}?tab=diligence&pane=${pane}`
+                  : `/deals/${deal.id}?tab=${item.id}`
+              }
               className={`deal-tab ${tab === item.id ? "is-on" : ""}`}
-              onClick={() => open(item.id)}
             >
               {item.label}
-            </button>
+            </a>
           ))}
           <a
             className="deal-tab deal-tab-ext"
@@ -154,22 +139,19 @@ export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: 
             <ExternalIcon />
           </a>
           {TABS.slice(3).map((item) => (
-            <button
+            <a
               key={item.id}
-              type="button"
+              href={`/deals/${deal.id}?tab=${item.id}`}
               className={`deal-tab ${tab === item.id ? "is-on" : ""}`}
-              onClick={() => open(item.id)}
             >
               {item.label}
-            </button>
+            </a>
           ))}
         </nav>
         <main id="deal-main" className="pb-20">
           {tab === "overview" ? <OverviewTab intel={intel} /> : null}
           {tab === "thesis" ? <ThesisTab intel={intel} /> : null}
-          {tab === "diligence" ? (
-            <DiligenceTab deal={deal} intel={intel} pane={pane} onPane={(id) => open("diligence", id)} />
-          ) : null}
+          {tab === "diligence" ? <DiligenceTab deal={deal} intel={intel} pane={pane} /> : null}
           {tab === "ask" ? (
             <AskTab
               dealId={deal.id}

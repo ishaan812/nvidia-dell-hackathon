@@ -1,5 +1,3 @@
-"use client";
-
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
 import { FinancialsPane } from "./FinancialsPane";
@@ -18,22 +16,20 @@ type Props = {
   deal: Deal;
   intel: DealIntelligence;
   pane: DiligencePane;
-  onPane: (id: DiligencePane) => void;
 };
 
-export function DiligenceTab({ deal, intel, pane, onPane }: Props) {
+export function DiligenceTab({ deal, intel, pane }: Props) {
   return (
     <div>
       <nav className="diligence-panes" aria-label="Due diligence">
         {PANES.map((item) => (
-          <button
+          <a
             key={item.id}
-            type="button"
+            href={`/deals/${deal.id}?tab=diligence&pane=${item.id}`}
             className={pane === item.id ? "is-on" : ""}
-            onClick={() => onPane(item.id)}
           >
             {item.label}
-          </button>
+          </a>
         ))}
       </nav>
       {pane === "founder" ? <FounderPane dealId={deal.id} intel={intel} /> : null}

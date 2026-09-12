@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import { FilePreview } from "@/components/FilePreview";
+import { ModelBadge } from "@/components/ModelBadge";
+import { settings } from "@/lib/diligence/paths";
 import { previewFile } from "@/lib/diligence/evidence";
 import { loadDeal } from "@/lib/diligence/store";
 
@@ -38,6 +40,7 @@ export default async function FilePreviewPage({
       <div className="preview-page-bar">
         <BrandLogo compact size={18} />
         <div className="flex items-center gap-5">
+          <ModelBadge name={settings().llmModel} />
           <Link href={`/deals/${id}`} className="text-[15px] text-paper/75 underline-offset-2 hover:underline">
             Back to the data room
           </Link>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { DealLobby } from "@/components/DealLobby";
 import { loadDeal } from "@/lib/diligence/store";
 import { toLobbyView } from "@/lib/diligence/view";
+import { settings } from "@/lib/diligence/paths";
 
 export const dynamic = "force-dynamic";
 
@@ -17,5 +18,5 @@ export default async function DealRoomPage({ params }: { params: Promise<{ id: s
   const { id } = await params;
   const deal = await loadDeal(id);
   if (!deal) notFound();
-  return <DealLobby deal={await toLobbyView(deal)} />;
+  return <DealLobby deal={await toLobbyView(deal)} model={settings().llmModel} />;
 }

@@ -21,7 +21,7 @@ export function PipelineHome({ deals, model, using }: Props) {
       </a>
       <PageFrame>
         <header className="pb-8 pt-10">
-          <AppChrome />
+          <AppChrome model={using} modelOk={model.ok} />
           <h1 className="mt-9 font-serif text-[2.75rem] font-medium leading-none tracking-tight">
             Pipeline
           </h1>

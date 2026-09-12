@@ -43,6 +43,11 @@ export function settings() {
   };
 }
 
+export function modelDisplayName(id = settings().llmModel): string {
+  if (/muse[-_]?glimmer|glimmer[-_]?muse/i.test(id)) return "Muse Glimmer";
+  return id.replace(/:latest$/, "");
+}
+
 export function citationLabel(c: {
   filename: string;
   page?: number;

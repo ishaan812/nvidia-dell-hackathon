@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppChrome } from "@/components/AppChrome";
 import { PageFrame } from "@/components/PageFrame";
 import { ThesisForm } from "@/components/thesis/ThesisForm";
+import { settings } from "@/lib/diligence/paths";
 import { loadThesis } from "@/lib/intelligence/thesis";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,7 @@ export default async function ThesisPage() {
     <div className="min-h-screen">
       <PageFrame>
         <header className="pb-6 pt-10">
-          <AppChrome />
+          <AppChrome model={settings().llmModel} />
           <h1 className="mt-9 font-serif text-[2.75rem] font-medium leading-none tracking-tight">
             Thesis
           </h1>

@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import type { DealRoomView } from "@/lib/diligence/types";
 import { riskTone } from "@/lib/format";
 import { BrandLogo } from "./BrandLogo";
+import { ModelBadge } from "./ModelBadge";
 import { FlagList } from "./FlagList";
 import { SideDesk, type SidePane } from "./SideDesk";
 
@@ -22,9 +23,10 @@ const PptxViewer = dynamic(() => import("./PptxViewer").then((mod) => mod.PptxVi
 
 type Props = {
   deal: DealRoomView;
+  model?: string;
 };
 
-export function DealRoom({ deal }: Props) {
+export function DealRoom({ deal, model }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [pane, setPane] = useState<SidePane>("source");
@@ -58,6 +60,7 @@ export function DealRoom({ deal }: Props) {
           <h1 className="truncate font-serif text-[28px] leading-none">{deal.company || deal.name}</h1>
         </div>
         <div className="flex items-baseline gap-5 font-mono text-[11px] text-paper/45">
+          <ModelBadge name={model} />
           <span className={riskTone(deal.riskScore)}>
             {deal.riskScore != null ? `risk ${deal.riskScore}` : deal.status}
           </span>

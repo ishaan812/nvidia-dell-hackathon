@@ -9,6 +9,7 @@ import { STAGE_LABELS, normalizeStage } from "@/lib/intelligence/types";
 import { AppChrome } from "../AppChrome";
 import { PageFrame } from "../PageFrame";
 import { StageRail } from "../pipeline/StageRail";
+import { AskTab } from "./AskTab";
 import { ICTab } from "./ICTab";
 import { OverviewTab } from "./OverviewTab";
 import { ProcessTab } from "./ProcessTab";
@@ -21,6 +22,7 @@ const TABS = [
   { id: "validation", label: "Validation" },
   { id: "process", label: "Process" },
   { id: "decision", label: "Decision Room" },
+  { id: "ask", label: "Ask" },
 ] as const;
 
 const ALIASES: Record<string, (typeof TABS)[number]["id"]> = {
@@ -37,6 +39,8 @@ const ALIASES: Record<string, (typeof TABS)[number]["id"]> = {
   risks: "validation",
   documents: "process",
   stage: "overview",
+  chat: "ask",
+  analyst: "ask",
 };
 
 type TabId = (typeof TABS)[number]["id"];
@@ -44,9 +48,10 @@ type TabId = (typeof TABS)[number]["id"];
 type Props = {
   deal: Deal;
   intel: DealIntelligence;
+  model?: string;
 };
 
-export function DealShell({ deal, intel }: Props) {
+export function DealShell({ deal, intel, model }: Props) {
   const params = useSearchParams();
   const router = useRouter();
   const raw = params.get("tab") ?? "overview";
@@ -73,6 +78,7 @@ export function DealShell({ deal, intel }: Props) {
       <PageFrame>
         <header className="pb-6 pt-10">
           <AppChrome
+            model={model}
             extra={
               <Link href={`/deals/${deal.id}/room`}>
                 Data room
@@ -121,8 +127,28 @@ export function DealShell({ deal, intel }: Props) {
           {tab === "validation" ? <ValidationTab deal={deal} intel={intel} /> : null}
           {tab === "process" ? <ProcessTab deal={deal} intel={intel} /> : null}
           {tab === "decision" ? <ICTab dealId={deal.id} intel={intel} /> : null}
+          {tab === "ask" ? (
+            <AskTab
+              dealId={deal.id}
+              company={intel.profile.company}
+              suggestions={askSuggestions(deal.flags.map((f) => f.comment), intel.profile.company)}
+            />
+          ) : null}
         </main>
       </PageFrame>
     </div>
   );
+}
+
+function askSuggestions(flags: string[], company: string): string[] {
+  const fromFlags = flags
+    .filter((flag) => /ARR|runway|headcount|ownership|TAM|burn/i.test(flag))
+    .slice(0, 2)
+    .map((flag) => flag.replace(/\.$/, "?"));
+  return [
+    `What's ${company}'s real ARR?`,
+    "Why does the deck disagree with the room?",
+    "Who owns the company?",
+    ...fromFlags,
+  ].slice(0, 4);
 }

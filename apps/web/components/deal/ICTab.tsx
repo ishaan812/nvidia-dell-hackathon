@@ -1,4 +1,4 @@
-import { AskPanel } from "@/components/AskPanel";
+import Link from "next/link";
 import { recommendationLabel, scoreDisplay } from "@/lib/format";
 import { convictionCopy, effectiveScores, scoreTone } from "@/lib/intelligence/scores";
 import type { DealIntelligence, ScoreKey } from "@/lib/intelligence/types";
@@ -87,8 +87,10 @@ export function ICTab({ dealId, intel }: { dealId?: string; intel: DealIntellige
       ) : null}
 
       {dealId ? (
-        <Section title="Interactive analyst" lead="Questions stay inside this deal.">
-          <AskPanel dealId={dealId} compact />
+        <Section title="Ask the room" lead="Muse Glimmer answers from the files, with citations.">
+          <Link href={`/deals/${dealId}?tab=ask`} className="ask-jump">
+            Open Ask
+          </Link>
         </Section>
       ) : null}
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { DealRoom } from "@/components/DealRoom";
 import { loadDeal } from "@/lib/diligence/store";
 import { toRoomView } from "@/lib/diligence/view";
+import { settings } from "@/lib/diligence/paths";
 
 export const dynamic = "force-dynamic";
 
@@ -24,5 +25,5 @@ export default async function DeckPage({
   const { name } = await searchParams;
   const deal = await loadDeal(id);
   if (!deal) notFound();
-  return <DealRoom deal={toRoomView(deal, name)} />;
+  return <DealRoom deal={toRoomView(deal, name)} model={settings().llmModel} />;
 }

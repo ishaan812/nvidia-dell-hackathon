@@ -8,6 +8,7 @@ import { riskTone } from "@/lib/format";
 import { readJson } from "@/lib/http";
 import { BrandLogo } from "./BrandLogo";
 import { FileDrop, roleMap, type StagedFile } from "./FileDrop";
+import { ModelBadge } from "./ModelBadge";
 import { RoomDesk, type RoomDeskTab } from "./RoomDesk";
 
 const KIND: Record<DealFile["kind"], string> = {
@@ -20,9 +21,10 @@ const KIND: Record<DealFile["kind"], string> = {
 
 type Props = {
   deal: DealLobbyView;
+  model?: string;
 };
 
-export function DealLobby({ deal }: Props) {
+export function DealLobby({ deal, model }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [incoming, setIncoming] = useState<StagedFile[]>([]);
@@ -140,6 +142,7 @@ export function DealLobby({ deal }: Props) {
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end gap-3">
+              <ModelBadge name={model} />
               <p className={`font-mono text-[12px] ${riskTone(deal.riskScore)}`}>
                 {deal.riskScore != null ? `risk ${deal.riskScore}` : deal.status}
               </p>

@@ -18,6 +18,17 @@ export type Citation = {
   label?: string;
 };
 
+export type AskCitation = {
+  n: number;
+  filename: string;
+  page?: number;
+  sheet?: string;
+  quote?: string;
+  label: string;
+};
+
+export type AskTurn = { role: "user" | "assistant"; content: string };
+
 export type OcrWord = {
   t: string;
   x: number;

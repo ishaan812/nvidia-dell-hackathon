@@ -3,3 +3,7 @@ so also it should be the foudner sending the email to the openclaw bot here whic
 ---
 
 so also it should be the foudner sending the email to the openclaw bot here which tehn creates the deal
+
+---
+
+Dont write hi night desk make it write Hi Acme VC, its writing to VC

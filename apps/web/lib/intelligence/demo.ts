@@ -199,10 +199,8 @@ async function ingestLive(id: string, source: string): Promise<Deal> {
 }
 
 async function cloneSeeded(id: string): Promise<Deal> {
-  const { seedIntelligence } = await import("./seed");
-  const seeded = await loadDeal("northstar-robotics");
-  if (!seeded) await seedIntelligence();
-  const source = (await loadDeal("northstar-robotics")) ?? (await fallbackBare(id));
+  const { buildNorthstarDeal } = await import("./seed");
+  const source = (await loadDeal("northstar-robotics")) ?? buildNorthstarDeal();
   const root = path.join(dirs().data, id);
   await rm(root, { recursive: true, force: true });
   const workspace = path.join(root, "workspace");

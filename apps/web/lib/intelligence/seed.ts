@@ -15,7 +15,6 @@ import type {
 export const SEED_IDS = [
   "harbor-mail",
   "lumen-health",
-  "northstar-robotics",
   "aether-grid",
   "helio-freight",
 ] as const;
@@ -787,6 +786,10 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
   return { deal, files: [], copySample: true };
 }
 
+export function buildNorthstarDeal(): Deal {
+  return structuredClone(northstar().deal);
+}
+
 function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
   const profile: CompanyProfile = {
     company: "Aether Grid",
@@ -1391,7 +1394,7 @@ export async function seedIntelligence(opts?: { force?: boolean }): Promise<{
     thesis,
   ).score ?? 46;
 
-  const built = [harbor(), lumen(lumenThesis), northstar(), aether(), helio()];
+  const built = [harbor(), lumen(lumenThesis), aether(), helio()];
   const created: string[] = [];
 
   for (const item of built) {

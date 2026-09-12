@@ -56,7 +56,12 @@ export function RoomGraph({ graph, activeFile, onOpenFile }: Props) {
   }
   const placed = place(
     graph.nodes.filter(
-      (node) => node.type === "Company" || node.type === "Metric" || connected.has(node.id),
+      (node) =>
+        node.type === "Company" ||
+        node.type === "Metric" ||
+        node.type === "Deck" ||
+        node.type === "File" ||
+        connected.has(node.id),
     ),
   );
   const byId = new Map(placed.map((node) => [node.id, node]));

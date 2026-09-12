@@ -166,6 +166,7 @@ export function previewDoc(
   const needles = [
     ...(metric ? NEEDLES[metric] ?? [metric.replaceAll("_", " ")] : []),
     highlight?.toLowerCase() ?? "",
+    highlight?.replace(/_/g, " ").toLowerCase() ?? "",
     sheet?.toLowerCase() ?? "",
   ].filter(Boolean);
 
@@ -274,16 +275,22 @@ export function withEvidence(deal: Deal, flag: Flag): FlagView {
   const filename = flag.sourceFile ?? room?.citation.filename;
   const sheet = flag.sourceSheet ?? room?.citation.sheet;
   const doc = filename ? deal.docs.find((item) => item.filename === filename) : undefined;
+  const highlight = room ? String(room.value) : (roomValue ?? flag.quote);
 
   let source: SourcePreview | undefined;
-  if (flag.severity === "unsupported" || flag.severity === "missing") {
+  if (doc) {
+    source = {
+      ...previewDoc(doc, flag.metric, highlight, sheet),
+      filename: doc.filename,
+      sheet: sheet ?? room?.citation.sheet,
+      highlight,
+    };
+  } else if (flag.severity === "unsupported" || flag.severity === "missing") {
     source = {
       filename: filename ?? "data room",
       kind: "missing",
       highlight: deckValue ?? flag.quote,
     };
-  } else if (doc) {
-    source = previewDoc(doc, flag.metric, roomValue ?? room?.raw, sheet);
   }
 
   return {
@@ -293,7 +300,7 @@ export function withEvidence(deal: Deal, flag: Flag): FlagView {
     sourceFile: filename,
     sourceSheet: sheet,
     sourceCitation: flag.sourceCitation || [filename, sheet].filter(Boolean).join(" · "),
-    label: (flag.metric && METRIC_LABELS[flag.metric]) || flag.quote || "Finding",
+    label: (flag.metric && METRIC_LABELS[flag.metric]) || room?.citation.label || flag.quote || "Finding",
     source,
   };
 }

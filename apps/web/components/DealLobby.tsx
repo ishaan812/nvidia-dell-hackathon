@@ -6,6 +6,7 @@ import { type FormEvent, useEffect, useState, useTransition } from "react";
 import type { DealFile, DealLobbyView, FileRole } from "@/lib/diligence/types";
 import { riskTone } from "@/lib/format";
 import { readJson } from "@/lib/http";
+import { BrandLogo } from "./BrandLogo";
 import { FileDrop, roleMap, type StagedFile } from "./FileDrop";
 import { RoomDesk, type RoomDeskTab } from "./RoomDesk";
 
@@ -122,9 +123,15 @@ export function DealLobby({ deal }: Props) {
         <section className="lobby-files">
           <header className="flex items-end justify-between gap-6 pb-8">
             <div>
-              <Link href="/" className="text-[15px] text-paper/75 underline-offset-2 hover:text-paper hover:underline">
-                All deals
-              </Link>
+              <BrandLogo />
+              <p className="mt-5 text-[15px] text-paper/75">
+                <Link
+                  href={`/deals/${deal.id}`}
+                  className="underline-offset-2 hover:text-paper hover:underline"
+                >
+                  Deal desk
+                </Link>
+              </p>
               <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight">
                 {deal.company || deal.name}
               </h1>
@@ -140,7 +147,7 @@ export function DealLobby({ deal }: Props) {
                 type="button"
                 disabled={pending}
                 onClick={recompute}
-                className="pressable border border-white/20 px-3 py-2 text-[13px] text-paper/80 hover:text-paper disabled:opacity-50"
+                className="pressable border border-line px-3 py-2 text-[13px] text-mute hover:text-paper disabled:opacity-50"
               >
                 {pending ? "Recomputing…" : "Recompute the deck"}
               </button>

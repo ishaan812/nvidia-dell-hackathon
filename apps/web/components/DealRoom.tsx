@@ -6,10 +6,16 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { DealRoomView } from "@/lib/diligence/types";
 import { riskTone } from "@/lib/format";
+import { BrandLogo } from "./BrandLogo";
 import { FlagList } from "./FlagList";
 import { SideDesk, type SidePane } from "./SideDesk";
 
 const DeckViewer = dynamic(() => import("./DeckViewer").then((mod) => mod.DeckViewer), {
+  ssr: false,
+  loading: () => <p className="p-8 font-mono text-[12px] text-black/45">Opening slides…</p>,
+});
+
+const PptxViewer = dynamic(() => import("./PptxViewer").then((mod) => mod.PptxViewer), {
   ssr: false,
   loading: () => <p className="p-8 font-mono text-[12px] text-black/45">Opening slides…</p>,
 });
@@ -41,7 +47,8 @@ export function DealRoom({ deal }: Props) {
   return (
     <div className="flex h-screen flex-col bg-desk text-paper">
       <header className="flex items-center justify-between gap-6 border-b border-white/10 px-6 py-3">
-        <div className="flex min-w-0 items-baseline gap-4">
+        <div className="flex min-w-0 items-center gap-4">
+          <BrandLogo compact size={18} />
           <Link
             href={`/deals/${deal.id}`}
             className="shrink-0 text-[14px] text-paper/80 underline-offset-2 hover:text-paper hover:underline"
@@ -97,13 +104,22 @@ export function DealRoom({ deal }: Props) {
 
       <div className="grid min-h-0 flex-1 grid-cols-[260px_minmax(0,1fr)_400px]">
         <FlagList flags={deal.flags} activeId={activeId} onSelect={openFlag} />
-        <main className="min-h-0 overflow-y-auto bg-[#d8dee4]">
-          <DeckViewer
-            src={`/api/deals/${deal.id}/deck${deal.activeDeck ? `?name=${encodeURIComponent(deal.activeDeck)}` : ""}`}
-            flags={deal.flags}
-            activeId={activeId}
-            onSelect={openFlag}
-          />
+        <main className="min-h-0 min-w-0 overflow-y-auto bg-[#d8dee4]">
+          {/\.pptx$/i.test(deal.activeDeck ?? deal.decks[0]?.filename ?? "") ? (
+            <PptxViewer
+              src={`/api/deals/${deal.id}/slides?name=${encodeURIComponent(deal.activeDeck ?? deal.decks[0]?.filename ?? "")}`}
+              flags={deal.flags}
+              activeId={activeId}
+              onSelect={openFlag}
+            />
+          ) : (
+            <DeckViewer
+              src={`/api/deals/${deal.id}/deck${deal.activeDeck ? `?name=${encodeURIComponent(deal.activeDeck)}` : ""}`}
+              flags={deal.flags}
+              activeId={activeId}
+              onSelect={openFlag}
+            />
+          )}
         </main>
         <SideDesk deal={deal} flag={active} pane={pane} onPane={setPane} onOpenFlag={openFlag} />
       </div>

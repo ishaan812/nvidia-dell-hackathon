@@ -32,7 +32,10 @@ export function toRoomView(deal: Deal, activeDeck?: string): DealRoomView {
     status: deal.status,
     riskScore: deal.riskScore,
     sandbox: deal.sandbox,
-    flags: deal.flags.map((flag) => withEvidence(deal, flag)),
+    flags: deal.flags.map((flag) => {
+      const view = withEvidence(deal, flag);
+      return { ...view, page: view.page && view.page > 0 ? view.page : 1 };
+    }),
     memo: deal.memo
       ? { verdict: deal.memo.verdict, bodyMarkdown: deal.memo.bodyMarkdown }
       : undefined,

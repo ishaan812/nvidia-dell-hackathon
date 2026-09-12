@@ -16,6 +16,7 @@ export function quoteNeedles(quote: string): string[] {
     /[0-9]+\s*people/i,
     /Founders?\s+[0-9]+(?:\.[0-9]+)?\s*%/i,
     /[0-9]+(?:\.[0-9]+)?\s*%/,
+    />?\s*[0-9]+(?:\.[0-9]+)?\s*(?:\+|%|x|bn|m|k)?/i,
   ];
   for (const re of patterns) {
     const match = q.match(re);
@@ -72,6 +73,29 @@ export function clipFactor(str: string, quote: string): { start: number; end: nu
     }
   }
   return { start: 0, end: 1 };
+}
+
+export function findOcrBox(
+  words: { t: string; x: number; y: number; w: number; h: number }[],
+  quote: string,
+): { x: number; y: number; w: number; h: number } | null {
+  if (!quote.trim() || !words.length) return null;
+  const runs = words.map((word) => ({ str: word.t }));
+  const indexes = findRunIndexes(runs, quote);
+  if (!indexes.length) return null;
+  const used = indexes.map((i) => words[i]);
+  const x = Math.min(...used.map((word) => word.x));
+  const y = Math.min(...used.map((word) => word.y));
+  const right = Math.max(...used.map((word) => word.x + word.w));
+  const bottom = Math.max(...used.map((word) => word.y + word.h));
+  const padX = 0.01;
+  const padY = 0.012;
+  return {
+    x: Math.max(0, x - padX),
+    y: Math.max(0, y - padY),
+    w: Math.min(1, right - x + padX * 2),
+    h: Math.min(1, bottom - y + padY * 2),
+  };
 }
 
 export function pdfRunBox(run: TextRun, quote?: string) {

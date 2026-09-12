@@ -2,6 +2,7 @@
 
 import type { SourcePreview } from "@/lib/diligence/types";
 import { NativePdf } from "./NativePdf";
+import { PptxViewer } from "./PptxViewer";
 import { WordViewer } from "./WordViewer";
 import { WorkbookViewer } from "./WorkbookViewer";
 
@@ -17,9 +18,11 @@ type Props = {
 export function FilePreview({ preview, href, openHref, compact = false, fill = false, onClose }: Props) {
   const open = openHref ?? href;
   const isPdf = /\.pdf$/i.test(preview.filename);
+  const isPptx = /\.pptx$/i.test(preview.filename);
   const isGrid = /\.(xlsx?|csv)$/i.test(preview.filename);
   const isDoc = /\.docx$/i.test(preview.filename);
-  const native = Boolean(href) && (isPdf || isGrid);
+  const native = Boolean(href) && (isPdf || isGrid || isPptx);
+  const slidesHref = href?.replace("/file?", "/slides?");
 
   return (
     <div className={`source-file ${fill ? "is-fill" : ""}`}>
@@ -49,6 +52,7 @@ export function FilePreview({ preview, href, openHref, compact = false, fill = f
 
       <div className="preview-body">
         {isPdf && href ? <NativePdf src={href} fill={fill} title={preview.filename} /> : null}
+        {isPptx && slidesHref ? <PptxViewer src={slidesHref} compact={compact} /> : null}
         {isGrid && href ? (
           <WorkbookViewer
             href={href}
@@ -63,8 +67,8 @@ export function FilePreview({ preview, href, openHref, compact = false, fill = f
         {!native && !isDoc && (preview.kind === "text" || preview.paragraphs?.length) ? (
           <div className="source-doc">
             {(preview.paragraphs?.length ? preview.paragraphs : preview.excerpt ? [preview.excerpt] : []).map(
-              (paragraph) => (
-                <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+              (paragraph, index) => (
+                <p key={`${index}-${paragraph.slice(0, 24)}`}>{paragraph}</p>
               ),
             )}
           </div>

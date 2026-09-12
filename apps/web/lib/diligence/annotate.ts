@@ -50,15 +50,24 @@ export async function annotateDeck(deal: Deal, outDir: string): Promise<string |
   const reader = await getDocument({ data: new Uint8Array(bytes), useSystemFonts: true }).promise;
 
   for (const flag of deal.flags) {
-    if (!flag.page) continue;
-    const page = pdf.getPage(flag.page - 1);
+    const pageNo = flag.page && flag.page > 0 ? flag.page : 1;
+    const page = pdf.getPage(pageNo - 1);
     if (!page) continue;
     const { width, height } = page.getSize();
-    const view = await reader.getPage(flag.page);
+    const view = await reader.getPage(pageNo);
     const items = (await view.getTextContent()).items.filter(
       (item): item is TextRun => "str" in item && "transform" in item,
     );
-    const hits = findRunIndexes(items, flag.quote).map((i) => pdfRunBox(items[i], flag.quote));
+    const hits = flag.box
+      ? [
+          {
+            x: flag.box.x * width,
+            y: (1 - flag.box.y - flag.box.h) * height,
+            width: flag.box.w * width,
+            height: flag.box.h * height,
+          },
+        ]
+      : findRunIndexes(items, flag.quote).map((i) => pdfRunBox(items[i], flag.quote));
     const color = FILL[flag.severity];
     const ink = INK[flag.severity];
     if (hits.length) {

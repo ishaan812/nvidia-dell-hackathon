@@ -18,6 +18,21 @@ export type Citation = {
   label?: string;
 };
 
+export type OcrWord = {
+  t: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
+export type NormBox = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
 export type IngestedDoc = {
   docId: string;
   filename: string;
@@ -26,6 +41,7 @@ export type IngestedDoc = {
   path: string;
   markdown: string;
   pageTexts: Record<number, string>;
+  pageWords?: Record<number, OcrWord[]>;
 };
 
 export type Metric = {
@@ -51,6 +67,7 @@ export type Flag = {
   sourceSheet?: string;
   deckValue?: string;
   roomValue?: string;
+  box?: NormBox;
 };
 
 export type PreviewRow = {
@@ -163,6 +180,8 @@ export type DealEvent = {
   message: string;
 };
 
+export type { DealIntelligence, DealStage } from "../intelligence/types";
+
 export type Deal = {
   id: string;
   name: string;
@@ -182,6 +201,7 @@ export type Deal = {
   deckFilename?: string;
   deckFilenames?: string[];
   sandbox?: DealSandbox;
+  intelligence?: import("../intelligence/types").DealIntelligence;
 };
 
 export type DealSummary = {
@@ -196,6 +216,16 @@ export type DealSummary = {
   docCount: number;
   error?: string;
   deckFilename?: string;
+  stage?: import("../intelligence/types").DealStage;
+  thesisException?: boolean;
+  thesisFit?: number;
+  opportunityQuality?: number;
+  uncertainty?: number;
+  evidenceConfidence?: number;
+  valuationAttractiveness?: number;
+  investmentConviction?: number;
+  nextAction?: string;
+  lastActivity?: string;
 };
 
 export type DealFile = {

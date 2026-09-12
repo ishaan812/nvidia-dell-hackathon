@@ -30,9 +30,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!file) return NextResponse.json({ error: "no deck" }, { status: 404 });
   if (deal.sandbox) assertInsideDeal(id, file);
   const bytes = await readFile(file);
+  const ext = path.extname(file).toLowerCase();
+  const type =
+    ext === ".pptx"
+      ? "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      : "application/pdf";
   return new NextResponse(Uint8Array.from(bytes), {
     headers: {
-      "Content-Type": "application/pdf",
+      "Content-Type": type,
       "Content-Disposition": `inline; filename="${chosen?.filename ?? "deck.pdf"}"`,
       "Cache-Control": "no-store",
     },

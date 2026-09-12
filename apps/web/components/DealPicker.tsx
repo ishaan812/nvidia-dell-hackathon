@@ -6,14 +6,17 @@ import { type FormEvent, useState, useTransition } from "react";
 import type { DealSummary } from "@/lib/diligence/types";
 import { riskTone, when } from "@/lib/format";
 import { readJson } from "@/lib/http";
+import { BrandLogo } from "./BrandLogo";
 import { FileDrop, roleMap, type StagedFile } from "./FileDrop";
 
 type Props = {
   deals: DealSummary[];
   model: { ok: boolean; models: string[] };
+  using: string;
+  embedded?: boolean;
 };
 
-export function DealPicker({ deals, model }: Props) {
+export function DealPicker({ deals, model, using, embedded }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [kind, setKind] = useState<"sample" | "upload" | null>(null);
@@ -64,25 +67,29 @@ export function DealPicker({ deals, model }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-desk text-paper">
-      <a href="#deals" className="skip-link">
-        Skip to deals
-      </a>
-      <header className="mx-auto flex max-w-5xl items-end justify-between px-8 pb-10 pt-14">
-        <div>
-          <p className="font-mono text-[13px] text-copper">Night Desk</p>
-          <h1 className="mt-2 font-serif text-5xl font-medium tracking-tight">Open a deal</h1>
-          <p className="mt-3 max-w-lg text-[16px] leading-7 text-paper/75">
-            Pick a room you already started, or make a new one and upload the files yourself. Each
-            deal keeps its own folder.
-          </p>
-        </div>
-        <p className="font-mono text-[12px] text-paper/70">
-          {model.ok ? `local · ${model.models[0] ?? "ollama"}` : "ollama not reachable"}
-        </p>
-      </header>
+    <div className={embedded ? "" : "min-h-screen bg-desk text-paper"}>
+      {embedded ? null : (
+        <>
+          <a href="#deals" className="skip-link">
+            Skip to deals
+          </a>
+          <header className="mx-auto flex max-w-5xl items-end justify-between px-8 pb-10 pt-14">
+            <div>
+              <BrandLogo />
+              <h1 className="mt-6 font-serif text-5xl font-medium tracking-tight">Open a deal</h1>
+              <p className="mt-3 max-w-lg text-[16px] leading-7 text-paper/75">
+                Pick a room you already started, or make a new one and upload the files yourself.
+                Each deal keeps its own folder.
+              </p>
+            </div>
+            <p className="font-mono text-[12px] text-paper/70">
+              {model.ok ? `local · ${using}` : "ollama not reachable"}
+            </p>
+          </header>
+        </>
+      )}
 
-      <div className="mx-auto grid max-w-5xl gap-16 px-8 pb-20 md:grid-cols-[1.15fr_0.85fr]">
+      <div className={embedded ? "grid gap-10" : "mx-auto grid max-w-5xl gap-16 px-8 pb-20 md:grid-cols-[1.15fr_0.85fr]"}>
         <section id="deals" aria-labelledby="rooms-heading">
           <h2 id="rooms-heading" className="text-[16px] text-paper/80">
             Your rooms
@@ -141,7 +148,7 @@ export function DealPicker({ deals, model }: Props) {
               onChange={(event) => setName(event.target.value)}
               placeholder="Northstar Robotics"
               autoComplete="organization"
-              className="mt-2 w-full border-b border-white/25 bg-transparent py-2 text-[16px] outline-none placeholder:text-paper/40 focus:border-copper"
+              className="mt-2 w-full border-b border-line bg-transparent py-2 text-[16px] outline-none placeholder:text-mute focus:border-copper"
             />
             <div className="mt-6">
               <FileDrop
@@ -164,7 +171,7 @@ export function DealPicker({ deals, model }: Props) {
               type="button"
               onClick={runSample}
               disabled={busy}
-              className="mt-3 w-full border border-white/20 px-5 py-3 text-left text-[15px] text-paper hover:border-copper disabled:opacity-50"
+              className="mt-3 w-full border border-line px-5 py-3 text-left text-[15px] text-paper hover:border-copper disabled:opacity-50"
             >
               {kind === "sample" ? "Opening Northstar…" : "Try the Northstar sample instead"}
             </button>

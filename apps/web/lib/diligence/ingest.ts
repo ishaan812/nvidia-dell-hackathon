@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { toMarkdown } from "@firecrawl/anydoc";
+import { ocrPdfPages, pagesNeedOcr } from "./ocr";
+import { parsePptx } from "./pptx";
 import { applyRoles, kindFromName } from "./roles";
 import type { FileRole, IngestedDoc } from "./types";
 
@@ -13,6 +15,7 @@ async function walkFiles(dir: string): Promise<string[]> {
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
     if (entry.name.startsWith(".")) continue;
+    if (entry.name.endsWith(".ocr-pages")) continue;
     if (entry.isDirectory()) out.push(...(await walkFiles(full)));
     else if (OFFICE.has(path.extname(entry.name).toLowerCase())) out.push(full);
   }
@@ -71,7 +74,23 @@ export async function ingestFolder(
         markdown = `<!-- parse error ${filename}: ${(error as Error).message} -->`;
       }
     }
-    const pageTexts = await pdfPageTexts(filePath);
+    let pageTexts = await pdfPageTexts(filePath);
+    let pageWords: IngestedDoc["pageWords"];
+    if (path.extname(filePath).toLowerCase() === ".pptx") {
+      try {
+        const slides = await parsePptx(await readFile(filePath));
+        pageTexts = Object.fromEntries(slides.map((slide) => [slide.n, slide.text]));
+      } catch {
+        // keep anydoc markdown
+      }
+    }
+    if (path.extname(filePath).toLowerCase() === ".pdf" && pagesNeedOcr(pageTexts)) {
+      const ocr = await ocrPdfPages(filePath);
+      if (Object.keys(ocr.pages).length) {
+        pageTexts = ocr.pages;
+        pageWords = ocr.words;
+      }
+    }
     const kind = kindFromName(filename);
     const docId = createHash("sha1").update(filePath).digest("hex").slice(0, 12);
     docs.push({
@@ -82,6 +101,7 @@ export async function ingestFolder(
       path: path.resolve(filePath),
       markdown: tagPages(filename, pageTexts, markdown),
       pageTexts,
+      pageWords,
     });
   }
   applyRoles(docs, roles);

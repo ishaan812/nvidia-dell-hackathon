@@ -1,5 +1,6 @@
 import { copyFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { effectiveScores } from "../intelligence/scores";
 import { resolveExisting } from "./files";
 import { dirs } from "./paths";
 import { assertInsideDeal } from "./sandbox";
@@ -12,6 +13,8 @@ function dealPath(id: string) {
 export function summarize(deal: Deal): DealSummary {
   const flagCounts = { contradiction: 0, unsupported: 0, missing: 0 };
   for (const flag of deal.flags) flagCounts[flag.severity] += 1;
+  const intel = deal.intelligence;
+  const scores = intel ? effectiveScores(intel) : undefined;
   return {
     id: deal.id,
     name: deal.name,
@@ -19,11 +22,21 @@ export function summarize(deal: Deal): DealSummary {
     status: deal.status,
     createdAt: deal.createdAt,
     updatedAt: deal.updatedAt,
-    riskScore: deal.riskScore,
+    riskScore: scores?.risk ?? deal.riskScore,
     flagCounts,
     docCount: deal.docs.length,
     error: deal.error,
     deckFilename: deal.deckFilename,
+    stage: intel?.stage,
+    thesisException: (intel?.thesis.exceptions.length ?? 0) > 0,
+    thesisFit: scores?.thesisFit,
+    opportunityQuality: scores?.opportunityQuality,
+    uncertainty: scores?.uncertainty,
+    evidenceConfidence: scores?.evidenceConfidence,
+    valuationAttractiveness: scores?.valuationAttractiveness,
+    investmentConviction: scores?.investmentConviction,
+    nextAction: intel?.nextAction.title,
+    lastActivity: intel?.timeline[intel.timeline.length - 1]?.at ?? deal.updatedAt,
   };
 }
 

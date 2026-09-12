@@ -13,9 +13,9 @@ type Props = {
 };
 
 const FILL: Record<string, string> = {
-  contradiction: "rgba(180, 35, 24, 0.32)",
-  unsupported: "rgba(154, 103, 0, 0.32)",
-  missing: "rgba(102, 112, 133, 0.28)",
+  contradiction: "rgba(220, 38, 28, 0.42)",
+  unsupported: "rgba(180, 120, 0, 0.4)",
+  missing: "rgba(102, 112, 133, 0.38)",
 };
 
 const EDGE: Record<string, string> = {
@@ -30,7 +30,7 @@ export function DeckViewer({ src, flags, activeId, onPage, onSelect }: Props) {
   const onSelectRef = useRef(onSelect);
   flagsRef.current = flags;
   onSelectRef.current = onSelect;
-  const flagKey = flags.map((flag) => `${flag.id}:${flag.page}:${flag.quote}`).join("|");
+  const flagKey = flags.map((flag) => `${flag.id}:${flag.page}:${flag.quote}:${flag.box?.x}:${flag.box?.y}`).join("|");
   const [status, setStatus] = useState<"loading" | "ready" | "fallback" | "error">("loading");
   const [message, setMessage] = useState("");
 
@@ -64,7 +64,7 @@ export function DeckViewer({ src, flags, activeId, onPage, onSelect }: Props) {
           canvas.className = "block h-auto w-full";
           wrap.appendChild(canvas);
           const overlay = document.createElement("div");
-          overlay.className = "pointer-events-none absolute inset-0";
+          overlay.className = "pointer-events-none absolute inset-0 z-10";
           wrap.appendChild(overlay);
           const label = document.createElement("div");
           label.className = "absolute right-3 top-3 z-10 font-mono text-[11px] text-black/45";
@@ -79,29 +79,46 @@ export function DeckViewer({ src, flags, activeId, onPage, onSelect }: Props) {
           const runs = content.items.filter(
             (item): item is typeof item & { str: string; transform: number[]; width: number } => "str" in item,
           );
-          const pageFlags = flagsRef.current.filter((flag) => flag.page === n);
+          const pageFlags = flagsRef.current.filter((flag) => (flag.page ?? 1) === n);
           for (const flag of pageFlags) {
-            const indexes = findRunIndexes(runs, flag.quote);
-            const boxes = indexes.map((i) => {
-              const run = runs[i];
-              const tx = pdfjs.Util.transform(viewport.transform, run.transform);
-              const height = Math.hypot(tx[2], tx[3]) || 18;
-              const full = (run.width || 40) * viewport.scale;
-              const clip = clipFactor(run.str, flag.quote);
-              return {
-                x: tx[4] + full * clip.start,
-                y: tx[5] - height - 4,
-                w: Math.max(40, full * (clip.end - clip.start) + 8),
-                h: height * 1.45 + 8,
-              };
-            });
+            const boxes = flag.box
+              ? [
+                  {
+                    x: flag.box.x * viewport.width,
+                    y: flag.box.y * viewport.height,
+                    w: flag.box.w * viewport.width,
+                    h: flag.box.h * viewport.height,
+                  },
+                ]
+              : findRunIndexes(runs, flag.quote).map((i) => {
+                  const run = runs[i];
+                  const tx = pdfjs.Util.transform(viewport.transform, run.transform);
+                  const height = Math.hypot(tx[2], tx[3]) || 18;
+                  const full = (run.width || 40) * viewport.scale;
+                  const clip = clipFactor(run.str, flag.quote);
+                  return {
+                    x: tx[4] + full * clip.start,
+                    y: tx[5] - height - 4,
+                    w: Math.max(40, full * (clip.end - clip.start) + 8),
+                    h: height * 1.45 + 8,
+                  };
+                });
             if (!boxes.length) {
-              boxes.push({
-                x: viewport.width * 0.06,
-                y: viewport.height * 0.28,
-                w: viewport.width * 0.42,
-                h: 48,
-              });
+              boxes.push(
+                flag.quote
+                  ? {
+                      x: viewport.width * 0.06,
+                      y: viewport.height * 0.28,
+                      w: viewport.width * 0.42,
+                      h: 48,
+                    }
+                  : {
+                      x: viewport.width * 0.04,
+                      y: viewport.height * 0.04,
+                      w: viewport.width * 0.92,
+                      h: 56,
+                    },
+              );
             }
             const open = () => onSelectRef.current?.(flag.id);
             for (const box of boxes) {
@@ -110,6 +127,15 @@ export function DeckViewer({ src, flags, activeId, onPage, onSelect }: Props) {
               mark.className = "slide-hl";
               mark.dataset.flagId = flag.id;
               mark.title = flag.comment;
+              if (!flag.quote) {
+                mark.textContent = flag.comment;
+                mark.style.color = EDGE[flag.severity] ?? "#111";
+                mark.style.fontSize = "12px";
+                mark.style.lineHeight = "1.3";
+                mark.style.textAlign = "left";
+                mark.style.padding = "10px 12px";
+                mark.style.overflow = "hidden";
+              }
               mark.style.left = `${(box.x / viewport.width) * 100}%`;
               mark.style.top = `${(box.y / viewport.height) * 100}%`;
               mark.style.width = `${(box.w / viewport.width) * 100}%`;
@@ -144,8 +170,9 @@ export function DeckViewer({ src, flags, activeId, onPage, onSelect }: Props) {
       el.classList.toggle("is-active", el.dataset.flagId === activeId);
     });
     const flag = flags.find((item) => item.id === activeId);
-    if (!flag?.page) return;
-    const slide = document.getElementById(`slide-${flag.page}`);
+    const page = flag?.page && flag.page > 0 ? flag.page : 1;
+    if (!flag) return;
+    const slide = document.getElementById(`slide-${page}`);
     const scroller = slide?.closest("main");
     if (slide && scroller) {
       const top = slide.offsetTop - scroller.clientHeight / 2 + slide.offsetHeight / 2;

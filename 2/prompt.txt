@@ -1,0 +1,742 @@
+Build Spec
+SATURDAY, SEPTEMBER 12 2026
+Always-On VC Diligence
+Agent — Build Spec
+An always-on agent that watches your deal inbox, auto-ingests every deck and data room a founder sends, builds a cross-document knowledge graph, cross-checks the deck's claims against the financials, flags contradictions on the slides, and drafts an IC memo — then replies on the same channel. The whole deal-flow loop runs with no app to open and no human babysitting: a deck lands, a diligence report comes back. It all runs locally on the Dell Pro Max with GB10 — nothing leaves the box. The knowledge-graph engine underneath generalizes to any research corpus, but the product is deal-flow diligence.
+
+Deal inbox
+Trigger
+Email/Slack, auto
+Deck ↔ data room
+Cross-check
+Graph + RAG
+nemotron3:33b
+Local model
+Vision + tools
+100%
+On the box
+No cloud API
+I. The Product
+1. What it is
+An automated first-pass diligence analyst for a VC's deal flow. A founder emails a pitch deck and a data room to the fund's diligence address; the agent does the grunt work an associate would do overnight and replies with a verdict.
+
+Reads the deck and every supporting doc (financial model, cap table, metrics, contracts).
+Builds a knowledge graph linking claims, numbers, entities, and sources across all of them.
+Cross-checks each deck claim against the financials and flags contradictions, gaps, and unsupported numbers.
+Annotates the deck in place — a colored flag on the exact slide, with the source that contradicts it.
+Drafts an IC memo: summary, risk score, flagged items, open questions.
+Replies on the same channel and stays queryable for follow-ups ("what's their real burn?").
+2. Why it wins
+It automates the most tedious, highest-leverage part of the deal funnel — the first-pass read that decides whether a deal is worth a partner's time. It is always-on (the NVIDIA-native agent narrative), visibly multimodal (reads charts and scanned pages), and provably local (an air-gap flourish is optional). The graph is the moat: contradiction-catching needs cross-document reasoning, not keyword RAG.
+
+3. Design stance
+Compose, don't fork. Every layer is a focused open-source component wired together; the team owns only the orchestration and the diligence logic. LightRAG does the graph + retrieval + viewer, so the custom surface area stays small enough to finish in 12 hours.
+
+II. Deal-Flow Automation
+The loop, stage by stage
+Each stage runs automatically off the previous one. The only human touch is the founder sending the deck and the partner reading the reply.
+
+1 · Watch. Agent monitors the deal inbox/channel (Gmail or Slack) plus a heartbeat poll for anything missed. New deck with attachments = new deal.
+2 · Ingest. AnyDoc + pdf-inspector parse the deck and every data-room file (pptx, xlsx, pdf, docx) to clean markdown + tables locally, keeping page/slide numbers.
+3 · Graph. Content is pushed to LightRAG → entities, numbers, and relationships are extracted and linked into one graph spanning the deck and the data room.
+4 · Diligence. A fixed checklist runs against the graph in mix mode: does each deck claim have support in the financials? Do the numbers reconcile? What's missing? Each finding carries a source citation (doc + slide/entity).
+5 · Annotate. Findings become colored flags pinned to the exact slides; export a flattened, marked-up deck.
+6 · Memo + reply. Agent drafts the IC memo and replies on the channel with the summary, risk score, annotated deck, and a link to the graph view.
+7 · Interrogate. Partner keeps chatting with the agent about the deal; graph traversal answers with sources. New deals pile up in parallel — that's the always-on payoff.
+III. Architecture
+Components
+Orchestrator — OpenClaw agent (on NemoClaw). Always-on runtime; receives deals over messaging channels; runs tools (ingest, graph, diligence, annotate, reply); heartbeats keep it live. Wired to the model with ollama launch openclaw --model nemotron3:33b.
+Ingestion — AnyDoc + pdf-inspector. Local Rust libraries; parse 14 formats incl. pptx/xlsx natively to markdown + tables, preserving page/slide numbers. No API key, no network.
+Brain — LightRAG. Extracts entities + relationships into a graph + vector store; retrieves via combined vector + graph traversal (mix mode). Ollama-compatible; built-in graph viewer.
+Model — Nemotron 3 Nano Omni (nemotron3:33b). 28GB (q4), 128K context, vision + tools + reasoning — serves all inference locally and reads charts/scanned pages. Document-intelligence oriented.
+Annotator — react-pdf-highlighter-plus. Headless React/PDF.js overlay; renders sourced flags on slides; flatten-export a marked-up deck. Viewport-independent coordinates so pins hold through zoom.
+Stores. Graph: Neo4j or Postgres+AGE. Vector: LightRAG's configured store (pgvector, or the built-in default to save setup time).
+IV. Build Stack — Components & Links
+Agent runtime
+NemoClaw (reference stack, Apache-2.0) — github.com/NVIDIA/NemoClaw · docs docs.nvidia.com/nemoclaw/latest
+OpenClaw (default agent) — openclaw.ai
+OpenShell (sandbox) — github.com/NVIDIA/OpenShell
+Onboard: nemoclaw onboard → express install picks OpenClaw. Messaging channels + heartbeats provide the always-on inbox watch.
+Model + inference
+Nemotron 3 Nano Omni — ollama.com/library/nemotron3
+Pull: ollama run nemotron3:33b (28GB q4 · 128K ctx · vision+tools). nemotron3:33b-q8 = 36GB for more headroom.
+Wire agent → model: ollama launch openclaw --model nemotron3:33b
+Ollama: ollama.com — require ≥ 0.32.9 for structured tool calls.
+Graph + RAG engine
+LightRAG (MIT) — github.com/HKUDS/LightRAG
+Install: pip install lightrag-hku. Point llm_model_func + embedding_func at the local Ollama/NemoClaw endpoint; query with QueryParam(mode="mix").
+Set Ollama context to ≥ 32k (num_ctx) for extraction to work; built-in graph visualization + web UI included.
+Ingestion / parsing
+AnyDoc (MIT, 14 formats incl. pptx/xlsx/docx) — github.com/firecrawl/anydoc · pip install firecrawl-anydoc (also @firecrawl/anydoc for Node)
+pdf-inspector (MIT, text-vs-scanned routing + extraction) — github.com/firecrawl/pdf-inspector · pip install pdf-inspector
+Both run fully local (Rust, no API key). AnyDoc embeds pdf-inspector, so one call covers PDFs + the other 13 formats.
+Annotation UI
+react-pdf-highlighter-plus (headless PDF.js annotation) — npm react-pdf-highlighter-plus; base project github.com/agentcooper/react-pdf-highlighter (MIT)
+Highlight / note / area annotation types; viewport-independent coords; flatten-export the marked-up deck.
+Front end in Next.js/React; render decks as PDF, overlay the flag objects from section V.4.
+Stores
+Graph: Postgres + Apache AGE (simplest), or Neo4j if the graph view needs it.
+Vector: pgvector alongside the graph, or LightRAG's built-in store to skip setup on demo day.
+V. Interfaces & Contracts
+1. Deal inbox / chat
+NemoClaw messaging channels. Configure Slack and/or Gmail as the deal front door. Inbound messages carry decks + data-room files (ingest) or questions (query); outbound carries the memo, risk score, and annotated deck. Slack is faster to wire — set it up first, add Gmail if time allows.
+
+2. Model endpoint
+OpenAI-compatible, local. NemoClaw serves Nemotron via a token-gated proxy on :11435 (Ollama bound to 127.0.0.1:11434); Bearer token in ~/.nemoclaw/ollama-proxy-token. LightRAG and the agent both call this endpoint. Raise NEMOCLAW_CONTEXT_WINDOW above the 16384 default.
+
+3. LightRAG
+Ingest + query API. rag.insert(markdown) per parsed file for graph/vector indexing; rag.query(q, QueryParam(mode="mix")) for combined vector + graph retrieval. Point the LLM + embedding config at the NemoClaw endpoint. Graph store on Postgres+AGE or Neo4j.
+
+4. Flag (annotation) object
+One diligence finding → one flag object the annotator renders:
+
+id, docId, page/slide, type (highlight | note | area)
+severity → color (red = contradiction, amber = unsupported, gray = missing)
+comment → the explanation; sourceCitation → the doc/slide or graph entity that backs the flag
+Coordinates are viewport-independent so pins hold through zoom.
+VI. Compliance Mapping
+Rules 02 & 06
+Compliant
+Local inference. All inference runs on-box via NemoClaw + Ollama + nemotron3:33b. No remote LLM/API in the runtime path.[1]BuilderBase — Rules
+Required stack satisfied. OpenClaw (agent) on NemoClaw (runtime) is the named stack.[2]NVIDIA NemoClaw — supported agents
+Local ingestion. AnyDoc/pdf-inspector run as libraries on-box — not the hosted Firecrawl API.[3]Firecrawl AnyDoc — local Rust, no API key
+Deal-inbox network use is allowed — fetching email/Slack is not an inference call. Optional wifi-cut proves local inference; an air-gap is not required.
+Originality/IP. All components are MIT/Apache OSS — declare the stack in the writeup.
+VII. 12-Hour Build Milestones
+Hr 0–1 · All
+Box up. nemoclaw onboard + ollama run nemotron3:33b; confirm one local multimodal inference and clean tool-call validation. Stand up LightRAG pointed at the NemoClaw proxy.
+
+Hr 1–6 · A
+Ingestion: AnyDoc/pdf-inspector → LightRAG insert; confirm deck + data-room entities/relationships appear in one graph.
+
+Hr 1–6 · B
+OpenClaw agent: Slack (then Gmail) deal channel + heartbeat; tools for ingest / diligence / annotate / reply.
+
+Hr 1–6 · C
+Front end (Next.js): deck annotator (react-pdf-highlighter-plus) + graph view (LightRAG viewer) + memo panel.
+
+Hr 1–6 · D
+Diligence logic: contradiction checklist + deck-vs-financials cross-check query in mix mode; build the sample data room (deck with 3–4 planted contradictions + matching financials).
+
+Hr 6–9
+Integrate end-to-end: email a deck → graph builds → annotated deck + memo comes back. Tune for precision on the planted flags.
+
+Hr 9–12
+Freeze, record backup demo video (18:30), build pitch deck + rehearse the 5-minute pitch (19:00).
+
+VIII. Risks & Open Questions
+Extraction quality on Nemotron
+LightRAG's entity/relationship extraction leans on structured output. Validate Nemotron's extraction in hour one; if weak, tune the extraction prompt or reduce entity types. Turn reasoning off during pure vision steps.
+
+Contradiction precision
+False flags kill credibility with a VC audience. Keep the checklist tight and demo on the seeded data room where the ground-truth contradictions are known.
+
+Email channel setup
+Gmail app-password wiring can eat time. Ship Slack first; keep a watched-folder fallback so the demo never depends on email.
+
+Annotator coordinates
+On-slide pin mapping is the riskiest UI piece. Fallback: a side panel of sourced flags linked to slide numbers; upgrade to pins if ahead.
+
+Scope
+VC diligence is the headline and the demo. The general knowledge-graph platform is the engine story, not a second product to finish. Exhaustive file-type coverage is nice-to-have, not day-one.
+
+
+Want to build this fully, dont have access to the GB 10 machine right now but want to build everything else around it so that once I have it i only have to run the model and connect everything to it to have it run. Make a plan to execute on this, you can use subagents.
+
+---
+
+Build Spec
+SATURDAY, SEPTEMBER 12 2026
+Always-On VC Diligence
+Agent — Build Spec
+An always-on agent that watches your deal inbox, auto-ingests every deck and data room a founder sends, builds a cross-document knowledge graph, cross-checks the deck's claims against the financials, flags contradictions on the slides, and drafts an IC memo — then replies on the same channel. The whole deal-flow loop runs with no app to open and no human babysitting: a deck lands, a diligence report comes back. It all runs locally on the Dell Pro Max with GB10 — nothing leaves the box. The knowledge-graph engine underneath generalizes to any research corpus, but the product is deal-flow diligence.
+
+Deal inbox
+Trigger
+Email/Slack, auto
+Deck ↔ data room
+Cross-check
+Graph + RAG
+nemotron3:33b
+Local model
+Vision + tools
+100%
+On the box
+No cloud API
+I. The Product
+1. What it is
+An automated first-pass diligence analyst for a VC's deal flow. A founder emails a pitch deck and a data room to the fund's diligence address; the agent does the grunt work an associate would do overnight and replies with a verdict.
+
+Reads the deck and every supporting doc (financial model, cap table, metrics, contracts).
+Builds a knowledge graph linking claims, numbers, entities, and sources across all of them.
+Cross-checks each deck claim against the financials and flags contradictions, gaps, and unsupported numbers.
+Annotates the deck in place — a colored flag on the exact slide, with the source that contradicts it.
+Drafts an IC memo: summary, risk score, flagged items, open questions.
+Replies on the same channel and stays queryable for follow-ups ("what's their real burn?").
+2. Why it wins
+It automates the most tedious, highest-leverage part of the deal funnel — the first-pass read that decides whether a deal is worth a partner's time. It is always-on (the NVIDIA-native agent narrative), visibly multimodal (reads charts and scanned pages), and provably local (an air-gap flourish is optional). The graph is the moat: contradiction-catching needs cross-document reasoning, not keyword RAG.
+
+3. Design stance
+Compose, don't fork. Every layer is a focused open-source component wired together; the team owns only the orchestration and the diligence logic. LightRAG does the graph + retrieval + viewer, so the custom surface area stays small enough to finish in 12 hours.
+
+II. Deal-Flow Automation
+The loop, stage by stage
+Each stage runs automatically off the previous one. The only human touch is the founder sending the deck and the partner reading the reply.
+
+1 · Watch. Agent monitors the deal inbox/channel (Gmail or Slack) plus a heartbeat poll for anything missed. New deck with attachments = new deal.
+2 · Ingest. AnyDoc + pdf-inspector parse the deck and every data-room file (pptx, xlsx, pdf, docx) to clean markdown + tables locally, keeping page/slide numbers.
+3 · Graph. Content is pushed to LightRAG → entities, numbers, and relationships are extracted and linked into one graph spanning the deck and the data room.
+4 · Diligence. A fixed checklist runs against the graph in mix mode: does each deck claim have support in the financials? Do the numbers reconcile? What's missing? Each finding carries a source citation (doc + slide/entity).
+5 · Annotate. Findings become colored flags pinned to the exact slides; export a flattened, marked-up deck.
+6 · Memo + reply. Agent drafts the IC memo and replies on the channel with the summary, risk score, annotated deck, and a link to the graph view.
+7 · Interrogate. Partner keeps chatting with the agent about the deal; graph traversal answers with sources. New deals pile up in parallel — that's the always-on payoff.
+III. Architecture
+Components
+Orchestrator — OpenClaw agent (on NemoClaw). Always-on runtime; receives deals over messaging channels; runs tools (ingest, graph, diligence, annotate, reply); heartbeats keep it live. Wired to the model with ollama launch openclaw --model nemotron3:33b.
+Ingestion — AnyDoc + pdf-inspector. Local Rust libraries; parse 14 formats incl. pptx/xlsx natively to markdown + tables, preserving page/slide numbers. No API key, no network.
+Brain — LightRAG. Extracts entities + relationships into a graph + vector store; retrieves via combined vector + graph traversal (mix mode). Ollama-compatible; built-in graph viewer.
+Model — Nemotron 3 Nano Omni (nemotron3:33b). 28GB (q4), 128K context, vision + tools + reasoning — serves all inference locally and reads charts/scanned pages. Document-intelligence oriented.
+Annotator — react-pdf-highlighter-plus. Headless React/PDF.js overlay; renders sourced flags on slides; flatten-export a marked-up deck. Viewport-independent coordinates so pins hold through zoom.
+Stores. Graph: Neo4j or Postgres+AGE. Vector: LightRAG's configured store (pgvector, or the built-in default to save setup time).
+IV. Build Stack — Components & Links
+Agent runtime
+NemoClaw (reference stack, Apache-2.0) — github.com/NVIDIA/NemoClaw · docs docs.nvidia.com/nemoclaw/latest
+OpenClaw (default agent) — openclaw.ai
+OpenShell (sandbox) — github.com/NVIDIA/OpenShell
+Onboard: nemoclaw onboard → express install picks OpenClaw. Messaging channels + heartbeats provide the always-on inbox watch.
+Model + inference
+Nemotron 3 Nano Omni — ollama.com/library/nemotron3
+Pull: ollama run nemotron3:33b (28GB q4 · 128K ctx · vision+tools). nemotron3:33b-q8 = 36GB for more headroom.
+Wire agent → model: ollama launch openclaw --model nemotron3:33b
+Ollama: ollama.com — require ≥ 0.32.9 for structured tool calls.
+Graph + RAG engine
+LightRAG (MIT) — github.com/HKUDS/LightRAG
+Install: pip install lightrag-hku. Point llm_model_func + embedding_func at the local Ollama/NemoClaw endpoint; query with QueryParam(mode="mix").
+Set Ollama context to ≥ 32k (num_ctx) for extraction to work; built-in graph visualization + web UI included.
+Ingestion / parsing
+AnyDoc (MIT, 14 formats incl. pptx/xlsx/docx) — github.com/firecrawl/anydoc · pip install firecrawl-anydoc (also @firecrawl/anydoc for Node)
+pdf-inspector (MIT, text-vs-scanned routing + extraction) — github.com/firecrawl/pdf-inspector · pip install pdf-inspector
+Both run fully local (Rust, no API key). AnyDoc embeds pdf-inspector, so one call covers PDFs + the other 13 formats.
+Annotation UI
+react-pdf-highlighter-plus (headless PDF.js annotation) — npm react-pdf-highlighter-plus; base project github.com/agentcooper/react-pdf-highlighter (MIT)
+Highlight / note / area annotation types; viewport-independent coords; flatten-export the marked-up deck.
+Front end in Next.js/React; render decks as PDF, overlay the flag objects from section V.4.
+Stores
+Graph: Postgres + Apache AGE (simplest), or Neo4j if the graph view needs it.
+Vector: pgvector alongside the graph, or LightRAG's built-in store to skip setup on demo day.
+V. Interfaces & Contracts
+1. Deal inbox / chat
+NemoClaw messaging channels. Configure Slack and/or Gmail as the deal front door. Inbound messages carry decks + data-room files (ingest) or questions (query); outbound carries the memo, risk score, and annotated deck. Slack is faster to wire — set it up first, add Gmail if time allows.
+
+2. Model endpoint
+OpenAI-compatible, local. NemoClaw serves Nemotron via a token-gated proxy on :11435 (Ollama bound to 127.0.0.1:11434); Bearer token in ~/.nemoclaw/ollama-proxy-token. LightRAG and the agent both call this endpoint. Raise NEMOCLAW_CONTEXT_WINDOW above the 16384 default.
+
+3. LightRAG
+Ingest + query API. rag.insert(markdown) per parsed file for graph/vector indexing; rag.query(q, QueryParam(mode="mix")) for combined vector + graph retrieval. Point the LLM + embedding config at the NemoClaw endpoint. Graph store on Postgres+AGE or Neo4j.
+
+4. Flag (annotation) object
+One diligence finding → one flag object the annotator renders:
+
+id, docId, page/slide, type (highlight | note | area)
+severity → color (red = contradiction, amber = unsupported, gray = missing)
+comment → the explanation; sourceCitation → the doc/slide or graph entity that backs the flag
+Coordinates are viewport-independent so pins hold through zoom.
+VI. Compliance Mapping
+Rules 02 & 06
+Compliant
+Local inference. All inference runs on-box via NemoClaw + Ollama + nemotron3:33b. No remote LLM/API in the runtime path.[1]BuilderBase — Rules
+Required stack satisfied. OpenClaw (agent) on NemoClaw (runtime) is the named stack.[2]NVIDIA NemoClaw — supported agents
+Local ingestion. AnyDoc/pdf-inspector run as libraries on-box — not the hosted Firecrawl API.[3]Firecrawl AnyDoc — local Rust, no API key
+Deal-inbox network use is allowed — fetching email/Slack is not an inference call. Optional wifi-cut proves local inference; an air-gap is not required.
+Originality/IP. All components are MIT/Apache OSS — declare the stack in the writeup.
+VII. 12-Hour Build Milestones
+Hr 0–1 · All
+Box up. nemoclaw onboard + ollama run nemotron3:33b; confirm one local multimodal inference and clean tool-call validation. Stand up LightRAG pointed at the NemoClaw proxy.
+
+Hr 1–6 · A
+Ingestion: AnyDoc/pdf-inspector → LightRAG insert; confirm deck + data-room entities/relationships appear in one graph.
+
+Hr 1–6 · B
+OpenClaw agent: Slack (then Gmail) deal channel + heartbeat; tools for ingest / diligence / annotate / reply.
+
+Hr 1–6 · C
+Front end (Next.js): deck annotator (react-pdf-highlighter-plus) + graph view (LightRAG viewer) + memo panel.
+
+Hr 1–6 · D
+Diligence logic: contradiction checklist + deck-vs-financials cross-check query in mix mode; build the sample data room (deck with 3–4 planted contradictions + matching financials).
+
+Hr 6–9
+Integrate end-to-end: email a deck → graph builds → annotated deck + memo comes back. Tune for precision on the planted flags.
+
+Hr 9–12
+Freeze, record backup demo video (18:30), build pitch deck + rehearse the 5-minute pitch (19:00).
+
+VIII. Risks & Open Questions
+Extraction quality on Nemotron
+LightRAG's entity/relationship extraction leans on structured output. Validate Nemotron's extraction in hour one; if weak, tune the extraction prompt or reduce entity types. Turn reasoning off during pure vision steps.
+
+Contradiction precision
+False flags kill credibility with a VC audience. Keep the checklist tight and demo on the seeded data room where the ground-truth contradictions are known.
+
+Email channel setup
+Gmail app-password wiring can eat time. Ship Slack first; keep a watched-folder fallback so the demo never depends on email.
+
+Annotator coordinates
+On-slide pin mapping is the riskiest UI piece. Fallback: a side panel of sourced flags linked to slide numbers; upgrade to pins if ahead.
+
+Scope
+VC diligence is the headline and the demo. The general knowledge-graph platform is the engine story, not a second product to finish. Exhaustive file-type coverage is nice-to-have, not day-one.
+
+
+Want to build this fully, dont have access to the GB 10 machine right now but want to build everything else around it so that once I have it i only have to run the model and connect everything to it to have it run. Make a plan to execute on this, you can use subagents.
+
+---
+
+Build Spec
+SATURDAY, SEPTEMBER 12 2026
+Always-On VC Diligence
+Agent — Build Spec
+An always-on agent that watches your deal inbox, auto-ingests every deck and data room a founder sends, builds a cross-document knowledge graph, cross-checks the deck's claims against the financials, flags contradictions on the slides, and drafts an IC memo — then replies on the same channel. The whole deal-flow loop runs with no app to open and no human babysitting: a deck lands, a diligence report comes back. It all runs locally on the Dell Pro Max with GB10 — nothing leaves the box. The knowledge-graph engine underneath generalizes to any research corpus, but the product is deal-flow diligence.
+
+Deal inbox
+Trigger
+Email/Slack, auto
+Deck ↔ data room
+Cross-check
+Graph + RAG
+nemotron3:33b
+Local model
+Vision + tools
+100%
+On the box
+No cloud API
+I. The Product
+1. What it is
+An automated first-pass diligence analyst for a VC's deal flow. A founder emails a pitch deck and a data room to the fund's diligence address; the agent does the grunt work an associate would do overnight and replies with a verdict.
+
+Reads the deck and every supporting doc (financial model, cap table, metrics, contracts).
+Builds a knowledge graph linking claims, numbers, entities, and sources across all of them.
+Cross-checks each deck claim against the financials and flags contradictions, gaps, and unsupported numbers.
+Annotates the deck in place — a colored flag on the exact slide, with the source that contradicts it.
+Drafts an IC memo: summary, risk score, flagged items, open questions.
+Replies on the same channel and stays queryable for follow-ups ("what's their real burn?").
+2. Why it wins
+It automates the most tedious, highest-leverage part of the deal funnel — the first-pass read that decides whether a deal is worth a partner's time. It is always-on (the NVIDIA-native agent narrative), visibly multimodal (reads charts and scanned pages), and provably local (an air-gap flourish is optional). The graph is the moat: contradiction-catching needs cross-document reasoning, not keyword RAG.
+
+3. Design stance
+Compose, don't fork. Every layer is a focused open-source component wired together; the team owns only the orchestration and the diligence logic. LightRAG does the graph + retrieval + viewer, so the custom surface area stays small enough to finish in 12 hours.
+
+II. Deal-Flow Automation
+The loop, stage by stage
+Each stage runs automatically off the previous one. The only human touch is the founder sending the deck and the partner reading the reply.
+
+1 · Watch. Agent monitors the deal inbox/channel (Gmail or Slack) plus a heartbeat poll for anything missed. New deck with attachments = new deal.
+2 · Ingest. AnyDoc + pdf-inspector parse the deck and every data-room file (pptx, xlsx, pdf, docx) to clean markdown + tables locally, keeping page/slide numbers.
+3 · Graph. Content is pushed to LightRAG → entities, numbers, and relationships are extracted and linked into one graph spanning the deck and the data room.
+4 · Diligence. A fixed checklist runs against the graph in mix mode: does each deck claim have support in the financials? Do the numbers reconcile? What's missing? Each finding carries a source citation (doc + slide/entity).
+5 · Annotate. Findings become colored flags pinned to the exact slides; export a flattened, marked-up deck.
+6 · Memo + reply. Agent drafts the IC memo and replies on the channel with the summary, risk score, annotated deck, and a link to the graph view.
+7 · Interrogate. Partner keeps chatting with the agent about the deal; graph traversal answers with sources. New deals pile up in parallel — that's the always-on payoff.
+III. Architecture
+Components
+Orchestrator — OpenClaw agent (on NemoClaw). Always-on runtime; receives deals over messaging channels; runs tools (ingest, graph, diligence, annotate, reply); heartbeats keep it live. Wired to the model with ollama launch openclaw --model nemotron3:33b.
+Ingestion — AnyDoc + pdf-inspector. Local Rust libraries; parse 14 formats incl. pptx/xlsx natively to markdown + tables, preserving page/slide numbers. No API key, no network.
+Brain — LightRAG. Extracts entities + relationships into a graph + vector store; retrieves via combined vector + graph traversal (mix mode). Ollama-compatible; built-in graph viewer.
+Model — Nemotron 3 Nano Omni (nemotron3:33b). 28GB (q4), 128K context, vision + tools + reasoning — serves all inference locally and reads charts/scanned pages. Document-intelligence oriented.
+Annotator — react-pdf-highlighter-plus. Headless React/PDF.js overlay; renders sourced flags on slides; flatten-export a marked-up deck. Viewport-independent coordinates so pins hold through zoom.
+Stores. Graph: Neo4j or Postgres+AGE. Vector: LightRAG's configured store (pgvector, or the built-in default to save setup time).
+IV. Build Stack — Components & Links
+Agent runtime
+NemoClaw (reference stack, Apache-2.0) — github.com/NVIDIA/NemoClaw · docs docs.nvidia.com/nemoclaw/latest
+OpenClaw (default agent) — openclaw.ai
+OpenShell (sandbox) — github.com/NVIDIA/OpenShell
+Onboard: nemoclaw onboard → express install picks OpenClaw. Messaging channels + heartbeats provide the always-on inbox watch.
+Model + inference
+Nemotron 3 Nano Omni — ollama.com/library/nemotron3
+Pull: ollama run nemotron3:33b (28GB q4 · 128K ctx · vision+tools). nemotron3:33b-q8 = 36GB for more headroom.
+Wire agent → model: ollama launch openclaw --model nemotron3:33b
+Ollama: ollama.com — require ≥ 0.32.9 for structured tool calls.
+Graph + RAG engine
+LightRAG (MIT) — github.com/HKUDS/LightRAG
+Install: pip install lightrag-hku. Point llm_model_func + embedding_func at the local Ollama/NemoClaw endpoint; query with QueryParam(mode="mix").
+Set Ollama context to ≥ 32k (num_ctx) for extraction to work; built-in graph visualization + web UI included.
+Ingestion / parsing
+AnyDoc (MIT, 14 formats incl. pptx/xlsx/docx) — github.com/firecrawl/anydoc · pip install firecrawl-anydoc (also @firecrawl/anydoc for Node)
+pdf-inspector (MIT, text-vs-scanned routing + extraction) — github.com/firecrawl/pdf-inspector · pip install pdf-inspector
+Both run fully local (Rust, no API key). AnyDoc embeds pdf-inspector, so one call covers PDFs + the other 13 formats.
+Annotation UI
+react-pdf-highlighter-plus (headless PDF.js annotation) — npm react-pdf-highlighter-plus; base project github.com/agentcooper/react-pdf-highlighter (MIT)
+Highlight / note / area annotation types; viewport-independent coords; flatten-export the marked-up deck.
+Front end in Next.js/React; render decks as PDF, overlay the flag objects from section V.4.
+Stores
+Graph: Postgres + Apache AGE (simplest), or Neo4j if the graph view needs it.
+Vector: pgvector alongside the graph, or LightRAG's built-in store to skip setup on demo day.
+V. Interfaces & Contracts
+1. Deal inbox / chat
+NemoClaw messaging channels. Configure Slack and/or Gmail as the deal front door. Inbound messages carry decks + data-room files (ingest) or questions (query); outbound carries the memo, risk score, and annotated deck. Slack is faster to wire — set it up first, add Gmail if time allows.
+
+2. Model endpoint
+OpenAI-compatible, local. NemoClaw serves Nemotron via a token-gated proxy on :11435 (Ollama bound to 127.0.0.1:11434); Bearer token in ~/.nemoclaw/ollama-proxy-token. LightRAG and the agent both call this endpoint. Raise NEMOCLAW_CONTEXT_WINDOW above the 16384 default.
+
+3. LightRAG
+Ingest + query API. rag.insert(markdown) per parsed file for graph/vector indexing; rag.query(q, QueryParam(mode="mix")) for combined vector + graph retrieval. Point the LLM + embedding config at the NemoClaw endpoint. Graph store on Postgres+AGE or Neo4j.
+
+4. Flag (annotation) object
+One diligence finding → one flag object the annotator renders:
+
+id, docId, page/slide, type (highlight | note | area)
+severity → color (red = contradiction, amber = unsupported, gray = missing)
+comment → the explanation; sourceCitation → the doc/slide or graph entity that backs the flag
+Coordinates are viewport-independent so pins hold through zoom.
+VI. Compliance Mapping
+Rules 02 & 06
+Compliant
+Local inference. All inference runs on-box via NemoClaw + Ollama + nemotron3:33b. No remote LLM/API in the runtime path.[1]BuilderBase — Rules
+Required stack satisfied. OpenClaw (agent) on NemoClaw (runtime) is the named stack.[2]NVIDIA NemoClaw — supported agents
+Local ingestion. AnyDoc/pdf-inspector run as libraries on-box — not the hosted Firecrawl API.[3]Firecrawl AnyDoc — local Rust, no API key
+Deal-inbox network use is allowed — fetching email/Slack is not an inference call. Optional wifi-cut proves local inference; an air-gap is not required.
+Originality/IP. All components are MIT/Apache OSS — declare the stack in the writeup.
+VII. 12-Hour Build Milestones
+Hr 0–1 · All
+Box up. nemoclaw onboard + ollama run nemotron3:33b; confirm one local multimodal inference and clean tool-call validation. Stand up LightRAG pointed at the NemoClaw proxy.
+
+Hr 1–6 · A
+Ingestion: AnyDoc/pdf-inspector → LightRAG insert; confirm deck + data-room entities/relationships appear in one graph.
+
+Hr 1–6 · B
+OpenClaw agent: Slack (then Gmail) deal channel + heartbeat; tools for ingest / diligence / annotate / reply.
+
+Hr 1–6 · C
+Front end (Next.js): deck annotator (react-pdf-highlighter-plus) + graph view (LightRAG viewer) + memo panel.
+
+Hr 1–6 · D
+Diligence logic: contradiction checklist + deck-vs-financials cross-check query in mix mode; build the sample data room (deck with 3–4 planted contradictions + matching financials).
+
+Hr 6–9
+Integrate end-to-end: email a deck → graph builds → annotated deck + memo comes back. Tune for precision on the planted flags.
+
+Hr 9–12
+Freeze, record backup demo video (18:30), build pitch deck + rehearse the 5-minute pitch (19:00).
+
+VIII. Risks & Open Questions
+Extraction quality on Nemotron
+LightRAG's entity/relationship extraction leans on structured output. Validate Nemotron's extraction in hour one; if weak, tune the extraction prompt or reduce entity types. Turn reasoning off during pure vision steps.
+
+Contradiction precision
+False flags kill credibility with a VC audience. Keep the checklist tight and demo on the seeded data room where the ground-truth contradictions are known.
+
+Email channel setup
+Gmail app-password wiring can eat time. Ship Slack first; keep a watched-folder fallback so the demo never depends on email.
+
+Annotator coordinates
+On-slide pin mapping is the riskiest UI piece. Fallback: a side panel of sourced flags linked to slide numbers; upgrade to pins if ahead.
+
+Scope
+VC diligence is the headline and the demo. The general knowledge-graph platform is the engine story, not a second product to finish. Exhaustive file-type coverage is nice-to-have, not day-one.
+
+
+Want to build this fully, dont have access to the GB 10 machine right now but want to build everything else around it so that once I have it i only have to run the model and connect everything to it to have it run. Make a plan to execute on this, you can use subagents.
+
+---
+
+Build Spec
+SATURDAY, SEPTEMBER 12 2026
+Always-On VC Diligence
+Agent — Build Spec
+An always-on agent that watches your deal inbox, auto-ingests every deck and data room a founder sends, builds a cross-document knowledge graph, cross-checks the deck's claims against the financials, flags contradictions on the slides, and drafts an IC memo — then replies on the same channel. The whole deal-flow loop runs with no app to open and no human babysitting: a deck lands, a diligence report comes back. It all runs locally on the Dell Pro Max with GB10 — nothing leaves the box. The knowledge-graph engine underneath generalizes to any research corpus, but the product is deal-flow diligence.
+
+Deal inbox
+Trigger
+Email/Slack, auto
+Deck ↔ data room
+Cross-check
+Graph + RAG
+nemotron3:33b
+Local model
+Vision + tools
+100%
+On the box
+No cloud API
+I. The Product
+1. What it is
+An automated first-pass diligence analyst for a VC's deal flow. A founder emails a pitch deck and a data room to the fund's diligence address; the agent does the grunt work an associate would do overnight and replies with a verdict.
+
+Reads the deck and every supporting doc (financial model, cap table, metrics, contracts).
+Builds a knowledge graph linking claims, numbers, entities, and sources across all of them.
+Cross-checks each deck claim against the financials and flags contradictions, gaps, and unsupported numbers.
+Annotates the deck in place — a colored flag on the exact slide, with the source that contradicts it.
+Drafts an IC memo: summary, risk score, flagged items, open questions.
+Replies on the same channel and stays queryable for follow-ups ("what's their real burn?").
+2. Why it wins
+It automates the most tedious, highest-leverage part of the deal funnel — the first-pass read that decides whether a deal is worth a partner's time. It is always-on (the NVIDIA-native agent narrative), visibly multimodal (reads charts and scanned pages), and provably local (an air-gap flourish is optional). The graph is the moat: contradiction-catching needs cross-document reasoning, not keyword RAG.
+
+3. Design stance
+Compose, don't fork. Every layer is a focused open-source component wired together; the team owns only the orchestration and the diligence logic. LightRAG does the graph + retrieval + viewer, so the custom surface area stays small enough to finish in 12 hours.
+
+II. Deal-Flow Automation
+The loop, stage by stage
+Each stage runs automatically off the previous one. The only human touch is the founder sending the deck and the partner reading the reply.
+
+1 · Watch. Agent monitors the deal inbox/channel (Gmail or Slack) plus a heartbeat poll for anything missed. New deck with attachments = new deal.
+2 · Ingest. AnyDoc + pdf-inspector parse the deck and every data-room file (pptx, xlsx, pdf, docx) to clean markdown + tables locally, keeping page/slide numbers.
+3 · Graph. Content is pushed to LightRAG → entities, numbers, and relationships are extracted and linked into one graph spanning the deck and the data room.
+4 · Diligence. A fixed checklist runs against the graph in mix mode: does each deck claim have support in the financials? Do the numbers reconcile? What's missing? Each finding carries a source citation (doc + slide/entity).
+5 · Annotate. Findings become colored flags pinned to the exact slides; export a flattened, marked-up deck.
+6 · Memo + reply. Agent drafts the IC memo and replies on the channel with the summary, risk score, annotated deck, and a link to the graph view.
+7 · Interrogate. Partner keeps chatting with the agent about the deal; graph traversal answers with sources. New deals pile up in parallel — that's the always-on payoff.
+III. Architecture
+Components
+Orchestrator — OpenClaw agent (on NemoClaw). Always-on runtime; receives deals over messaging channels; runs tools (ingest, graph, diligence, annotate, reply); heartbeats keep it live. Wired to the model with ollama launch openclaw --model nemotron3:33b.
+Ingestion — AnyDoc + pdf-inspector. Local Rust libraries; parse 14 formats incl. pptx/xlsx natively to markdown + tables, preserving page/slide numbers. No API key, no network.
+Brain — LightRAG. Extracts entities + relationships into a graph + vector store; retrieves via combined vector + graph traversal (mix mode). Ollama-compatible; built-in graph viewer.
+Model — Nemotron 3 Nano Omni (nemotron3:33b). 28GB (q4), 128K context, vision + tools + reasoning — serves all inference locally and reads charts/scanned pages. Document-intelligence oriented.
+Annotator — react-pdf-highlighter-plus. Headless React/PDF.js overlay; renders sourced flags on slides; flatten-export a marked-up deck. Viewport-independent coordinates so pins hold through zoom.
+Stores. Graph: Neo4j or Postgres+AGE. Vector: LightRAG's configured store (pgvector, or the built-in default to save setup time).
+IV. Build Stack — Components & Links
+Agent runtime
+NemoClaw (reference stack, Apache-2.0) — github.com/NVIDIA/NemoClaw · docs docs.nvidia.com/nemoclaw/latest
+OpenClaw (default agent) — openclaw.ai
+OpenShell (sandbox) — github.com/NVIDIA/OpenShell
+Onboard: nemoclaw onboard → express install picks OpenClaw. Messaging channels + heartbeats provide the always-on inbox watch.
+Model + inference
+Nemotron 3 Nano Omni — ollama.com/library/nemotron3
+Pull: ollama run nemotron3:33b (28GB q4 · 128K ctx · vision+tools). nemotron3:33b-q8 = 36GB for more headroom.
+Wire agent → model: ollama launch openclaw --model nemotron3:33b
+Ollama: ollama.com — require ≥ 0.32.9 for structured tool calls.
+Graph + RAG engine
+LightRAG (MIT) — github.com/HKUDS/LightRAG
+Install: pip install lightrag-hku. Point llm_model_func + embedding_func at the local Ollama/NemoClaw endpoint; query with QueryParam(mode="mix").
+Set Ollama context to ≥ 32k (num_ctx) for extraction to work; built-in graph visualization + web UI included.
+Ingestion / parsing
+AnyDoc (MIT, 14 formats incl. pptx/xlsx/docx) — github.com/firecrawl/anydoc · pip install firecrawl-anydoc (also @firecrawl/anydoc for Node)
+pdf-inspector (MIT, text-vs-scanned routing + extraction) — github.com/firecrawl/pdf-inspector · pip install pdf-inspector
+Both run fully local (Rust, no API key). AnyDoc embeds pdf-inspector, so one call covers PDFs + the other 13 formats.
+Annotation UI
+react-pdf-highlighter-plus (headless PDF.js annotation) — npm react-pdf-highlighter-plus; base project github.com/agentcooper/react-pdf-highlighter (MIT)
+Highlight / note / area annotation types; viewport-independent coords; flatten-export the marked-up deck.
+Front end in Next.js/React; render decks as PDF, overlay the flag objects from section V.4.
+Stores
+Graph: Postgres + Apache AGE (simplest), or Neo4j if the graph view needs it.
+Vector: pgvector alongside the graph, or LightRAG's built-in store to skip setup on demo day.
+V. Interfaces & Contracts
+1. Deal inbox / chat
+NemoClaw messaging channels. Configure Slack and/or Gmail as the deal front door. Inbound messages carry decks + data-room files (ingest) or questions (query); outbound carries the memo, risk score, and annotated deck. Slack is faster to wire — set it up first, add Gmail if time allows.
+
+2. Model endpoint
+OpenAI-compatible, local. NemoClaw serves Nemotron via a token-gated proxy on :11435 (Ollama bound to 127.0.0.1:11434); Bearer token in ~/.nemoclaw/ollama-proxy-token. LightRAG and the agent both call this endpoint. Raise NEMOCLAW_CONTEXT_WINDOW above the 16384 default.
+
+3. LightRAG
+Ingest + query API. rag.insert(markdown) per parsed file for graph/vector indexing; rag.query(q, QueryParam(mode="mix")) for combined vector + graph retrieval. Point the LLM + embedding config at the NemoClaw endpoint. Graph store on Postgres+AGE or Neo4j.
+
+4. Flag (annotation) object
+One diligence finding → one flag object the annotator renders:
+
+id, docId, page/slide, type (highlight | note | area)
+severity → color (red = contradiction, amber = unsupported, gray = missing)
+comment → the explanation; sourceCitation → the doc/slide or graph entity that backs the flag
+Coordinates are viewport-independent so pins hold through zoom.
+VI. Compliance Mapping
+Rules 02 & 06
+Compliant
+Local inference. All inference runs on-box via NemoClaw + Ollama + nemotron3:33b. No remote LLM/API in the runtime path.[1]BuilderBase — Rules
+Required stack satisfied. OpenClaw (agent) on NemoClaw (runtime) is the named stack.[2]NVIDIA NemoClaw — supported agents
+Local ingestion. AnyDoc/pdf-inspector run as libraries on-box — not the hosted Firecrawl API.[3]Firecrawl AnyDoc — local Rust, no API key
+Deal-inbox network use is allowed — fetching email/Slack is not an inference call. Optional wifi-cut proves local inference; an air-gap is not required.
+Originality/IP. All components are MIT/Apache OSS — declare the stack in the writeup.
+VII. 12-Hour Build Milestones
+Hr 0–1 · All
+Box up. nemoclaw onboard + ollama run nemotron3:33b; confirm one local multimodal inference and clean tool-call validation. Stand up LightRAG pointed at the NemoClaw proxy.
+
+Hr 1–6 · A
+Ingestion: AnyDoc/pdf-inspector → LightRAG insert; confirm deck + data-room entities/relationships appear in one graph.
+
+Hr 1–6 · B
+OpenClaw agent: Slack (then Gmail) deal channel + heartbeat; tools for ingest / diligence / annotate / reply.
+
+Hr 1–6 · C
+Front end (Next.js): deck annotator (react-pdf-highlighter-plus) + graph view (LightRAG viewer) + memo panel.
+
+Hr 1–6 · D
+Diligence logic: contradiction checklist + deck-vs-financials cross-check query in mix mode; build the sample data room (deck with 3–4 planted contradictions + matching financials).
+
+Hr 6–9
+Integrate end-to-end: email a deck → graph builds → annotated deck + memo comes back. Tune for precision on the planted flags.
+
+Hr 9–12
+Freeze, record backup demo video (18:30), build pitch deck + rehearse the 5-minute pitch (19:00).
+
+VIII. Risks & Open Questions
+Extraction quality on Nemotron
+LightRAG's entity/relationship extraction leans on structured output. Validate Nemotron's extraction in hour one; if weak, tune the extraction prompt or reduce entity types. Turn reasoning off during pure vision steps.
+
+Contradiction precision
+False flags kill credibility with a VC audience. Keep the checklist tight and demo on the seeded data room where the ground-truth contradictions are known.
+
+Email channel setup
+Gmail app-password wiring can eat time. Ship Slack first; keep a watched-folder fallback so the demo never depends on email.
+
+Annotator coordinates
+On-slide pin mapping is the riskiest UI piece. Fallback: a side panel of sourced flags linked to slide numbers; upgrade to pins if ahead.
+
+Scope
+VC diligence is the headline and the demo. The general knowledge-graph platform is the engine story, not a second product to finish. Exhaustive file-type coverage is nice-to-have, not day-one.
+
+
+Want to build this fully, dont have access to the GB 10 machine right now but want to build everything else around it so that once I have it i only have to run the model and connect everything to it to have it run. Make a plan to execute on this, you can use subagents.
+
+---
+
+Tehre is a local Ollama runnign with a weak llm just for testing (see with ollama)build everythign, need to have a full platform covering all capabilities please nice UI to view all this deal flow needs to be precise liek a real work. Make it all work and build it
+
+---
+
+Pleasee no no python please use node js please
+
+---
+
+Could not render the deck. getDocument - expected either `data`, `range`, or `url` parameter.
+
+Lot of stuff just does not work, please test everything all the deal flows and then only come back to me
+
+---
+
+slideshow annotation does not seem to be working at all please fix it it should be on the slideshow pdf the annotationa nd mayeb also highlight the number
+
+---
+
+nice redo the UI and deal room, the opening page shoudl be selecting the deal, creaating the deal each deal has a sandboxed environement make sure of that (Can we use openshell for htis / do we need somehting like it), Also the graph makes no sense rn, please imporve the UI and make better and more friendly use react best conventions to design to @/Users/ishaan812/.cursor/plugins/cache/cursor-public/vercel/11c32588786a9d49791372657433b88d49561874/skills/react-best-practices/SKILL.md
+
+---
+
+wait do we even need openshell? or something else might be ok too if too complicated
+
+---
+
+In the slide annotation contradictions and all that we need to link the source and we also on click we neeed ot show what number we are referencing in what file and preview it on the side please upgrade UI /workflow for thsoi
+
+---
+
+doesnt work also side pane display was better this sucks figure out a better UI please, side pane ideally
+
+---
+
+Okay for eevry deal if i click on If I click on the deal, the first page that should pop up should be the list of files that we have uploaded for them. This should include all of the data for that deal, and it should also include the deck, which is like a PPT. We can show the deck separately, but the rest should be on the initial page. I should have three options:
+1. Just click on the PPT so that I can view it.
+2. We can compare it to the rest of the data room. The data room will have all of the files that are verified already, the financials, and all of that. Our deck and stuff would be in a different place, and we should be able to see a graph of how these files connect to each other, I guess, using Lightdrag or however that works.  Once I click on the deck, I should be able to see the PPT thing that you are showing me right now, with the live review of the files which is there.
+
+---
+
+Make the UI a lot more accesible for humans to manulaly use as well uploading things to the data room and so on make it all human accessible too
+
+---
+
+Also delete all the data except for one entry of the northstar robotics example to make it cleaner
+
+---
+
+This preview sucks for xlsx make it for both and also let me open file in a new window on click (sepe button on top of preview in a new tab
+
+---
+
+preview still sucks in dark mode
+
+---
+
+Another issue, so when I uploaded like a document , it led to the document becoming the deck automatically. So we need to be able to select when we upload something that it is going to be just like part of the data room, or it's just going to be the deck. So, and there could be multiple decks as well, right? So, just be careful of that, and add like a UI distinction for it, I would say so that it's not as confusing as I found it. So, just fix that, and yeah.
+
+---
+
+even here it should be allowed to open this file bigger in a new tab
+
+---
+
+The pdf viewer excel sheet viewer suck I want to look at it how it would look in acrobat / excel like in its compe;ete real rendering format not a derived system
+
+---
+
+preview is really bad and make it work better full one page mayeb just ahve apane on the right for preview only when we click on a file
+
+---
+
+Nwo the main deal room page is wildly overflowing the same preveiw mode w ehave there should also be the same. Please have /critique on both pages and fix layouts and make user friend;ly add bits of /delight
+
+---
+
+CONTINUE
+
+---
+
+Okay, just tell me this now. now we have something ready right now. I'm sure I'm going to iterate a lot on it tomorrow and get, make it better and make it like a fully functioning VC agent. But, what do I have to do the first thing tomorrow? Give me like a concise checklist. Of things I will have to do to make this run. So, the first thing is, I'm just going to make like, make our entire repo, GitHub repo. And after that, I'm going to push it onto the GB10 and have it run over there and also have it install the Nemotron and run Ollama. What else will I have to do to make everything work and accessible? After that?
+
+---
+
+got it, the new deal room UI kinda sucks the blotter hsould only open up when i click on a file and only show the first page and allow to scroll not the full sidebar should only be half the page as well.
+
+Also the annotating in the excel files earlier does not work anymore, when I clcik the number which is contadicting in slideshow gets annoted but not in the excel file can we have that back>
+
+---
+
+xlsx is fine csv and docx rendering sucks fix those too
+
+---
+
+The hwo teh files connect and compare to the room, are kind of meaingless could we have a sidepane deisgn where 1 i can access the lightrag graph and all that to see how files connect
+
+---
+
+Add a recompute button if i add files into the data room i should be able to recompute the deck right pls add
+
+---
+
+(0 , __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$diligence$2f$pipeline$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__.recomputeDeal) is not a function
+
+Fuck you fix this
+
+---
+
+its says oen new finding but cant see any annotations on the deck at all
+
+---
+
+hwo can we add suppor tfor annotating scans too?
+
+---
+
+We are not able to cite teh files at all No file in this room cites 100+. The slide is standing alone.
+
+FOr all the contradictions
+
+---
+
+Console Error
+
+
+
+Encountered two children with the same key, `VALOSTRIKE / INVESTOR MATERIALS / CONFIDENTIAL`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+components/FilePreview.tsx (67:17) @ <unknown>
+
+
+  65 |             {(preview.paragraphs?.length ? preview.paragraphs : preview.excerpt ? [preview.excerpt] : []).map(
+  66 |               (paragraph) => (
+> 67 |                 <p key={paragraph.slice(0, 48)}>{paragraph}</p>
+     |                 ^
+  68 |               ),
+  69 |             )}
+  70 |           </div>
+Call Stack
+27
+
+Show 20 ignore-listed frame(s)
+p
+<anonymous>
+<unknown>
+components/FilePreview.tsx (67:17)
+Array.map
+<anonymous>
+
+
+PPTX rendering is fully broken see teh valostrike deal room
+
+---
+
+when i uplaoded new valostrike deal why is tehre no graph all claimns should be verifieed all numbers why not happening all of this should be happening when we press recompute or when we initially upload the deal

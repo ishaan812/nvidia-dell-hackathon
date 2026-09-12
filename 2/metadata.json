@@ -1,0 +1,117 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BA0M3R6CPKZ5FP3T86KDQY",
+  "session_id": "682d1d89-9abe-4324-bb11-12e59f8416a6",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T17:18:05.020357Z",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "save_step_count": 5,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/deck/route.ts",
+    "apps/web/app/api/deals/[id]/slides/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/components/DealRoom.tsx",
+    "apps/web/components/DeckViewer.tsx",
+    "apps/web/components/FilePreview.tsx",
+    "apps/web/components/PptxViewer.tsx",
+    "apps/web/components/RoomGraph.tsx",
+    "apps/web/lib/diligence/annotate.ts",
+    "apps/web/lib/diligence/checklist.ts",
+    "apps/web/lib/diligence/evidence.ts",
+    "apps/web/lib/diligence/ingest.ts",
+    "apps/web/lib/diligence/metrics.ts",
+    "apps/web/lib/diligence/ocr.ts",
+    "apps/web/lib/diligence/pptx.ts",
+    "apps/web/lib/diligence/textMatch.ts",
+    "apps/web/lib/diligence/types.ts",
+    "apps/web/lib/diligence/view.ts",
+    "apps/web/package.json",
+    "apps/web/pnpm-lock.yaml",
+    "apps/web/scripts/check-metrics.ts",
+    "apps/web/scripts/refresh-flags.ts",
+    "apps/web/scripts/verify-annotations.mjs",
+    "apps/web/scripts/verify-citations.mjs",
+    "apps/web/scripts/verify-pptx.mjs"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "83016c912715",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 553649,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 18752704,
+    "output_tokens": 105268,
+    "api_call_count": 5
+  },
+  "session_metrics": {
+    "turn_count": 5,
+    "context_tokens": 234215,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T17:18:04.7481Z",
+    "agent_lines": 1681,
+    "agent_removed": 73,
+    "human_added": 4590,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 6271,
+    "total_lines_changed": 6390,
+    "agent_percentage": 27.449139280125195,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 379,
+      "agent_lines_removed": 25,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 575,
+      "agent_lines_removed": 41,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 618,
+      "agent_lines_removed": 45,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1028,
+      "agent_lines_removed": 56,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

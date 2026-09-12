@@ -38,7 +38,7 @@ export function settings() {
   return {
     llmBaseUrl: process.env.LLM_BASE_URL ?? "http://127.0.0.1:11434/v1",
     llmApiKey: process.env.LLM_API_KEY ?? "ollama",
-    llmModel: process.env.LLM_MODEL ?? "gemma3:latest",
+    llmModel: process.env.LLM_MODEL ?? "muse-glimmer:latest",
     embeddingModel: process.env.EMBEDDING_MODEL ?? "nomic-embed-text",
   };
 }

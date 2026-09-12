@@ -37,14 +37,33 @@ export async function chat(
         model: settings().llmModel,
         messages,
         temperature: 0.2,
-        max_tokens: opts?.maxTokens ?? 500,
+        max_tokens: opts?.maxTokens ?? 2048,
       }),
     });
-    if (!res.ok) return "";
-    const data = (await res.json()) as {
-      choices?: { message?: { content?: string } }[];
+    if (res.ok) {
+      const data = (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+      };
+      const content = data.choices?.[0]?.message?.content?.trim() ?? "";
+      if (content) return content;
+    }
+    // Thinking models (muse-glimmer) often leave OpenAI `content` empty until
+    // the user turn. Native /api/chat returns the final message.content.
+    const native = await fetch(`${ollamaHost()}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: settings().llmModel,
+        messages,
+        stream: false,
+        options: { temperature: 0.2, num_predict: opts?.maxTokens ?? 2048 },
+      }),
+    });
+    if (!native.ok) return "";
+    const data = (await native.json()) as {
+      message?: { content?: string };
     };
-    return data.choices?.[0]?.message?.content?.trim() ?? "";
+    return data.message?.content?.trim() ?? "";
   } catch {
     return "";
   }

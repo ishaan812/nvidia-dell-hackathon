@@ -37,7 +37,7 @@ export { LIVE_DEAL_ID };
 
 const PROFILE: CompanyProfile = {
   company: "Northstar Robotics",
-  founders: ["Maya Chen", "Owen Blake"],
+  founders: ["Simon Kalouche", "Erik Nieves"],
   sector: "Industrial robotics — warehouse autonomy",
   geography: "United States (Pittsburgh)",
   stage: "Series A",
@@ -339,7 +339,7 @@ function attachNumbers(deal: Deal, intel: DealIntelligence) {
       timeHorizon: "This raise",
       mitigation: "Restate ARR and send a fully-diluted cap table.",
       status: "open",
-      owner: "Maya Chen",
+      owner: "Simon Kalouche",
       evidenceIds: evidence.map((e) => e.id).slice(0, 2),
       cluster: "stated-vs-room",
     },
@@ -351,7 +351,7 @@ function attachNumbers(deal: Deal, intel: DealIntelligence) {
       findingId: "f-live-arr",
       reason: "Largest single swing on conviction and valuation.",
       evidenceRequired: "Monthly billed + contracted roll-forward",
-      owner: "Maya Chen",
+      owner: "Simon Kalouche",
       status: "asked",
     });
   }
@@ -385,7 +385,7 @@ function attachNumbers(deal: Deal, intel: DealIntelligence) {
   intel.people = [
     {
       title: "Founders",
-      claim: "Maya Chen and Owen Blake.",
+      claim: "Simon Kalouche and Erik Nieves.",
       evidence: "Deck bios only.",
       assessment: "Not independently verified this pass.",
     },
@@ -461,7 +461,7 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
         {
           id: "t-live-arr",
           title: "Waiting on ARR restatement",
-          owner: "Maya Chen",
+          owner: "Simon Kalouche",
           status: "waiting",
           waitingOn: "Founder — monthly roll-forward",
           kind: "document",

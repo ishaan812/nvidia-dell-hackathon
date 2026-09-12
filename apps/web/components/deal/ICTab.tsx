@@ -1,107 +1,71 @@
-import Link from "next/link";
-import { recommendationLabel, scoreDisplay } from "@/lib/format";
-import { convictionCopy, effectiveScores, scoreTone } from "@/lib/intelligence/scores";
-import type { DealIntelligence, ScoreKey } from "@/lib/intelligence/types";
-import { TimelineTab } from "./TimelineTab";
-import { ValuationTab } from "./ValuationTab";
+import { recommendationLabel } from "@/lib/format";
+import { StoryList } from "./StoryList";
+import { decisionCopy, plainAction } from "@/lib/intelligence/viewStory";
+import type { DealIntelligence } from "@/lib/intelligence/types";
 import { Note, Section } from "./ui";
 
-const ROOM_SCORES: ScoreKey[] = [
-  "investmentConviction",
-  "risk",
-  "uncertainty",
-  "evidenceConfidence",
-  "thesisFit",
-  "valuationAttractiveness",
-  "portfolioFit",
-];
-
-const LABELS: Record<ScoreKey, string> = {
-  investmentConviction: "Conviction",
-  opportunityQuality: "Opportunity",
-  risk: "Risk",
-  thesisFit: "Thesis fit",
-  uncertainty: "Uncertainty",
-  evidenceConfidence: "Evidence",
-  valuationAttractiveness: "Valuation",
-  portfolioFit: "Portfolio fit",
-};
-
-export function ICTab({ dealId, intel }: { dealId?: string; intel: DealIntelligence }) {
+export function ICTab({ intel }: { intel: DealIntelligence }) {
   const ic = intel.ic;
-  const scores = effectiveScores(intel);
+  const copy = decisionCopy(intel);
   const tooEarly = intel.stage === "source" || intel.stage === "triage";
 
   return (
     <div>
-      <Section title="Decision Room" lead={convictionCopy()}>
-        <div className="score-strip">
-          {ROOM_SCORES.map((key) => (
-            <div key={key}>
-              <p className="score-label">{LABELS[key]}</p>
-              <p className={`score-value ${scoreTone(key, scores[key])}`}>{scoreDisplay(scores[key])}</p>
-            </div>
-          ))}
+      <Section title="Next action">
+        <p className="font-serif text-[1.45rem] leading-snug">{plainAction(copy.next)}</p>
+        <div className="mt-3">
+          <Note>{copy.why}</Note>
         </div>
+        {ic ? <p className="mt-4 text-mute">{recommendationLabel(ic.recommendation)}</p> : null}
       </Section>
 
-      {ic ? (
-        <Section title="Investment case">
-          <p className="font-serif text-[1.75rem] leading-snug">{recommendationLabel(ic.recommendation)}</p>
-          <div className="mt-3">
-            <Note>{ic.executiveSummary}</Note>
+      <Section title="The case">
+        {ic ? (
+          <div className="view-copy">
+            <p>{ic.executiveSummary}</p>
           </div>
-          <p className="mt-4 text-[16px] leading-7">{ic.opportunityQuality}</p>
-        </Section>
-      ) : (
-        <Section title="Investment case">
+        ) : (
           <Note>
             {tooEarly
-              ? "Too early for a packet. Validation has to land first."
-              : "No IC packet on this deal yet. Helio Freight has the full room."}
+              ? "Too early for a packet. Diligence has to land first."
+              : copy.view.like || "The case is still being written from the files."}
           </Note>
-        </Section>
-      )}
+        )}
+      </Section>
 
-      {ic ? (
-        <Section title="IC summary">
-          <p className="text-[16px] leading-7">{ic.recommendationNote}</p>
-          <p className="mt-4 text-[16px] leading-7">
-            <span className="text-ledger">Bull. </span>
-            {ic.bullCase}
-          </p>
-          <p className="mt-3 text-[16px] leading-7">
-            <span className="text-flag-amber">Bear. </span>
-            {ic.bearCase}
-          </p>
+      {copy.like.length ? (
+        <Section title="Why we like it">
+          <ul className="prose-list">
+            {copy.like.filter(Boolean).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </Section>
       ) : null}
 
-      <ValuationTab intel={intel} />
-
-      {intel.portfolio ? (
-        <Section title="Portfolio fit">
-          <p>{intel.portfolio.sector}</p>
-          <p className="mt-2 text-mute">{intel.portfolio.capitalNote}</p>
+      {copy.concern.length ? (
+        <Section title="What concerns us">
+          <ul className="prose-list">
+            {copy.concern.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </Section>
       ) : null}
 
-      {dealId ? (
-        <Section title="Ask the room" lead="Muse Glimmer answers from the files, with citations.">
-          <Link href={`/deals/${dealId}?tab=ask`} className="ask-jump">
-            Open Ask
-          </Link>
+      {copy.unknown.length ? (
+        <Section title="What we don't know">
+          <ul className="prose-list">
+            {copy.unknown.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </Section>
       ) : null}
 
-      {ic ? (
-        <Section title="Final decision">
-          <p className="font-serif text-[1.75rem] leading-snug">{recommendationLabel(ic.recommendation)}</p>
-          <p className="mt-3 text-mute">{ic.nextBestAction}</p>
-        </Section>
-      ) : null}
-
-      <TimelineTab intel={intel} />
+      <Section title="Deal story">
+        <StoryList events={intel.timeline} />
+      </Section>
     </div>
   );
 }

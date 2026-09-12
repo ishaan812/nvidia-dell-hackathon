@@ -3,10 +3,7 @@ import { Note, Section } from "./ui";
 
 export function WorldTab({ intel }: { intel: DealIntelligence }) {
   return (
-    <Section
-      title="World"
-      lead="Independent evidence tests the company story. Missing evidence stays visible."
-    >
+    <Section title="Independent checks">
       {intel.world.length === 0 ? (
         <Note>No external tests yet.</Note>
       ) : (

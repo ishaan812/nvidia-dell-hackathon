@@ -1,49 +1,38 @@
 import type { DealIntelligence } from "@/lib/intelligence/types";
+import { thesisBrief, thesisChecks } from "@/lib/intelligence/viewStory";
+import { ScoreValue } from "./ScoreValue";
 import { Note, Section } from "./ui";
 
 export function ThesisTab({ intel }: { intel: DealIntelligence }) {
-  const t = intel.thesis;
+  const score = intel.thesis.score;
+  const checks = thesisChecks(intel);
   return (
     <div>
-      <Section title="Thesis fit" lead="A miss is a warning. It never auto-rejects.">
-        <p className="font-serif text-[2.5rem] leading-none">{t.score ?? "—"}</p>
-        <div className="mt-4">
-          <Note>{t.whyItMayStillMatter}</Note>
-        </div>
+      <Section title="Thesis fit">
+        <p className="font-serif text-[2.1rem] leading-none">
+          <ScoreValue value={score} />
+        </p>
+        <p className="mt-4 max-w-[38rem] text-[1.05rem] leading-7">{thesisBrief(intel)}</p>
       </Section>
-
-      {t.exceptions.length ? (
-        <Section title="Exception">
-          {t.exceptions.map((item) => (
-            <div key={item.label}>
-              <p className="font-medium text-flag-amber">{item.label}</p>
-              <p className="mt-2 text-[16px] leading-7 text-mute">{item.detail}</p>
-            </div>
-          ))}
-        </Section>
-      ) : null}
-
-      <Section title="What fits">
-        {t.matches.length ? (
-          <ul className="space-y-2 text-[16px] leading-7">
-            {t.matches.map((item) => (
-              <li key={item.label}>{item.detail}</li>
+      <Section title="Shared with the thesis">
+        {checks.length ? (
+          <ul className="thesis-checks">
+            {checks.map((item) => (
+              <li key={item.label}>
+                <label>
+                  <input type="checkbox" checked={item.on} readOnly />
+                  <span>
+                    <strong>{item.label}</strong>
+                    {item.detail}
+                  </span>
+                </label>
+              </li>
             ))}
           </ul>
         ) : (
           <Note>Scoring starts after triage.</Note>
         )}
       </Section>
-
-      {t.mismatches.length ? (
-        <Section title="What does not">
-          <ul className="space-y-2 text-[16px] leading-7 text-mute">
-            {t.mismatches.map((item) => (
-              <li key={item.label}>{item.detail}</li>
-            ))}
-          </ul>
-        </Section>
-      ) : null}
     </div>
   );
 }

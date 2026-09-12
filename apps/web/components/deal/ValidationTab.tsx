@@ -1,10 +1,11 @@
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
+import { groupDiscrepancies, openQuestions, pendingItems } from "@/lib/intelligence/viewStory";
 import { EvidenceTab } from "./EvidenceTab";
 import { FindingsTab } from "./FindingsTab";
+import { FounderThread } from "./FounderThread";
 import { NumbersTab } from "./NumbersTab";
 import { PeopleTab } from "./PeopleTab";
-import { QuestionsTab } from "./QuestionsTab";
 import { RisksTab } from "./RisksTab";
 import { WorldTab } from "./WorldTab";
 import { Note, Section } from "./ui";
@@ -13,15 +14,59 @@ type Props = { deal: Deal; intel: DealIntelligence };
 
 export function ValidationTab({ deal, intel }: Props) {
   const benches = intel.benchmarks;
+  const groups = groupDiscrepancies(deal.flags);
+  const pending = pendingItems(intel);
+  const questions = openQuestions(intel);
   return (
     <div>
-      <Section
-        title="Validation"
-        lead="Financials, market, customers, competition, product, team, and the outside world — one room, not four stages."
-      >
+      <Section title="What appears true">
         <Note>
-          Pending items and founder replies live across every stage. A new answer re-runs the affected checks.
+          This room checks the files against the pitch — what is supported, what conflicts, and what is still a guess.
         </Note>
+      </Section>
+      {groups.map((group) => (
+        <Section key={group.id} title={group.issue} lead="Related findings. Each line keeps its own status.">
+          <ul className="disc-list">
+            {group.findings.map((item) => (
+              <li key={item.id}>
+                <p>{item.metric}</p>
+                {item.deck || item.room ? (
+                  <p>
+                    Deck: {item.deck ?? "—"}. Data room: {item.room ?? "—"}.
+                  </p>
+                ) : (
+                  <p>{item.comment}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ))}
+      {deal.flags.length ? <FounderThread dealId={deal.id} intel={intel} flags={deal.flags} /> : null}
+      <Section title="Pending items" lead="Things we still need to receive.">
+        {pending.length ? (
+          <ul className="prose-list">
+            {pending.map((item) => (
+              <li key={item.id}>
+                {item.title}
+                {item.waitingOn ? ` — waiting on ${item.waitingOn}` : ""}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Note>Nothing outstanding to receive.</Note>
+        )}
+      </Section>
+      <Section title="Open questions" lead="Things we still need answered.">
+        {questions.length ? (
+          <ul className="prose-list">
+            {questions.map((item) => (
+              <li key={item.id}>{item.question}</li>
+            ))}
+          </ul>
+        ) : (
+          <Note>No open questions.</Note>
+        )}
       </Section>
       <NumbersTab deal={deal} intel={intel} />
       {benches.length ? (
@@ -45,7 +90,6 @@ export function ValidationTab({ deal, intel }: Props) {
       <WorldTab intel={intel} />
       <PeopleTab intel={intel} />
       <RisksTab intel={intel} />
-      <QuestionsTab dealId={deal.id} intel={intel} />
     </div>
   );
 }

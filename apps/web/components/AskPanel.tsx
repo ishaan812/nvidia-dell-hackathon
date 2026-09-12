@@ -10,5 +10,13 @@ type Props = {
 };
 
 export function AskPanel({ dealId, company, suggestions, compact = false }: Props) {
-  return <AskTab dealId={dealId} company={company} suggestions={suggestions} compact={compact} />;
+  return (
+    <AskTab
+      dealId={dealId}
+      company={company}
+      suggestions={suggestions}
+      compact={compact}
+      surface="memo"
+    />
+  );
 }

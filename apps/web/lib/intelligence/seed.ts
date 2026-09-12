@@ -124,7 +124,7 @@ async function writeWorkspace(deal: Deal, files: { filename: string; body: strin
 function harbor(): { deal: Deal; files: { filename: string; body: string }[] } {
   const profile: CompanyProfile = {
     company: "HarborMail",
-    founders: ["Priya Shah", "Eli Vargas"],
+    founders: ["Benny Rubin", "Vinoop Thayatt"],
     sector: "B2B infrastructure — email deliverability",
     geography: "United States (Austin)",
     stage: "Pre-seed",
@@ -136,7 +136,7 @@ function harbor(): { deal: Deal; files: { filename: string; body: string }[] } {
   };
   const created = "2026-09-11T15:40:00.000Z";
   const deal = shell("harbor-mail", "HarborMail", created, "source");
-  const note = `# HarborMail inbound\n\nPriya Shah (ex-Twilio) and Eli Vargas. Inbox placement API.\nRaising $2.2M. 11 design partners. Intro from First Round scout.`;
+  const note = `# HarborMail inbound\n\nBenny Rubin (ex-Twilio) and Vinoop Thayatt. Inbox placement API.\nRaising $2.2M. 11 design partners. Intro from First Round scout.`;
   deal.docs = [doc(deal.id, "inbound-note.md", "other", "room", note)];
   deal.intelligence = {
     stage: "source",
@@ -178,7 +178,7 @@ function harbor(): { deal: Deal; files: { filename: string; body: string }[] } {
         id: "tl-hm-in",
         at: created,
         title: "Inbound captured",
-        body: "Scout forwarded Priya’s note. Deal created in SOURCE.",
+        body: "Scout forwarded Benny’s note. Deal created in SOURCE.",
         source: "Inbox",
       },
     ],
@@ -198,7 +198,7 @@ function harbor(): { deal: Deal; files: { filename: string; body: string }[] } {
 function lumen(thesisScore: number): { deal: Deal; files: { filename: string; body: string }[] } {
   const profile: CompanyProfile = {
     company: "Lumen Health",
-    founders: ["Dr. Amira Cole", "Jonah Park"],
+    founders: ["Kristen Valdes", "Jenny Gackic"],
     sector: "Clinic-first healthcare — virtual specialty clinic",
     geography: "United States (Boston)",
     stage: "Seed",
@@ -305,7 +305,7 @@ function lumen(thesisScore: number): { deal: Deal; files: { filename: string; bo
         question: "What fraction of value is the clinic vs the protocol/lab network?",
         reason: "Decides whether the thesis exception is cosmetic or structural.",
         evidenceRequired: "Unit economics split by service line",
-        owner: "Amira Cole",
+        owner: "Kristen Valdes",
         status: "open",
       },
     ],
@@ -327,7 +327,7 @@ function lumen(thesisScore: number): { deal: Deal; files: { filename: string; bo
     people: [
       {
         title: "Founder-market fit",
-        claim: "Amira ran a hospital endocrine service; Jonah built lab logistics at Color.",
+        claim: "Kristen ran a hospital endocrine service; Jenny built lab logistics at Color.",
         evidence: "Bios on the one-pager only.",
         assessment: "Plausible. Unverified.",
       },
@@ -382,7 +382,7 @@ function lumen(thesisScore: number): { deal: Deal; files: { filename: string; bo
 function northstar(): { deal: Deal; files: { filename: string; body: string }[]; copySample: boolean } {
   const profile: CompanyProfile = {
     company: "Northstar Robotics",
-    founders: ["Maya Chen", "Owen Blake"],
+    founders: ["Simon Kalouche", "Erik Nieves"],
     sector: "Industrial robotics — warehouse autonomy",
     geography: "United States (Pittsburgh)",
     stage: "Series A",
@@ -645,7 +645,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
         timeHorizon: "This raise",
         mitigation: "Restate ARR and send a fully-diluted cap table.",
         status: "open",
-        owner: "Maya Chen",
+        owner: "Simon Kalouche",
         evidenceIds: ["e-ns-arr-model", "e-ns-cash"],
         cluster: "stated-vs-room",
       },
@@ -673,7 +673,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
         riskId: "r-ns-numbers",
         reason: "Largest single swing on conviction and valuation.",
         evidenceRequired: "Monthly billed + contracted roll-forward",
-        owner: "Maya Chen",
+        owner: "Simon Kalouche",
         status: "asked",
         deadline: "2026-09-18",
       },
@@ -682,7 +682,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
         question: "Please send the FD cap table that produces 15% founder ownership — or correct the slide.",
         reason: "Ownership is a priced term, not a narrative.",
         evidenceRequired: "Fully diluted cap table",
-        owner: "Owen Blake",
+        owner: "Erik Nieves",
         status: "open",
       },
     ],
@@ -690,7 +690,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
       {
         id: "t-ns-arr",
         title: "Waiting on ARR restatement",
-        owner: "Maya Chen",
+        owner: "Simon Kalouche",
         status: "waiting",
         waitingOn: "Founder — monthly roll-forward",
         kind: "document",
@@ -709,7 +709,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
         id: "m-ns-1",
         title: "First partner meeting",
         when: "2026-09-04T16:00:00.000Z",
-        attendees: ["You", "Maya Chen"],
+        attendees: ["You", "Simon Kalouche"],
         notes: "They walked the warehouse video. Numbers were not opened.",
       },
     ],
@@ -790,7 +790,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
 function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
   const profile: CompanyProfile = {
     company: "Aether Grid",
-    founders: ["Samira Okon", "Luca Moretti"],
+    founders: ["James McGinniss", "William Burke"],
     sector: "Climate / industrial — grid orchestration",
     geography: "EU (Milan) + US customers",
     stage: "Series A",
@@ -814,7 +814,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
     investmentConviction: 0,
   };
   scores.investmentConviction = computeConviction(scores);
-  const brief = `# Aether Grid\n\nSamira Okon (ex-Terna). Luca Moretti (controls).\n$1.6M ARR. 3 utilities. Key-person: Samira holds the ISO relationships.`;
+  const brief = `# Aether Grid\n\nJames McGinniss (ex-Terna). William Burke (controls).\n$1.6M ARR. 3 utilities. Key-person: James holds the ISO relationships.`;
   deal.docs = [doc(deal.id, "aether-brief.md", "other", "room", brief)];
   deal.intelligence = {
     stage: "validation",
@@ -864,7 +864,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
     findings: [
       {
         id: "f-ae-key",
-        title: "Key-person dependency on Samira",
+        title: "Key-person dependency on James",
         body: "ISO relationships sit with one founder. Product can ship without her; the book of business may not.",
         kind: "risk",
         claimIds: ["c-ae-moat"],
@@ -875,7 +875,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
       {
         id: "r-ae-key",
         category: "team",
-        description: "Key-person risk: ISO and utility relationships concentrated on Samira Okon.",
+        description: "Key-person risk: ISO and utility relationships concentrated on James McGinniss.",
         probability: "medium",
         impact: "high",
         materiality: "high",
@@ -884,7 +884,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
         timeHorizon: "24 months",
         mitigation: "Hire a second markets lead before close.",
         status: "open",
-        owner: "Samira Okon",
+        owner: "James McGinniss",
         evidenceIds: ["e-ae-iso"],
         cluster: "key-person",
       },
@@ -892,12 +892,12 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
     questions: [
       {
         id: "q-ae-hire",
-        question: "Who is the second person who can sit in an ISO room without Samira?",
+        question: "Who is the second person who can sit in an ISO room without James?",
         findingId: "f-ae-key",
         riskId: "r-ae-key",
         reason: "Separates founder-market fit (strength) from key-person (risk).",
         evidenceRequired: "Org plan + named candidate",
-        owner: "Samira Okon",
+        owner: "James McGinniss",
         status: "asked",
       },
     ],
@@ -912,7 +912,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
       },
     ],
     meetings: [
-      { id: "m-ae-1", title: "Product walkthrough", when: "2026-08-28T13:00:00.000Z", attendees: ["You", "Luca Moretti"] },
+      { id: "m-ae-1", title: "Product walkthrough", when: "2026-08-28T13:00:00.000Z", attendees: ["You", "William Burke"] },
     ],
     versions: [{ id: "ae-1", filename: "aether-brief.md", version: "v1", date: created, note: "Syndicate brief" }],
     assumptions: [],
@@ -937,13 +937,13 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
     people: [
       {
         title: "Founder-market fit",
-        claim: "Samira ran Terna’s flexibility desk.",
+        claim: "James ran Terna’s flexibility desk.",
         evidence: "Public bio + syndicate note.",
         assessment: "Verified strength. Also the key-person risk.",
       },
       {
         title: "Founder dynamics",
-        claim: "Luca owns product; Samira owns markets.",
+        claim: "William owns product; James owns markets.",
         evidence: "Walkthrough. They finish each other’s sentences.",
         assessment: "Healthy split. Bus factor is still one.",
       },
@@ -958,7 +958,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
       {
         title: "Technical debt",
         claim: "Each ISO is a custom connector.",
-        evidence: "Luca said six months per new ISO.",
+        evidence: "William said six months per new ISO.",
         assessment: "Scalability risk. Not fatal at A.",
       },
     ],
@@ -978,13 +978,13 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
         id: "tl-ae-walk",
         at: "2026-08-28T16:00:00.000Z",
         title: "Product walkthrough",
-        body: "Product is real. Moat is a claim. Samira is the book.",
+        body: "Product is real. Moat is a claim. James is the book.",
         source: "People + product",
       },
     ],
     nextAction: {
       title: "Run two utility references",
-      reason: "Tests whether the relationship survives without Samira in the room.",
+      reason: "Tests whether the relationship survives without James in the room.",
       decisionImpact: "high",
       informationValue: "high",
       cost: "medium",
@@ -1007,7 +1007,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
 function helio(): { deal: Deal; files: { filename: string; body: string }[] } {
   const profile: CompanyProfile = {
     company: "Helio Freight",
-    founders: ["Nora Voss", "Kenji Abe", "Idris Kane"],
+    founders: ["Bob King", "Austin McCombs", "Charley Dehoney"],
     sector: "B2B infrastructure — freight yield management",
     geography: "United States (Chicago)",
     stage: "Series A",
@@ -1152,7 +1152,7 @@ function helio(): { deal: Deal; files: { filename: string; body: string }[] } {
         claimId: "c-hf-take",
         reason: "Separates company quality from investment attractiveness at this price.",
         evidenceRequired: "Reference calls + contract excerpts",
-        owner: "Nora Voss",
+        owner: "Bob King",
         status: "asked",
         deadline: "2026-09-20",
       },
@@ -1253,7 +1253,7 @@ function helio(): { deal: Deal; files: { filename: string; body: string }[] } {
     people: [
       {
         title: "Team",
-        claim: "Nora ran yield at a top-20 carrier. Kenji built the pricing engine at Flexport.",
+        claim: "Bob ran yield at a top-20 carrier. Austin built the pricing engine at Flexport.",
         evidence: "References + public bios.",
         assessment: "Verified strength.",
       },

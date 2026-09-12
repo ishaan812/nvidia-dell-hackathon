@@ -2,6 +2,7 @@ import { copyFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises"
 import path from "node:path";
 import { effectiveScores } from "../intelligence/scores";
 import { normalizeStage } from "../intelligence/types";
+import { headerScores } from "../intelligence/viewStory";
 import { resolveExisting } from "./files";
 import { dirs } from "./paths";
 import { assertInsideDeal } from "./sandbox";
@@ -16,6 +17,8 @@ export function summarize(deal: Deal): DealSummary {
   for (const flag of deal.flags) flagCounts[flag.severity] += 1;
   const intel = deal.intelligence;
   const scores = intel ? effectiveScores(intel) : undefined;
+  const header = intel ? headerScores(intel, deal.flags) : undefined;
+  const pick = (key: string) => header?.find((row) => row.key === key)?.value;
   return {
     id: deal.id,
     name: deal.name,
@@ -30,8 +33,10 @@ export function summarize(deal: Deal): DealSummary {
     deckFilename: deal.deckFilename,
     stage: intel ? normalizeStage(intel.stage) : undefined,
     thesisException: (intel?.thesis.exceptions.length ?? 0) > 0,
-    thesisFit: scores?.thesisFit,
-    opportunityQuality: scores?.opportunityQuality,
+    thesisFit: pick("thesis") ?? scores?.thesisFit,
+    opportunityQuality: pick("opportunity") ?? scores?.opportunityQuality,
+    convictionScore: pick("conviction"),
+    diligenceScore: pick("diligence"),
     uncertainty: scores?.uncertainty,
     evidenceConfidence: scores?.evidenceConfidence,
     valuationAttractiveness: scores?.valuationAttractiveness,
@@ -45,8 +50,8 @@ export function summarize(deal: Deal): DealSummary {
 
 function waitingLabel(intel: Deal["intelligence"]): string | undefined {
   if (!intel?.pendingGate) return undefined;
-  if (intel.pendingGate.id === "founder") return "Waiting on founder email";
-  return "Waiting on partner email";
+  if (intel.pendingGate.id === "founder") return "Waiting on the founder";
+  return "Waiting on you";
 }
 
 export async function saveDeal(deal: Deal): Promise<void> {

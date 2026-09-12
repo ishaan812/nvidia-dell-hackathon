@@ -1,43 +1,43 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
-import { STAGE_LABELS, normalizeStage } from "@/lib/intelligence/types";
+import { normalizeStage } from "@/lib/intelligence/types";
 import { AppChrome } from "../AppChrome";
 import { PageFrame } from "../PageFrame";
 import { StageRail } from "../pipeline/StageRail";
 import { AskTab } from "./AskTab";
-import { ICTab } from "./ICTab";
+import { DealHeader } from "./DealHeader";
+import { DiligenceTab } from "./DiligenceTab";
 import { OverviewTab } from "./OverviewTab";
-import { ProcessTab } from "./ProcessTab";
 import { ThesisTab } from "./ThesisTab";
-import { ValidationTab } from "./ValidationTab";
 
 const TABS = [
   { id: "overview", label: "Overview" },
   { id: "thesis", label: "Thesis" },
-  { id: "validation", label: "Validation" },
-  { id: "process", label: "Process" },
-  { id: "decision", label: "Decision Room" },
+  { id: "diligence", label: "Due diligence" },
   { id: "ask", label: "Ask" },
 ] as const;
 
 const ALIASES: Record<string, (typeof TABS)[number]["id"]> = {
-  ic: "decision",
-  timeline: "decision",
-  valuation: "decision",
-  numbers: "validation",
-  questions: "validation",
-  claims: "validation",
-  evidence: "validation",
-  findings: "validation",
-  world: "validation",
-  people: "validation",
-  risks: "validation",
-  documents: "process",
+  validation: "diligence",
+  numbers: "diligence",
+  questions: "diligence",
+  claims: "diligence",
+  evidence: "diligence",
+  findings: "diligence",
+  world: "diligence",
+  people: "diligence",
+  risks: "diligence",
+  process: "overview",
+  documents: "overview",
+  room: "overview",
+  decision: "overview",
+  ic: "overview",
+  timeline: "overview",
+  valuation: "overview",
   stage: "overview",
   chat: "ask",
   analyst: "ask",
@@ -67,8 +67,18 @@ export function DealShell({ deal, intel, model }: Props) {
   }, [intel.pendingGate, router]);
 
   function open(id: TabId) {
-    router.replace(`/deals/${deal.id}?tab=${id}`, { scroll: false });
+    router.replace(id === "diligence" ? `/deals/${deal.id}?tab=diligence&pane=financials` : `/deals/${deal.id}?tab=${id}`, {
+      scroll: false,
+    });
   }
+
+  const waiting = intel.pendingGate
+    ? intel.pendingGate.id === "founder"
+      ? "Waiting on founder"
+      : "Waiting on you"
+    : decided
+      ? "Decision recorded"
+      : undefined;
 
   return (
     <div className="min-h-screen">
@@ -77,39 +87,34 @@ export function DealShell({ deal, intel, model }: Props) {
       </a>
       <PageFrame>
         <header className="pb-6 pt-10">
-          <AppChrome
-            model={model}
-            extra={
-              <Link href={`/deals/${deal.id}/room`}>
-                Data room
-              </Link>
-            }
-          />
-          <h1 className="mt-9 font-serif text-[2.5rem] font-medium leading-none tracking-tight">
-            {intel.profile.company}
-          </h1>
-          <p className="mt-3 max-w-xl text-[1.05rem] leading-7 text-mute">
-            <span className="text-copper">{STAGE_LABELS[stage]}</span>
-            {intel.thesis.exceptions.length ? (
-              <span className="text-flag-amber"> · Thesis exception</span>
-            ) : null}
-            {intel.pendingGate ? (
-              <span className="text-flag-amber">
-                {" "}
-                · {intel.pendingGate.id === "founder" ? "Waiting on founder" : "Waiting on partner"}
-              </span>
-            ) : decided ? (
-              <span className="text-ledger"> · Decision recorded</span>
-            ) : null}
-            {intel.profile.product ? ` · ${intel.profile.product}` : ""}
-          </p>
-          <div className="mt-5">
+          <AppChrome model={model} />
+          <DealHeader intel={intel} flags={deal.flags} waiting={waiting} />
+          <div className="mt-6">
             <StageRail current={stage} validated={validated} decided={decided} />
           </div>
         </header>
-
         <nav className="deal-tabs" aria-label="Deal sections">
-          {TABS.map((item) => (
+          {TABS.slice(0, 3).map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`deal-tab ${tab === item.id ? "is-on" : ""}`}
+              onClick={() => open(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+          <a
+            className="deal-tab deal-tab-ext"
+            href={`/deals/${deal.id}/room`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Data room
+            <span className="sr-only"> (opens in a new tab)</span>
+            <ExternalIcon />
+          </a>
+          {TABS.slice(3).map((item) => (
             <button
               key={item.id}
               type="button"
@@ -120,18 +125,21 @@ export function DealShell({ deal, intel, model }: Props) {
             </button>
           ))}
         </nav>
-
         <main id="deal-main" className="pb-20">
-          {tab === "overview" ? <OverviewTab deal={deal} intel={intel} /> : null}
+          {tab === "overview" ? <OverviewTab intel={intel} /> : null}
           {tab === "thesis" ? <ThesisTab intel={intel} /> : null}
-          {tab === "validation" ? <ValidationTab deal={deal} intel={intel} /> : null}
-          {tab === "process" ? <ProcessTab deal={deal} intel={intel} /> : null}
-          {tab === "decision" ? <ICTab dealId={deal.id} intel={intel} /> : null}
+          {tab === "diligence" ? <DiligenceTab deal={deal} intel={intel} /> : null}
           {tab === "ask" ? (
             <AskTab
               dealId={deal.id}
               company={intel.profile.company}
-              suggestions={askSuggestions(deal.flags.map((f) => f.comment), intel.profile.company)}
+              model={model}
+              suggestions={[
+                "Why is conviction at this level?",
+                "What concerns us most?",
+                "Challenge the investment case.",
+                "What would change our view?",
+              ]}
             />
           ) : null}
         </main>
@@ -140,15 +148,13 @@ export function DealShell({ deal, intel, model }: Props) {
   );
 }
 
-function askSuggestions(flags: string[], company: string): string[] {
-  const fromFlags = flags
-    .filter((flag) => /ARR|runway|headcount|ownership|TAM|burn/i.test(flag))
-    .slice(0, 2)
-    .map((flag) => flag.replace(/\.$/, "?"));
-  return [
-    `What's ${company}'s real ARR?`,
-    "Why does the deck disagree with the room?",
-    "Who owns the company?",
-    ...fromFlags,
-  ].slice(0, 4);
+function ExternalIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M6.5 2H3.25C2.56 2 2 2.56 2 3.25v9.5C2 13.44 2.56 14 3.25 14h9.5c.69 0 1.25-.56 1.25-1.25V9.5h-1.5v3.25H3.5V3.5H6.5V2Zm3.25 0H14v4.25h-1.5V4.56L7.78 9.28 6.72 8.22l4.72-4.72H9.75V2Z"
+      />
+    </svg>
+  );
 }

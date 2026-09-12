@@ -235,6 +235,8 @@ export type DealSummary = {
   evidenceConfidence?: number;
   valuationAttractiveness?: number;
   investmentConviction?: number;
+  convictionScore?: number;
+  diligenceScore?: number;
   nextAction?: string;
   lastActivity?: string;
   pendingGate?: import("../intelligence/types").PendingGate;

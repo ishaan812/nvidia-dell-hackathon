@@ -327,6 +327,39 @@ export type PeopleProductNote = {
   assessment: string;
 };
 
+export type ResearchHit = {
+  title: string;
+  url: string;
+  description: string;
+};
+
+export type FounderSpike = {
+  title: string;
+  detail: string;
+};
+
+export type FounderResearch = {
+  name: string;
+  summary: string;
+  spikes: FounderSpike[];
+  hits: ResearchHit[];
+};
+
+export type MarketInsight = {
+  title: string;
+  detail: string;
+};
+
+export type MarketResearch = {
+  deckTam?: string;
+  summary: string;
+  insights: MarketInsight[];
+  tam: ResearchHit[];
+  competitors: ResearchHit[];
+  space: ResearchHit[];
+  at: string;
+};
+
 export type NextAction = {
   title: string;
   reason: string;
@@ -410,6 +443,10 @@ export type DealIntelligence = {
   };
   portfolio?: PortfolioExposure;
   founderReplyApplied?: boolean;
+  research?: {
+    founders?: FounderResearch[];
+    market?: MarketResearch;
+  };
 };
 
 export type ThesisSettings = {

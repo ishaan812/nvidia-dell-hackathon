@@ -22,9 +22,10 @@ const KIND: Record<DealFile["kind"], string> = {
 type Props = {
   deal: DealLobbyView;
   model?: string;
+  embedded?: boolean;
 };
 
-export function DealLobby({ deal, model }: Props) {
+export function DealLobby({ deal, model, embedded = false }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [incoming, setIncoming] = useState<StagedFile[]>([]);
@@ -118,31 +119,41 @@ export function DealLobby({ deal, model }: Props) {
 
   return (
     <div className="bg-desk text-paper">
-      <a href="#data-room" className="skip-link">
-        Skip to data room
-      </a>
+      {embedded ? null : (
+        <a href="#data-room" className="skip-link">
+          Skip to data room
+        </a>
+      )}
       <div className="lobby-split is-open">
         <section className="lobby-files">
-          <header className="flex items-end justify-between gap-6 pb-8">
+          <header className={`flex items-end justify-between gap-6 ${embedded ? "pb-4" : "pb-8"}`}>
             <div>
-              <BrandLogo />
-              <p className="mt-5 text-[15px] text-paper/75">
-                <Link
-                  href={`/deals/${deal.id}`}
-                  className="underline-offset-2 hover:text-paper hover:underline"
-                >
-                  Deal desk
-                </Link>
-              </p>
-              <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight">
-                {deal.company || deal.name}
-              </h1>
-              <p className="mt-3 text-[15px] leading-7 text-paper/75">
-                The graph is on the desk. Click a file — or a node — to read it.
-              </p>
+              {embedded ? (
+                <p className="text-[15px] leading-7 text-paper/75">
+                  Click a file — or a node on the desk — to read it.
+                </p>
+              ) : (
+                <>
+                  <BrandLogo />
+                  <p className="mt-5 text-[15px] text-paper/75">
+                    <Link
+                      href={`/deals/${deal.id}`}
+                      className="underline-offset-2 hover:text-paper hover:underline"
+                    >
+                      Deal desk
+                    </Link>
+                  </p>
+                  <h1 className="mt-2 font-serif text-4xl font-medium tracking-tight">
+                    {deal.company || deal.name}
+                  </h1>
+                  <p className="mt-3 text-[15px] leading-7 text-paper/75">
+                    The graph is on the desk. Click a file — or a node — to read it.
+                  </p>
+                </>
+              )}
             </div>
             <div className="flex shrink-0 flex-col items-end gap-3">
-              <ModelBadge name={model} />
+              {embedded ? null : <ModelBadge name={model} />}
               <p className={`font-mono text-[12px] ${riskTone(deal.riskScore)}`}>
                 {deal.riskScore != null ? `risk ${deal.riskScore}` : deal.status}
               </p>

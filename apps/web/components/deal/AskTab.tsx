@@ -21,21 +21,25 @@ type Props = {
   company?: string;
   suggestions?: string[];
   compact?: boolean;
+  surface?: "desk" | "memo";
+  model?: string;
 };
 
 const FALLBACK_ASKS = [
-  "What's their real ARR?",
-  "Why does runway disagree?",
-  "Who owns the company?",
+  "Why is conviction at this level?",
+  "What concerns us most?",
+  "What would change our view?",
 ];
 
-export function AskTab({ dealId, company, suggestions, compact = false }: Props) {
+export function AskTab({ dealId, company, suggestions, compact = false, surface = "desk", model }: Props) {
+  const modelName = prettyModel(model);
   const chips = (suggestions?.length ? suggestions : FALLBACK_ASKS).slice(0, 4);
   const [input, setInput] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [ready, setReady] = useState(false);
   const bottom = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
+  const fieldId = useId();
   const storeKey = `nd-ask-${dealId}`;
 
   useEffect(() => {
@@ -89,13 +93,13 @@ export function AskTab({ dealId, company, suggestions, compact = false }: Props)
               answer: typeof data.answer === "string" ? data.answer : "",
               citations: parseCitations(data.citations),
               related: Array.isArray(data.related) ? data.related.map(String).slice(0, 3) : [],
-              model: typeof data.model === "string" ? data.model : "Muse Glimmer",
+              model: typeof data.model === "string" ? data.model : modelName,
               error:
                 res.ok || typeof data.answer === "string"
                   ? undefined
                   : typeof data.error === "string"
                     ? data.error
-                    : "Could not reach Muse Glimmer.",
+                    : `Could not reach ${modelName}.`,
             },
       ),
     );
@@ -109,10 +113,10 @@ export function AskTab({ dealId, company, suggestions, compact = false }: Props)
   const empty = turns.length === 0;
 
   return (
-    <div className={`ask-page ${compact ? "is-compact" : ""} ${empty ? "is-empty" : ""}`}>
+    <div className={`ask-page ${compact ? "is-compact" : ""} ${empty ? "is-empty" : ""} ${surface === "memo" ? "is-on-memo" : ""}`}>
       {empty ? (
         <div className="ask-hero">
-          <p className="ask-kicker">Muse Glimmer · this deal only</p>
+          <p className="ask-kicker">{modelName} · this deal only</p>
           <h2 className="ask-title">What would you like to know?</h2>
           <p className="ask-lead">
             {company ? `Ask about ${company}.` : "Ask about this room."} Answers come from the
@@ -121,7 +125,7 @@ export function AskTab({ dealId, company, suggestions, compact = false }: Props)
         </div>
       ) : (
         <div className="ask-toolbar">
-          <p className="ask-kicker">Muse Glimmer · this deal only</p>
+          <p className="ask-kicker">{modelName} · this deal only</p>
           <button type="button" className="ask-new" onClick={() => setTurns([])}>
             New question
           </button>
@@ -171,11 +175,11 @@ export function AskTab({ dealId, company, suggestions, compact = false }: Props)
 
       <form className="ask-composer" onSubmit={submit}>
         <div className="ask-composer-box">
-          <label className="sr-only" htmlFor={`ask-field-${dealId}`}>
+          <label className="sr-only" htmlFor={fieldId}>
             Ask this deal
           </label>
           <textarea
-            id={`ask-field-${dealId}`}
+            id={fieldId}
             ref={field}
             rows={1}
             value={input}
@@ -289,6 +293,13 @@ function parseCitations(raw: unknown): AskCitation[] {
       };
     })
     .filter((item): item is AskCitation => Boolean(item));
+}
+
+function prettyModel(id?: string): string {
+  if (!id) return "Gemma";
+  if (/muse[-_]?glimmer|glimmer[-_]?muse/i.test(id)) return "Muse Glimmer";
+  if (/gemma/i.test(id)) return "Gemma";
+  return id.replace(/:latest$/, "");
 }
 
 function fileHref(dealId: string, filename: string): string {

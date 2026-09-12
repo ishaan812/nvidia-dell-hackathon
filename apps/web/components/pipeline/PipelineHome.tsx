@@ -19,14 +19,14 @@ export function PipelineHome({ deals, model, using }: Props) {
       <a href="#pipeline-heading" className="skip-link">
         Skip to pipeline
       </a>
-      <PageFrame>
+      <PageFrame wide>
         <header className="pb-8 pt-10">
           <AppChrome model={using} modelOk={model.ok} />
-          <h1 className="mt-9 font-serif text-[2.75rem] font-medium leading-none tracking-tight">
+          <h1 className="mt-9 font-serif text-[2.35rem] font-medium leading-none tracking-tight">
             Pipeline
           </h1>
           <p className="mt-3 max-w-md text-[1.05rem] leading-7 text-mute">
-            Open a deal. The rail shows where it is. Waiting on email means the desk stopped for you.
+            What needs you, what is ready to read, and what we are waiting on.
           </p>
         </header>
         <PipelineBoard deals={book.length ? book : deals} />

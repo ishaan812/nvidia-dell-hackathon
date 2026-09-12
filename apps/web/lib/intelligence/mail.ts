@@ -106,7 +106,7 @@ export function buildDraft(kind: DraftKind, deal: Deal, intel: DealIntelligence)
       intel.ic ? `The optimistic read: ${intel.ic.bullCase}` : "",
       intel.ic ? `The bad one: ${intel.ic.bearCase}` : "",
       "",
-      `Decision Room: ${url}?tab=decision`,
+      `Overview: ${url}?tab=overview`,
       "",
       `Reply "confirm", "pass", or "term sheet". Your call — I'm not assigning a probability.`,
     ]

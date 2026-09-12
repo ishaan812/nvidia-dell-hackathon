@@ -4,29 +4,45 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { DealSummary } from "@/lib/diligence/types";
-import { DEAL_STAGES, STAGE_LABELS, type DealStage } from "@/lib/intelligence/types";
-import { scoreTone } from "@/lib/intelligence/scores";
-import { scoreDisplay } from "@/lib/format";
+import { STAGE_LABELS, type DealStage } from "@/lib/intelligence/types";
+import { pipelineBucket, plainAction, type PipelineBucket } from "@/lib/intelligence/viewStory";
+import { ScoreValue } from "../deal/ScoreValue";
+
+function pipeScores(deal: DealSummary) {
+  return [
+    { key: "thesis", label: "Thesis", value: deal.thesisFit },
+    { key: "conviction", label: "Conviction", value: deal.convictionScore ?? deal.investmentConviction },
+    { key: "opportunity", label: "Opportunity", value: deal.opportunityQuality },
+    { key: "diligence", label: "Diligence", value: deal.diligenceScore },
+  ] as const;
+}
 
 type Props = {
   deals: DealSummary[];
 };
 
+const BUCKETS: { id: PipelineBucket; title: string; lead: string }[] = [
+  { id: "attention", title: "Needs your attention", lead: "Someone has to move these." },
+  { id: "review", title: "Ready for review", lead: "The file is far enough along to read." },
+  { id: "waiting", title: "Waiting", lead: "We need a file or an answer. Not a new stage." },
+  { id: "updated", title: "Recently updated", lead: "Changed, but not asking you yet." },
+];
+
 export function PipelineBoard({ deals }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [stage, setStage] = useState<DealStage | "all">("all");
   const [error, setError] = useState<string | null>(null);
 
-  const rows = useMemo(() => {
-    const filtered = deals.filter((deal) => (stage === "all" ? true : deal.stage === stage));
-    return [...filtered].sort((a, b) => {
-      if (a.live !== b.live) return a.live ? -1 : 1;
-      const ai = DEAL_STAGES.indexOf(a.stage as DealStage);
-      const bi = DEAL_STAGES.indexOf(b.stage as DealStage);
-      return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
-    });
-  }, [deals, stage]);
+  const grouped = useMemo(() => {
+    const map: Record<PipelineBucket, DealSummary[]> = {
+      attention: [],
+      review: [],
+      waiting: [],
+      updated: [],
+    };
+    for (const deal of deals) map[pipelineBucket(deal)].push(deal);
+    return map;
+  }, [deals]);
 
   useEffect(() => {
     let stamp = deals.map((deal) => `${deal.id}:${deal.updatedAt}:${deal.nextAction}`).join("|");
@@ -41,7 +57,7 @@ export function PipelineBoard({ deals }: Props) {
           router.refresh();
         }
       } catch {
-        // Projector keeps the last good blotter if the poll misses.
+        /* keep last blotter */
       }
     }, 3000);
     return () => window.clearInterval(tick);
@@ -69,20 +85,6 @@ export function PipelineBoard({ deals }: Props) {
         <h2 id="pipeline-heading" className="sr-only">
           Deals
         </h2>
-        <label>
-          Stage
-          <select
-            value={stage}
-            onChange={(event) => setStage(event.target.value as DealStage | "all")}
-          >
-            <option value="all">All</option>
-            {DEAL_STAGES.map((item) => (
-              <option key={item} value={item}>
-                {STAGE_LABELS[item]}
-              </option>
-            ))}
-          </select>
-        </label>
         <button
           type="button"
           onClick={reseeds}
@@ -93,32 +95,40 @@ export function PipelineBoard({ deals }: Props) {
         </button>
       </div>
 
-      <div className="pipe-list">
-        <div className="pipe-head" aria-hidden="true">
-          <span>Company</span>
-          <span>Stage</span>
-          <span>Conv / risk</span>
-          <span>Next</span>
-        </div>
-        {rows.map((deal) => (
-          <Link key={deal.id} href={`/deals/${deal.id}`} className="pipe-row">
-            <span className="pipe-name">
-              {deal.company || deal.name}
-              {deal.live ? <span className="pipe-flag">Live</span> : null}
-              {deal.thesisException ? <span className="pipe-flag">Thesis exception</span> : null}
-            </span>
-            <span className="pipe-stage">{deal.stage ? STAGE_LABELS[deal.stage] : "—"}</span>
-            <span className="pipe-score">
-              <span className={scoreTone("investmentConviction", deal.investmentConviction)}>
-                {scoreDisplay(deal.investmentConviction)}
-              </span>
-              <span className="text-mute"> / </span>
-              <span className={scoreTone("risk", deal.riskScore)}>{scoreDisplay(deal.riskScore)}</span>
-            </span>
-            <span className="pipe-next">{deal.nextAction ?? "—"}</span>
-          </Link>
-        ))}
-      </div>
+      {BUCKETS.map((bucket) => {
+        const rows = grouped[bucket.id];
+        if (!rows.length) return null;
+        return (
+          <div key={bucket.id} className="pipe-bucket">
+            <h3>{bucket.title}</h3>
+            <p>{bucket.lead}</p>
+            <div className="pipe-list">
+              <div className="pipe-head" aria-hidden="true">
+                <span>Deal</span>
+                <span>Stage</span>
+                {pipeScores(rows[0]!).map((row) => (
+                  <span key={row.key}>{row.label}</span>
+                ))}
+                <span>Next</span>
+              </div>
+              {rows.map((deal) => (
+                <Link key={deal.id} href={`/deals/${deal.id}`} className="pipe-row">
+                  <span className="pipe-name">
+                    {deal.company || deal.name}
+                    {deal.live ? <span className="pipe-flag">Live</span> : null}
+                    {deal.thesisException ? <span className="pipe-flag">Thesis exception</span> : null}
+                  </span>
+                  <span className="pipe-stage">{deal.stage ? STAGE_LABELS[deal.stage as DealStage] : "—"}</span>
+                  {pipeScores(deal).map((row) => (
+                    <ScoreValue key={row.key} value={row.value} label={row.label} />
+                  ))}
+                  <span className="pipe-next">{plainAction(deal.nextAction)}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        );
+      })}
       {error ? <p className="mt-3 text-[0.875rem] text-flag-red">{error}</p> : null}
     </section>
   );

@@ -1,0 +1,13 @@
+teh UI still says gemma3 i just took a pull push all chnages for ui through github after that ill take pull to see glimmer work there now
+
+---
+
+do the git pull and env change for me then i will restart server when you tell me to, also could you initialise teh 5 deals we have locally there you have ssh access still right
+
+---
+
+add the model name on top right so we knwo what model we are using
+
+---
+
+did you take a pull on the server

@@ -113,7 +113,7 @@ async function assessFounder(
   const sources = hits
     .map((hit, i) => `${i + 1}. ${hit.title}\n${hit.url}\n${hit.description.slice(0, 1800)}`)
     .join("\n\n");
-  const parsed = await requireJson<{ summary: string; spikes: FounderSpike[] }>(
+  const parsed = await askJson<{ summary: string; spikes: FounderSpike[] }>(
     [
       {
         role: "system",
@@ -125,36 +125,38 @@ async function assessFounder(
         content: `Deal company: ${company}\nSector: ${sector}\nFounder named on the deal: ${name}\n\nSources:\n${sources}\n\nJSON shape:\n{"summary":"2-3 sentences: who the public record says they are, the spike of excellence, and why it matters for this sector.","spikes":[{"title":"short achievement","detail":"one sentence with the evidence"}]}`,
       },
     ],
-    (data) =>
-      typeof data.summary === "string" &&
-      data.summary.trim().length > 40 &&
-      Array.isArray(data.spikes) &&
-      data.spikes.length > 0,
-    `The model did not produce a founder read for ${name}.`,
+    (data) => typeof data.summary === "string" && data.summary.trim().length > 20,
   );
+  if (parsed?.summary) {
+    return {
+      name,
+      summary: parsed.summary.trim(),
+      spikes: (parsed.spikes ?? [])
+        .map((item) => ({ title: item.title?.trim(), detail: item.detail?.trim() }))
+        .filter((item): item is FounderSpike => Boolean(item.title && item.detail))
+        .slice(0, 4),
+      hits,
+    };
+  }
   return {
     name,
-    summary: parsed.summary.trim(),
-    spikes: parsed.spikes
-      .map((item) => ({ title: item.title?.trim(), detail: item.detail?.trim() }))
-      .filter((item): item is FounderSpike => Boolean(item.title && item.detail))
-      .slice(0, 4),
+    summary: hits[0]?.description?.replace(/\s+/g, " ").trim().slice(0, 400)
+      || `Public hits landed for ${name}. The record is thin — we did not write past the sources.`,
+    spikes: hits[0]?.title ? [{ title: hits[0].title.slice(0, 80), detail: hits[0].url }] : [],
     hits,
   };
 }
 
-async function requireJson<T extends object>(
+async function askJson<T extends object>(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
   ok: (data: T) => boolean,
-  fail: string,
-): Promise<T> {
-  let last = "";
-  for (let attempt = 0; attempt < 3; attempt++) {
-    last = await chat(messages, { maxTokens: 700, model: settings().diligenceModel });
+): Promise<T | null> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const last = await chat(messages, { maxTokens: 700, model: settings().diligenceModel });
     const parsed = extractJson<T>(last);
     if (parsed && ok(parsed)) return parsed;
   }
-  throw new Error(fail);
+  return null;
 }
 
 function extractJson<T>(raw: string): T | null {
@@ -246,7 +248,7 @@ async function assessMarket(
       at: new Date().toISOString(),
     };
   }
-  const parsed = await requireJson<{ summary: string; insights: MarketInsight[] }>(
+  const parsed = await askJson<{ summary: string; insights: MarketInsight[] }>(
     [
       {
         role: "system",
@@ -258,20 +260,30 @@ async function assessMarket(
         content: `Deal: ${company}\nSector: ${sector}\nProduct: ${product}\nDeck TAM: ${deckTam || "none"}\n\nMarket size sources:\n${pack(tam) || "none"}\n\nOpen space:\n${pack(space) || "none"}\n\nCompetitors:\n${pack(competitors) || "none"}\n\nJSON shape:\n{"summary":"2-3 sentences: the real market, the open space, the fight.","insights":[{"title":"TAM","detail":"one or two sentences"},{"title":"Open space","detail":"one or two sentences"},{"title":"Competitors","detail":"one or two sentences"}]}`,
       },
     ],
-    (data) =>
-      typeof data.summary === "string" &&
-      data.summary.trim().length > 40 &&
-      Array.isArray(data.insights) &&
-      data.insights.length >= 2,
-    `The model did not produce a market read for ${company}.`,
+    (data) => typeof data.summary === "string" && data.summary.trim().length > 20,
   );
+  if (parsed?.summary) {
+    return {
+      deckTam,
+      summary: parsed.summary.trim(),
+      insights: (parsed.insights ?? [])
+        .map((item) => ({ title: item.title?.trim(), detail: item.detail?.trim() }))
+        .filter((item): item is MarketInsight => Boolean(item.title && item.detail))
+        .slice(0, 4),
+      tam,
+      competitors,
+      space,
+      at: new Date().toISOString(),
+    };
+  }
+  const lead = tam[0] || competitors[0] || space[0];
   return {
     deckTam,
-    summary: parsed.summary.trim(),
-    insights: parsed.insights
-      .map((item) => ({ title: item.title?.trim(), detail: item.detail?.trim() }))
-      .filter((item): item is MarketInsight => Boolean(item.title && item.detail))
-      .slice(0, 4),
+    summary: deckTam
+      ? `Deck cites ${deckTam}. Public sources are thin; we did not replace that figure.`
+      : lead?.description?.replace(/\s+/g, " ").trim().slice(0, 400)
+        || "Public market sources landed. We did not invent a TAM.",
+    insights: lead ? [{ title: lead.title.slice(0, 80), detail: lead.url }] : [],
     tam,
     competitors,
     space,

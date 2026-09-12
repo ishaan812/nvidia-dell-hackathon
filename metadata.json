@@ -3,7 +3,7 @@
   "checkpoint_id": "01M2BMZMYY3H77P3P0GA5HFKMT",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 13,
+  "checkpoints_count": 14,
   "files_touched": [
     ".env.example",
     "apps/web/app/api/deals/[id]/research/founder/route.ts",
@@ -61,13 +61,20 @@
       "compact_transcript": "/1/transcript.jsonl",
       "content_hash": "/1/content_hash.txt",
       "prompt": "/1/prompt.txt"
+    },
+    {
+      "metadata": "/2/metadata.json",
+      "transcript": "/2/full.jsonl",
+      "compact_transcript": "/2/transcript.jsonl",
+      "content_hash": "/2/content_hash.txt",
+      "prompt": "/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 879205,
+    "input_tokens": 902759,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 21684544,
-    "output_tokens": 126847,
-    "api_call_count": 12
+    "cache_read_tokens": 21729536,
+    "output_tokens": 127393,
+    "api_call_count": 13
   }
 }

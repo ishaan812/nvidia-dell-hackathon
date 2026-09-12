@@ -1,0 +1,73 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BMZMYY3H77P3P0GA5HFKMT",
+  "session_id": "fadfb408-11df-44e6-ab1a-1e735b774ac7",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T20:29:47.602475Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".env.example",
+    "apps/web/app/globals.css",
+    "apps/web/components/AskPanel.tsx",
+    "apps/web/components/deal/AskTab.tsx",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/lib/diligence/paths.ts"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "428c6b25638f",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 23554,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 44992,
+    "output_tokens": 546,
+    "api_call_count": 1
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T20:29:47.598064Z",
+    "agent_lines": 568,
+    "agent_removed": 158,
+    "human_added": 1830,
+    "human_modified": 60,
+    "human_removed": 0,
+    "total_committed": 2458,
+    "total_lines_changed": 3098,
+    "agent_percentage": 23.43447385409942,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 106,
+      "user_lines_removed": 60,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".env.example": 1,
+        ".impeccable/hook.cache.json": 1,
+        "apps/web/app/globals.css": 67,
+        "apps/web/components/AskPanel.tsx": 9,
+        "apps/web/components/deal/AskTab.tsx": 19,
+        "apps/web/components/deal/DealShell.tsx": 2,
+        "apps/web/components/deal/ICTab.tsx": 5,
+        "apps/web/lib/diligence/paths.ts": 2
+      },
+      "user_removed_per_file": {
+        ".env.example": 1,
+        "apps/web/app/globals.css": 41,
+        "apps/web/components/AskPanel.tsx": 1,
+        "apps/web/components/deal/AskTab.tsx": 8,
+        "apps/web/components/deal/DealShell.tsx": 1,
+        "apps/web/components/deal/ICTab.tsx": 7,
+        "apps/web/lib/diligence/paths.ts": 1
+      }
+    }
+  ]
+}

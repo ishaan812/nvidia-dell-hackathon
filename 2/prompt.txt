@@ -1,0 +1,1 @@
+kill ollama server rn which is running locally

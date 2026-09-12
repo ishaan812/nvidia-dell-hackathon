@@ -48,7 +48,7 @@ function cleanNames(values?: string[] | null): string[] {
     const name = raw.replace(/\s+/g, " ").replace(/^dr\.?\s+/i, "Dr. ").trim();
     const key = name.toLowerCase();
     if (!name || name.length < 4 || name.length > 60) continue;
-    if (/\d|@|http|founder|confidential|discussion/i.test(name)) continue;
+    if (/\d|@|http|founder|confidential|discussion|team|research|electrochemistry|cathode/i.test(name)) continue;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(name);
@@ -58,7 +58,7 @@ function cleanNames(values?: string[] | null): string[] {
 
 function heuristicExtract(text: string): DeckExtract {
   const founders = cleanNames(
-    [...text.matchAll(/((?:Dr\.?\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z'.]+)+)\s+(?:Co-)?Founder/gi)].map(
+    [...text.matchAll(/(?:^|[^A-Za-z.])((?:Dr\.?\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z']+){1,2})\s+(?:Co-)?Founder/gi)].map(
       (match) => match[1],
     ),
   );

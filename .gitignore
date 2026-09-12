@@ -1,0 +1,17 @@
+.env
+.env.local
+.venv
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+outbox/
+inbox/*
+!inbox/.gitkeep
+node_modules/
+.next/
+apps/web/.next/
+*.egg-info/
+dist/
+.DS_Store
+rag_storage/

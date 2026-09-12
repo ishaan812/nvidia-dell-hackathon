@@ -1,0 +1,10 @@
+{
+  "name": "night-desk",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --dir apps/web dev --hostname 127.0.0.1 --port 3000",
+    "sample": "pnpm --dir apps/web exec tsx lib/diligence/cli.ts sample",
+    "run": "pnpm --dir apps/web exec tsx lib/diligence/cli.ts run",
+    "build": "pnpm --dir apps/web build"
+  }
+}

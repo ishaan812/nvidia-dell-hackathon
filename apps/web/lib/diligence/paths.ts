@@ -40,6 +40,7 @@ export function settings() {
     llmApiKey: process.env.LLM_API_KEY ?? "ollama",
     llmModel: process.env.LLM_MODEL ?? "gemma3:latest",
     embeddingModel: process.env.EMBEDDING_MODEL ?? "nomic-embed-text",
+    diligenceModel: "gemma3:latest",
   };
 }
 

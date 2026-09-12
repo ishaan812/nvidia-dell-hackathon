@@ -2,6 +2,7 @@ import type { Deal } from "./types";
 import { firecrawlScrapePage, firecrawlSearch, type SearchHit } from "./firecrawl";
 import { attachFounderPhotos } from "./founderPhoto";
 import { chat } from "./llm";
+import { settings } from "./paths";
 import { hasMarketSignal } from "../intelligence/fromDeck";
 import type { FounderResearch, FounderSpike, MarketInsight, MarketResearch, ResearchHit } from "../intelligence/types";
 
@@ -149,7 +150,7 @@ async function requireJson<T extends object>(
 ): Promise<T> {
   let last = "";
   for (let attempt = 0; attempt < 3; attempt++) {
-    last = await chat(messages, { maxTokens: 700 });
+    last = await chat(messages, { maxTokens: 700, model: settings().diligenceModel });
     const parsed = extractJson<T>(last);
     if (parsed && ok(parsed)) return parsed;
   }

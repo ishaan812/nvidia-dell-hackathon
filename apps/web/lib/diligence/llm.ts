@@ -27,14 +27,15 @@ export async function pingModel(): Promise<{ ok: boolean; models: string[] }> {
 
 export async function chat(
   messages: { role: "system" | "user" | "assistant"; content: string }[],
-  opts?: { maxTokens?: number },
+  opts?: { maxTokens?: number; model?: string },
 ): Promise<string> {
+  const model = opts?.model ?? settings().llmModel;
   try {
     const res = await fetch(`${settings().llmBaseUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
       headers: headers(),
       body: JSON.stringify({
-        model: settings().llmModel,
+        model,
         messages,
         temperature: 0.2,
         max_tokens: opts?.maxTokens ?? 2048,
@@ -53,7 +54,7 @@ export async function chat(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: settings().llmModel,
+        model,
         messages,
         stream: false,
         options: { temperature: 0.2, num_predict: opts?.maxTokens ?? 2048 },

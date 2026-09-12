@@ -1,4 +1,5 @@
 import { chat } from "../diligence/llm";
+import { settings } from "../diligence/paths";
 import type { Deal } from "../diligence/types";
 import type { CompanyProfile } from "./types";
 
@@ -45,7 +46,7 @@ function cleanNames(values?: string[] | null): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
   for (const raw of values) {
-    const name = raw.replace(/\s+/g, " ").replace(/^dr\.?\s+/i, "Dr. ").trim();
+    const name = raw.replace(/\s+/g, " ").replace(/^[A-Z]{1,3}\s+(?=[A-Z])/, "").replace(/^dr\.?\s+/i, "Dr. ").trim();
     const key = name.toLowerCase();
     if (!name || name.length < 4 || name.length > 60) continue;
     if (/\d|@|http|founder|confidential|discussion|team|research|electrochemistry|cathode/i.test(name)) continue;
@@ -132,7 +133,7 @@ export async function fillProfileFromDeck(deal: Deal, profile: CompanyProfile): 
           content: `Company on the folder: ${profile.company}\n\nDeck:\n${text}\n\nJSON shape:\n{"founders":["Full Name"]|null,"sector":"short sector"|null,"product":"what they sell"|null,"geography":"city or country"|null,"stage":"Pre-seed|Seed|Series A|Series B"|null,"fundraise":"raise line"|null,"businessModel":"how they charge"|null}`,
         },
       ],
-      { maxTokens: 400 },
+      { maxTokens: 400, model: settings().diligenceModel },
     ),
     20_000,
   );

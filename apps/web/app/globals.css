@@ -1141,6 +1141,7 @@ body {
 .stage-rail-item {
   display: flex;
   align-items: center;
+  gap: 0.35rem;
   flex: 0 0 auto;
   font-size: 0.8125rem;
   line-height: 1;
@@ -1149,18 +1150,40 @@ body {
 }
 
 .stage-rail-item + .stage-rail-item::before {
-  content: "→";
-  margin: 0 0.55rem;
-  color: color-mix(in srgb, var(--mute) 45%, transparent);
+  content: "";
+  width: 1.1rem;
+  height: 1px;
+  margin: 0 0.45rem 0 0.15rem;
+  background: color-mix(in srgb, var(--mute) 35%, transparent);
+}
+
+.stage-rail-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  font-size: 0.7rem;
 }
 
 .stage-rail-item.is-done {
-  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  color: var(--ledger);
+}
+
+.stage-rail-item.is-done .stage-rail-mark {
+  color: var(--ledger);
 }
 
 .stage-rail-item.is-now {
   color: var(--copper);
   font-weight: 500;
+}
+
+.stage-rail-item.is-now .stage-rail-mark {
+  color: var(--copper);
+}
+
+.stage-rail-item.is-next {
+  color: var(--mute);
 }
 
 .desk-card {

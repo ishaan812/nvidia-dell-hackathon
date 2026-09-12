@@ -58,7 +58,9 @@ export function NumbersTab({ deal, intel }: Props) {
       {question ? (
         <Section title="Open question">
           <p className="text-[17px] leading-7">{question.question}</p>
-          {deal.id === "northstar-robotics" ? <FounderReply dealId={deal.id} applied={Boolean(intel.founderReplyApplied)} /> : null}
+          {deal.id === "northstar-robotics" || deal.id === "northstar-live" ? (
+            <FounderReply dealId={deal.id} applied={Boolean(intel.founderReplyApplied)} />
+          ) : null}
         </Section>
       ) : null}
     </div>

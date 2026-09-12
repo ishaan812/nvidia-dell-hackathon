@@ -1,6 +1,6 @@
 import { DEAL_STAGES, STAGE_LABELS, type DealStage, type StageSnapshot } from "./types";
 
-export { DEAL_STAGES, STAGE_LABELS };
+export { DEAL_STAGES, STAGE_LABELS, normalizeStage } from "./types";
 
 export const STAGE_DEFS: Record<DealStage, StageSnapshot> = {
   source: {
@@ -21,84 +21,48 @@ export const STAGE_DEFS: Record<DealStage, StageSnapshot> = {
     openQuestions: ["Take a meeting, request information, watch, or decline?"],
     requiredActions: ["Read the profile", "Record a recommended next step"],
     exitCriteria: ["Initial scores written", "Recommendation is not a thesis auto-reject"],
-    nextStates: ["process", "source"],
+    nextStates: ["validation", "process", "source"],
+  },
+  validation: {
+    entryCriteria: ["Triage cleared a meeting or the room is already in"],
+    expectedInputs: ["Model, metrics, market claims, team, product"],
+    expectedDocuments: ["Financial model", "Metrics pack", "Cap table", "TAM slide", "Team / product"],
+    aiChecks: [
+      "Financial analysis",
+      "Market analysis",
+      "Customer analysis",
+      "Competition",
+      "Product",
+      "Team",
+      "External / real-world validation",
+      "Benchmarking",
+      "Plausibility analysis",
+      "Evidence checks",
+    ],
+    openQuestions: ["Which management claims survive the room and the world?"],
+    requiredActions: ["Reconcile deck vs room", "Test outside the room", "Separate people and product claims"],
+    exitCriteria: ["Material claims have a verification status"],
+    nextStates: ["process", "decision_room", "triage"],
   },
   process: {
-    entryCriteria: ["Triage recommended a meeting or more information"],
-    expectedInputs: ["Owner", "Meeting time", "Document request list"],
-    expectedDocuments: ["Data room index", "Calendar hold"],
-    aiChecks: ["What we are waiting on", "Who owns each item"],
-    openQuestions: ["What is blocking the next stage?"],
-    requiredActions: ["Assign owners", "Send document requests"],
-    exitCriteria: ["Next meeting booked or materials inbound"],
-    nextStates: ["numbers", "triage"],
+    entryCriteria: ["A human is waiting on a meeting, document, or owner"],
+    expectedInputs: ["Owner", "Meeting time", "Document request list", "Open questions"],
+    expectedDocuments: ["Data room index", "Calendar hold", "Founder replies"],
+    aiChecks: ["What we are waiting on", "Who owns each item", "Whether a reply should re-run analysis"],
+    openQuestions: ["What is blocking the next belief update?"],
+    requiredActions: ["Assign owners", "Send document requests", "Log meetings and notes"],
+    exitCriteria: ["Next meeting booked, materials inbound, or the partner is ready for Decision"],
+    nextStates: ["validation", "decision_room", "triage"],
   },
-  numbers: {
-    entryCriteria: ["Financials or metric pack in the room"],
-    expectedInputs: ["Model, ARR, burn, cohorts if claimed"],
-    expectedDocuments: ["Financial model", "Metrics pack", "Cap table"],
-    aiChecks: [
-      "Claim-to-evidence",
-      "Cross-document contradiction",
-      "Stated vs recomputed",
-      "Forward vs backward",
-      "Population completeness",
-      "Plausibility vs benchmark",
-    ],
-    openQuestions: ["Which management numbers survive the room?"],
-    requiredActions: ["Reconcile deck vs room", "Flag contradictions"],
-    exitCriteria: ["Material claims have a verification status"],
-    nextStates: ["world", "founder_loop", "process"],
-  },
-  world: {
-    entryCriteria: ["Company story is specific enough to test outside the room"],
-    expectedInputs: ["Market claim, competitors, pricing"],
-    expectedDocuments: ["TAM slide", "any third-party study"],
-    aiChecks: ["Independent market evidence", "Public signals", "Hiring / news"],
-    openQuestions: ["Does the outside world agree with the deck?"],
-    requiredActions: ["Record independent evidence for and against"],
-    exitCriteria: ["Each material world claim has an assessment"],
-    nextStates: ["people_product", "founder_loop"],
-  },
-  people_product: {
-    entryCriteria: ["Named founders and a product description"],
-    expectedInputs: ["Bios, org, product demo notes"],
-    expectedDocuments: ["Team slide", "product walkthrough"],
-    aiChecks: ["Founder-market fit", "Key-person risk", "Differentiation vs evidence"],
-    openQuestions: ["Can this team ship, and is the product real?"],
-    requiredActions: ["Separate claims from verified evidence"],
-    exitCriteria: ["People and product notes stored with evidence links"],
-    nextStates: ["founder_loop", "ic"],
-  },
-  founder_loop: {
-    entryCriteria: ["At least one unresolved finding"],
-    expectedInputs: ["Questions tied to claims"],
-    expectedDocuments: ["Founder answers", "updated model"],
-    aiChecks: ["Response completeness", "New contradictions"],
-    openQuestions: ["Did the answer close the finding or raise a new one?"],
-    requiredActions: ["Send questions", "Rerun affected checks on reply"],
-    exitCriteria: ["Material questions answered or explicitly parked"],
-    nextStates: ["ic", "numbers"],
-  },
-  ic: {
+  decision_room: {
     entryCriteria: ["Scores, risks, and a valuation view exist"],
-    expectedInputs: ["Conviction breakdown", "open questions"],
+    expectedInputs: ["Conviction breakdown", "open questions", "partner decision"],
     expectedDocuments: ["IC packet"],
     aiChecks: ["Packet completeness", "assumption visibility"],
     openQuestions: ["Advance, advance with conditions, watch, pass, or term sheet?"],
-    requiredActions: ["Generate packet", "Partner reads it"],
+    requiredActions: ["Read the case", "Ask the analyst", "Record a human decision"],
     exitCriteria: ["Recommendation recorded by the VC"],
-    nextStates: ["close_pass", "founder_loop"],
-  },
-  close_pass: {
-    entryCriteria: ["IC recommendation exists"],
-    expectedInputs: ["Decision and reason"],
-    expectedDocuments: ["Term sheet or pass note"],
-    aiChecks: ["Decision is attributed to a human"],
-    openQuestions: ["What do we tell the founder?"],
-    requiredActions: ["Record close or pass"],
-    exitCriteria: ["Outcome stored on the deal"],
-    nextStates: [],
+    nextStates: ["validation", "process"],
   },
 };
 
@@ -108,4 +72,18 @@ export function stageIndex(stage: DealStage): number {
 
 export function nextStages(stage: DealStage): DealStage[] {
   return STAGE_DEFS[stage].nextStates;
+}
+
+export function stageMark(
+  stage: DealStage,
+  current: DealStage,
+  opts?: { validated?: boolean; decided?: boolean },
+): "done" | "now" | "next" {
+  if (stage === current) return "now";
+  const here = stageIndex(current);
+  const at = stageIndex(stage);
+  if (stage === "validation" && current === "process" && opts?.validated) return "done";
+  if (stage === "process" && current === "decision_room") return "done";
+  if (stage === "decision_room" && opts?.decided) return "done";
+  return at < here ? "done" : "next";
 }

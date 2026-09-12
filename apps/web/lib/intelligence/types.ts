@@ -1,13 +1,9 @@
 export const DEAL_STAGES = [
   "source",
   "triage",
+  "validation",
   "process",
-  "numbers",
-  "world",
-  "people_product",
-  "founder_loop",
-  "ic",
-  "close_pass",
+  "decision_room",
 ] as const;
 
 export type DealStage = (typeof DEAL_STAGES)[number];
@@ -15,14 +11,25 @@ export type DealStage = (typeof DEAL_STAGES)[number];
 export const STAGE_LABELS: Record<DealStage, string> = {
   source: "Source",
   triage: "Triage",
+  validation: "Validation",
   process: "Process",
-  numbers: "Numbers",
-  world: "World",
-  people_product: "People",
-  founder_loop: "Loop",
-  ic: "IC",
-  close_pass: "Close",
+  decision_room: "Decision",
 };
+
+const LEGACY_STAGES: Record<string, DealStage> = {
+  numbers: "validation",
+  world: "validation",
+  people_product: "validation",
+  founder_loop: "validation",
+  ic: "decision_room",
+  close_pass: "decision_room",
+};
+
+export function normalizeStage(stage: string | undefined | null): DealStage {
+  if (stage && (DEAL_STAGES as readonly string[]).includes(stage)) return stage as DealStage;
+  if (stage && LEGACY_STAGES[stage]) return LEGACY_STAGES[stage];
+  return "source";
+}
 
 export type ClaimKind = "fact" | "management" | "benchmark" | "agent" | "scenario";
 export type SourceRank = "primary" | "secondary" | "management" | "unverified";
@@ -351,11 +358,28 @@ export type PortfolioExposure = {
   followOn: string;
 };
 
+export type PendingGateId = "triage" | "founder" | "ic";
+
+export type PendingGate = {
+  id: PendingGateId;
+  prompt: string;
+  options: string[];
+};
+
+export type DealMail = {
+  thread: string;
+  partner: string;
+  founder: string;
+  lastOutbound?: string;
+};
+
 export type DealIntelligence = {
   stage: DealStage;
   profile: CompanyProfile;
   thesis: ThesisAssessment;
   scores: ScoreSet;
+  pendingGate?: PendingGate;
+  mail?: DealMail;
   scoreBreakdown?: {
     opportunity?: OpportunityBreakdown;
     convictionNote: string;

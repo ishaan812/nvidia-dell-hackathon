@@ -1,39 +1,42 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
-import { STAGE_LABELS } from "@/lib/intelligence/types";
+import { STAGE_LABELS, normalizeStage } from "@/lib/intelligence/types";
 import { AppChrome } from "../AppChrome";
 import { PageFrame } from "../PageFrame";
 import { StageRail } from "../pipeline/StageRail";
 import { ICTab } from "./ICTab";
-import { NumbersTab } from "./NumbersTab";
 import { OverviewTab } from "./OverviewTab";
+import { ProcessTab } from "./ProcessTab";
 import { ThesisTab } from "./ThesisTab";
+import { ValidationTab } from "./ValidationTab";
 
 const TABS = [
   { id: "overview", label: "Overview" },
   { id: "thesis", label: "Thesis" },
-  { id: "numbers", label: "Numbers" },
-  { id: "decision", label: "Decision" },
+  { id: "validation", label: "Validation" },
+  { id: "process", label: "Process" },
+  { id: "decision", label: "Decision Room" },
 ] as const;
 
 const ALIASES: Record<string, (typeof TABS)[number]["id"]> = {
   ic: "decision",
   timeline: "decision",
   valuation: "decision",
-  questions: "numbers",
-  claims: "numbers",
-  evidence: "numbers",
-  findings: "numbers",
-  risks: "overview",
-  people: "overview",
-  world: "thesis",
+  numbers: "validation",
+  questions: "validation",
+  claims: "validation",
+  evidence: "validation",
+  findings: "validation",
+  world: "validation",
+  people: "validation",
+  risks: "validation",
+  documents: "process",
   stage: "overview",
-  process: "overview",
-  documents: "overview",
 };
 
 type TabId = (typeof TABS)[number]["id"];
@@ -48,6 +51,15 @@ export function DealShell({ deal, intel }: Props) {
   const router = useRouter();
   const raw = params.get("tab") ?? "overview";
   const tab = (TABS.some((t) => t.id === raw) ? raw : ALIASES[raw] ?? "overview") as TabId;
+  const stage = normalizeStage(intel.stage);
+  const validated = deal.flags.length > 0 || intel.claims.length > 0;
+  const decided = Boolean(intel.ic && !intel.pendingGate && stage === "decision_room");
+
+  useEffect(() => {
+    if (!intel.pendingGate) return;
+    const tick = window.setInterval(() => router.refresh(), 3000);
+    return () => window.clearInterval(tick);
+  }, [intel.pendingGate, router]);
 
   function open(id: TabId) {
     router.replace(`/deals/${deal.id}?tab=${id}`, { scroll: false });
@@ -71,14 +83,22 @@ export function DealShell({ deal, intel }: Props) {
             {intel.profile.company}
           </h1>
           <p className="mt-3 max-w-xl text-[1.05rem] leading-7 text-mute">
-            <span className="text-copper">{STAGE_LABELS[intel.stage]}</span>
+            <span className="text-copper">{STAGE_LABELS[stage]}</span>
             {intel.thesis.exceptions.length ? (
               <span className="text-flag-amber"> · Thesis exception</span>
+            ) : null}
+            {intel.pendingGate ? (
+              <span className="text-flag-amber">
+                {" "}
+                · {intel.pendingGate.id === "founder" ? "Waiting on founder" : "Waiting on partner"}
+              </span>
+            ) : decided ? (
+              <span className="text-ledger"> · Decision recorded</span>
             ) : null}
             {intel.profile.product ? ` · ${intel.profile.product}` : ""}
           </p>
           <div className="mt-5">
-            <StageRail current={intel.stage} />
+            <StageRail current={stage} validated={validated} decided={decided} />
           </div>
         </header>
 
@@ -98,8 +118,9 @@ export function DealShell({ deal, intel }: Props) {
         <main id="deal-main" className="pb-20">
           {tab === "overview" ? <OverviewTab deal={deal} intel={intel} /> : null}
           {tab === "thesis" ? <ThesisTab intel={intel} /> : null}
-          {tab === "numbers" ? <NumbersTab deal={deal} intel={intel} /> : null}
-          {tab === "decision" ? <ICTab intel={intel} /> : null}
+          {tab === "validation" ? <ValidationTab deal={deal} intel={intel} /> : null}
+          {tab === "process" ? <ProcessTab deal={deal} intel={intel} /> : null}
+          {tab === "decision" ? <ICTab dealId={deal.id} intel={intel} /> : null}
         </main>
       </PageFrame>
     </div>

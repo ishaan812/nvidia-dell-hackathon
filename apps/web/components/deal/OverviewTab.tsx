@@ -58,6 +58,16 @@ export function OverviewTab({ deal, intel }: Props) {
         <div className="mt-3">
           <Note>{intel.nextAction.reason}</Note>
         </div>
+        {intel.pendingGate ? (
+          <p className="mt-4 text-[15px] text-mute">
+            {intel.pendingGate.id === "founder"
+              ? "In the TUI: press 2, then A. Or apply the reply below."
+              : intel.pendingGate.id === "triage"
+                ? "In the TUI: press T to take the meeting."
+                : "In the TUI: press G, then C to confirm."}{" "}
+            Or reply {intel.pendingGate.options.map((item) => `“${item}”`).join(", ")}.
+          </p>
+        ) : null}
       </Section>
 
       {waiting.length ? (
@@ -82,7 +92,10 @@ export function OverviewTab({ deal, intel }: Props) {
         </Section>
       ) : null}
 
-      {deal.id === "northstar-robotics" ? <FounderReply intel={intel} dealId={deal.id} /> : null}
+      {deal.id === "northstar-robotics" ||
+      (deal.id === "northstar-live" && (intel.pendingGate?.id === "founder" || intel.founderReplyApplied)) ? (
+        <FounderReply intel={intel} dealId={deal.id} />
+      ) : null}
     </div>
   );
 }

@@ -393,7 +393,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
     source: "Inbound data room",
   };
   const created = "2026-09-02T14:00:00.000Z";
-  const deal = shell("northstar-robotics", "Northstar Robotics", created, "numbers");
+  const deal = shell("northstar-robotics", "Northstar Robotics", created, "validation");
   const oq = avg(OPP_NORTH);
   const scores = {
     thesisFit: 82,
@@ -520,7 +520,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
   ];
 
   deal.intelligence = {
-    stage: "numbers",
+    stage: "validation",
     profile,
     thesis: {
       score: 82,
@@ -801,7 +801,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
     source: "Climate syndicate",
   };
   const created = "2026-08-22T10:00:00.000Z";
-  const deal = shell("aether-grid", "Aether Grid", created, "people_product");
+  const deal = shell("aether-grid", "Aether Grid", created, "validation");
   const oq = avg(OPP_AETHER);
   const scores = {
     thesisFit: 88,
@@ -817,7 +817,7 @@ function aether(): { deal: Deal; files: { filename: string; body: string }[] } {
   const brief = `# Aether Grid\n\nSamira Okon (ex-Terna). Luca Moretti (controls).\n$1.6M ARR. 3 utilities. Key-person: Samira holds the ISO relationships.`;
   deal.docs = [doc(deal.id, "aether-brief.md", "other", "room", brief)];
   deal.intelligence = {
-    stage: "people_product",
+    stage: "validation",
     profile,
     thesis: {
       score: 88,
@@ -1018,7 +1018,7 @@ function helio(): { deal: Deal; files: { filename: string; body: string }[] } {
     source: "Existing portco intro",
   };
   const created = "2026-07-20T09:00:00.000Z";
-  const deal = shell("helio-freight", "Helio Freight", created, "ic");
+  const deal = shell("helio-freight", "Helio Freight", created, "decision_room");
   const oq = avg(OPP_HELIO);
   const scores = {
     thesisFit: 86,
@@ -1033,7 +1033,7 @@ function helio(): { deal: Deal; files: { filename: string; body: string }[] } {
   const memo = `# Helio Freight IC\n\nAdvance with conditions. Restate empty-mile take-rate after two more carrier references.`;
   deal.docs = [doc(deal.id, "helio-ic-draft.md", "other", "room", memo)];
   deal.intelligence = {
-    stage: "ic",
+    stage: "decision_room",
     profile,
     thesis: {
       score: 86,

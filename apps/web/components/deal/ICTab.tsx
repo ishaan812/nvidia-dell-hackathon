@@ -1,95 +1,105 @@
+import { AskPanel } from "@/components/AskPanel";
 import { recommendationLabel, scoreDisplay } from "@/lib/format";
-import type { DealIntelligence } from "@/lib/intelligence/types";
+import { convictionCopy, effectiveScores, scoreTone } from "@/lib/intelligence/scores";
+import type { DealIntelligence, ScoreKey } from "@/lib/intelligence/types";
+import { TimelineTab } from "./TimelineTab";
+import { ValuationTab } from "./ValuationTab";
 import { Note, Section } from "./ui";
 
-export function ICTab({ intel }: { intel: DealIntelligence }) {
-  const ic = intel.ic;
-  const walk = intel.scoreChanges.filter((c) => c.key === "investmentConviction");
+const ROOM_SCORES: ScoreKey[] = [
+  "investmentConviction",
+  "risk",
+  "uncertainty",
+  "evidenceConfidence",
+  "thesisFit",
+  "valuationAttractiveness",
+  "portfolioFit",
+];
 
-  if (!ic) {
-    return (
-      <div>
-        <Section title="Decision">
-          <Note>
-            {intel.stage === "source" || intel.stage === "triage"
-              ? "Too early for a packet."
-              : "No IC packet on this deal. Open Helio Freight for the full example."}
-          </Note>
-        </Section>
-        {walk.length ? <ConvictionWalk walk={walk} /> : null}
-      </div>
-    );
-  }
+const LABELS: Record<ScoreKey, string> = {
+  investmentConviction: "Conviction",
+  opportunityQuality: "Opportunity",
+  risk: "Risk",
+  thesisFit: "Thesis fit",
+  uncertainty: "Uncertainty",
+  evidenceConfidence: "Evidence",
+  valuationAttractiveness: "Valuation",
+  portfolioFit: "Portfolio fit",
+};
+
+export function ICTab({ dealId, intel }: { dealId?: string; intel: DealIntelligence }) {
+  const ic = intel.ic;
+  const scores = effectiveScores(intel);
+  const tooEarly = intel.stage === "source" || intel.stage === "triage";
 
   return (
     <div>
-      <Section title="Recommendation">
-        <p className="font-serif text-[1.75rem] leading-snug">{recommendationLabel(ic.recommendation)}</p>
-        <div className="mt-3">
-          <Note>{ic.executiveSummary}</Note>
+      <Section title="Decision Room" lead={convictionCopy()}>
+        <div className="score-strip">
+          {ROOM_SCORES.map((key) => (
+            <div key={key}>
+              <p className="score-label">{LABELS[key]}</p>
+              <p className={`score-value ${scoreTone(key, scores[key])}`}>{scoreDisplay(scores[key])}</p>
+            </div>
+          ))}
         </div>
       </Section>
 
-      <Section title="Bull / bear">
-        <p className="text-[16px] leading-7">
-          <span className="text-ledger">Bull. </span>
-          {ic.bullCase}
-        </p>
-        <p className="mt-4 text-[16px] leading-7">
-          <span className="text-flag-amber">Bear. </span>
-          {ic.bearCase}
-        </p>
-      </Section>
+      {ic ? (
+        <Section title="Investment case">
+          <p className="font-serif text-[1.75rem] leading-snug">{recommendationLabel(ic.recommendation)}</p>
+          <div className="mt-3">
+            <Note>{ic.executiveSummary}</Note>
+          </div>
+          <p className="mt-4 text-[16px] leading-7">{ic.opportunityQuality}</p>
+        </Section>
+      ) : (
+        <Section title="Investment case">
+          <Note>
+            {tooEarly
+              ? "Too early for a packet. Validation has to land first."
+              : "No IC packet on this deal yet. Helio Freight has the full room."}
+          </Note>
+        </Section>
+      )}
 
-      {intel.returns ? (
-        <Section title="Returns" lead={intel.returns.caveat}>
-          <p>
-            Base {intel.returns.scenarios.find((s) => s.name === "base")?.moic ?? "—"}x · bear{" "}
-            {intel.returns.scenarios.find((s) => s.name === "bear")?.moic ?? "—"}x · bull{" "}
-            {intel.returns.scenarios.find((s) => s.name === "bull")?.moic ?? "—"}x
+      {ic ? (
+        <Section title="IC summary">
+          <p className="text-[16px] leading-7">{ic.recommendationNote}</p>
+          <p className="mt-4 text-[16px] leading-7">
+            <span className="text-ledger">Bull. </span>
+            {ic.bullCase}
+          </p>
+          <p className="mt-3 text-[16px] leading-7">
+            <span className="text-flag-amber">Bear. </span>
+            {ic.bearCase}
           </p>
         </Section>
       ) : null}
 
-      {intel.valuation ? (
-        <Section title="Price">
-          <p>{intel.valuation.entryValuation}</p>
-          <p className="mt-2 text-mute">{intel.valuation.companyQualityVsPrice}</p>
+      <ValuationTab intel={intel} />
+
+      {intel.portfolio ? (
+        <Section title="Portfolio fit">
+          <p>{intel.portfolio.sector}</p>
+          <p className="mt-2 text-mute">{intel.portfolio.capitalNote}</p>
         </Section>
       ) : null}
 
-      <ConvictionWalk walk={walk} />
-    </div>
-  );
-}
+      {dealId ? (
+        <Section title="Interactive analyst" lead="Questions stay inside this deal.">
+          <AskPanel dealId={dealId} compact />
+        </Section>
+      ) : null}
 
-function ConvictionWalk({
-  walk,
-}: {
-  walk: DealIntelligence["scoreChanges"];
-}) {
-  if (!walk.length) return null;
-  const last = walk[walk.length - 1];
-  return (
-    <Section title="What changed my mind">
-      <p className="font-serif text-[1.75rem] leading-none">{scoreDisplay(last.next)}</p>
-      <ul className="mt-5 space-y-3">
-        {walk.map((change) => {
-          const delta =
-            change.previous != null && change.next != null ? change.next - change.previous : null;
-          return (
-            <li key={change.id} className="text-[16px] leading-7">
-              {change.reason}
-              {delta != null && delta !== 0 ? (
-                <span className={delta > 0 ? "text-ledger" : "text-flag-red"}>
-                  {" "}
-                  {delta > 0 ? `+${delta}` : delta}
-                </span>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    </Section>
+      {ic ? (
+        <Section title="Final decision">
+          <p className="font-serif text-[1.75rem] leading-snug">{recommendationLabel(ic.recommendation)}</p>
+          <p className="mt-3 text-mute">{ic.nextBestAction}</p>
+        </Section>
+      ) : null}
+
+      <TimelineTab intel={intel} />
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { effectiveScores } from "../intelligence/scores";
+import { normalizeStage } from "../intelligence/types";
 import { resolveExisting } from "./files";
 import { dirs } from "./paths";
 import { assertInsideDeal } from "./sandbox";
@@ -27,7 +28,7 @@ export function summarize(deal: Deal): DealSummary {
     docCount: deal.docs.length,
     error: deal.error,
     deckFilename: deal.deckFilename,
-    stage: intel?.stage,
+    stage: intel ? normalizeStage(intel.stage) : undefined,
     thesisException: (intel?.thesis.exceptions.length ?? 0) > 0,
     thesisFit: scores?.thesisFit,
     opportunityQuality: scores?.opportunityQuality,
@@ -35,9 +36,17 @@ export function summarize(deal: Deal): DealSummary {
     evidenceConfidence: scores?.evidenceConfidence,
     valuationAttractiveness: scores?.valuationAttractiveness,
     investmentConviction: scores?.investmentConviction,
-    nextAction: intel?.nextAction.title,
+    nextAction: waitingLabel(intel) ?? intel?.nextAction.title,
     lastActivity: intel?.timeline[intel.timeline.length - 1]?.at ?? deal.updatedAt,
+    pendingGate: intel?.pendingGate,
+    live: deal.id === "northstar-live",
   };
+}
+
+function waitingLabel(intel: Deal["intelligence"]): string | undefined {
+  if (!intel?.pendingGate) return undefined;
+  if (intel.pendingGate.id === "founder") return "Waiting on founder email";
+  return "Waiting on partner email";
 }
 
 export async function saveDeal(deal: Deal): Promise<void> {
@@ -71,7 +80,9 @@ export async function saveDeal(deal: Deal): Promise<void> {
 export async function loadDeal(id: string): Promise<Deal | null> {
   try {
     const raw = await readFile(dealPath(id), "utf8");
-    return JSON.parse(raw) as Deal;
+    const deal = JSON.parse(raw) as Deal;
+    if (deal.intelligence) deal.intelligence.stage = normalizeStage(deal.intelligence.stage);
+    return deal;
   } catch {
     return null;
   }

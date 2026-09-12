@@ -10,12 +10,13 @@ type Props = { dealId: string; intel: DealIntelligence };
 export function QuestionsTab({ dealId, intel }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const canReply = dealId === "northstar-robotics" && !intel.founderReplyApplied;
+  const canReply =
+    (dealId === "northstar-robotics" || dealId === "northstar-live") && !intel.founderReplyApplied;
 
   return (
     <Section
-      title="Founder loop"
-      lead="Questions come from unresolved findings. A reply re-runs the relevant scores."
+      title="Open questions"
+      lead="The founder loop is not a stage. Questions, replies, and re-analysis run from any stage."
     >
       {intel.questions.length === 0 ? (
         <Note>No questions yet.</Note>

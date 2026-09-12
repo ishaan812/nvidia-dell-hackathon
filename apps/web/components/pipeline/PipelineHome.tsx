@@ -26,7 +26,7 @@ export function PipelineHome({ deals, model, using }: Props) {
             Pipeline
           </h1>
           <p className="mt-3 max-w-md text-[1.05rem] leading-7 text-mute">
-            Five deals. A thesis miss is a flag, not a pass.
+            Open a deal. The rail shows where it is. Waiting on email means the desk stopped for you.
           </p>
         </header>
         <PipelineBoard deals={book.length ? book : deals} />

@@ -114,9 +114,18 @@ export async function runDeal(
   name?: string,
   roles: Record<string, FileRole> = {},
 ): Promise<Deal> {
+  const id = `${slug(name || path.basename(path.resolve(sourcePath)))}-${randomUUID().slice(0, 8)}`;
+  return runNamedDeal(id, sourcePath, name, roles);
+}
+
+export async function runNamedDeal(
+  id: string,
+  sourcePath: string,
+  name?: string,
+  roles: Record<string, FileRole> = {},
+): Promise<Deal> {
   const now = new Date().toISOString();
   sourcePath = path.resolve(sourcePath);
-  const id = `${slug(name || path.basename(sourcePath))}-${randomUUID().slice(0, 8)}`;
   const events: DealEvent[] = [];
   const push = pusher(events);
 

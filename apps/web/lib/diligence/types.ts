@@ -226,6 +226,8 @@ export type DealSummary = {
   investmentConviction?: number;
   nextAction?: string;
   lastActivity?: string;
+  pendingGate?: import("../intelligence/types").PendingGate;
+  live?: boolean;
 };
 
 export type DealFile = {

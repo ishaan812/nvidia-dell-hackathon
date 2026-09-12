@@ -20,4 +20,4 @@ pnpm dev
 
 Open [http://127.0.0.1:3000](http://127.0.0.1:3000). Use **Run the Northstar sample** or drop files onto the blotter.
 
-On the GB10 box, see [docs/GB10.md](docs/GB10.md).
+On the GB10 box, see [docs/GB10.md](docs/GB10.md). Email / TUI human-in-the-loop demo: [docs/HITL-DEMO.md](docs/HITL-DEMO.md).

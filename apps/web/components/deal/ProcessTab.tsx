@@ -1,11 +1,16 @@
 import { when } from "@/lib/format";
+import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
+import { DocumentsTab } from "./DocumentsTab";
+import { QuestionsTab } from "./QuestionsTab";
 import { Note, Section } from "./ui";
 
-export function ProcessTab({ intel }: { intel: DealIntelligence }) {
+export function ProcessTab({ deal, intel }: { deal?: Deal; intel: DealIntelligence }) {
+  const activity = intel.timeline.slice(-6).reverse();
+  const nextMeeting = intel.meetings.find((item) => item.when && new Date(item.when).getTime() > Date.now()) ?? intel.meetings[0];
   return (
     <div>
-      <Section title="Process" lead="Who owns the next item, and what we are waiting on.">
+      <Section title="Process" lead="The operational layer. It runs alongside Source, Triage, Validation, and Decision — not as a founder-loop stage.">
         {intel.tasks.length === 0 ? (
           <Note>No tasks yet.</Note>
         ) : (
@@ -47,6 +52,32 @@ export function ProcessTab({ intel }: { intel: DealIntelligence }) {
           </ul>
         )}
       </Section>
+      {nextMeeting ? (
+        <Section title="Next meeting">
+          <p className="font-serif text-[1.5rem] leading-snug">{nextMeeting.title}</p>
+          <p className="mt-2 text-mute">
+            {nextMeeting.when ? when(nextMeeting.when) : "unscheduled"} · {nextMeeting.attendees.join(", ")}
+          </p>
+        </Section>
+      ) : null}
+
+      {deal ? <QuestionsTab dealId={deal.id} intel={intel} /> : null}
+
+      {activity.length ? (
+        <Section title="Activity">
+          <ul className="space-y-3">
+            {activity.map((event) => (
+              <li key={event.id}>
+                <p>{event.title}</p>
+                <p className="text-[14px] text-mute">{event.body}</p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
+      {deal ? <DocumentsTab deal={deal} intel={intel} /> : null}
+
       <Section title="Document versions">
         {intel.versions.length === 0 ? (
           <Note>No versions stored.</Note>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
 import { FinancialsPane } from "./FinancialsPane";
@@ -13,18 +12,16 @@ const PANES = [
   { id: "market", label: "Market" },
 ] as const;
 
-type Pane = (typeof PANES)[number]["id"];
+export type DiligencePane = (typeof PANES)[number]["id"];
 
-export function DiligenceTab({ deal, intel }: { deal: Deal; intel: DealIntelligence }) {
-  const params = useSearchParams();
-  const router = useRouter();
-  const raw = params.get("pane");
-  const pane = (PANES.some((item) => item.id === raw) ? raw : "financials") as Pane;
+type Props = {
+  deal: Deal;
+  intel: DealIntelligence;
+  pane: DiligencePane;
+  onPane: (id: DiligencePane) => void;
+};
 
-  function open(id: Pane) {
-    router.replace(`/deals/${deal.id}?tab=diligence&pane=${id}`, { scroll: false });
-  }
-
+export function DiligenceTab({ deal, intel, pane, onPane }: Props) {
   return (
     <div>
       <nav className="diligence-panes" aria-label="Due diligence">
@@ -33,7 +30,7 @@ export function DiligenceTab({ deal, intel }: { deal: Deal; intel: DealIntellige
             key={item.id}
             type="button"
             className={pane === item.id ? "is-on" : ""}
-            onClick={() => open(item.id)}
+            onClick={() => onPane(item.id)}
           >
             {item.label}
           </button>

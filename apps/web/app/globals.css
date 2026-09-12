@@ -1229,6 +1229,7 @@ body {
   padding: 0.85rem 0;
   font-size: 0.9375rem;
   line-height: 1;
+  cursor: pointer;
 }
 
 .deal-tab.is-on {
@@ -1313,6 +1314,7 @@ body {
   border-bottom: 1px solid var(--line);
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .pipe-row:hover .pipe-name {
@@ -1808,6 +1810,7 @@ body {
   background: transparent;
   color: var(--paper);
   font-size: 0.9375rem;
+  cursor: pointer;
 }
 
 .desk-btn-quiet:disabled {
@@ -2190,6 +2193,7 @@ details.desk-card > summary {
   background: var(--paper);
   color: var(--ink);
   font-size: 0.9375rem;
+  cursor: pointer;
 }
 
 .desk-btn:disabled {

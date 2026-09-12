@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { DealLobby } from "@/components/DealLobby";
 import { DealShell } from "@/components/deal/DealShell";
@@ -16,8 +15,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: deal?.intelligence?.profile.company || deal?.company || deal?.name || "Deal" };
 }
 
-export default async function DealPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function DealPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string; pane?: string }>;
+}) {
   const { id } = await params;
+  const query = await searchParams;
   const deal = await loadDeal(id);
   if (!deal) notFound();
   const model = settings().llmModel;
@@ -26,8 +32,12 @@ export default async function DealPage({ params }: { params: Promise<{ id: strin
   }
   const merged = mergeFlagClaims(deal);
   return (
-    <Suspense fallback={<p className="p-10 text-paper/60">Opening the deal…</p>}>
-      <DealShell deal={merged} intel={merged.intelligence!} model={model} />
-    </Suspense>
+    <DealShell
+      deal={merged}
+      intel={merged.intelligence!}
+      model={model}
+      tab={query.tab}
+      pane={query.pane}
+    />
   );
 }

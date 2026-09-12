@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { startDemo } from "./demo";
 import { mailboxEnv } from "./mail";
 
@@ -24,6 +25,8 @@ type Letter = {
   subject: string;
   body: string;
 };
+
+type Hit = { id: "send" | "rewrite" | "quit" | "open"; x: number; y: number; w: number; h: number };
 
 function founderLetter(): Letter {
   const box = mailboxEnv();
@@ -63,8 +66,10 @@ export async function runTui(id = "northstar-live") {
   let sent = false;
   let sentAt = "";
   let dealUrl = "";
-  let flash = "Founder note to OpenClaw. Send it to open the deal.";
+  let flash = "Click Send, or press Enter.";
   let busy = false;
+  let hits: Hit[] = [];
+  let input = "";
 
   const tty = process.stdout;
   const stdin = process.stdin;
@@ -79,6 +84,7 @@ export async function runTui(id = "northstar-live") {
     const gutter = Math.max(0, Math.floor((cols - width) / 2));
     const g = " ".repeat(gutter);
     const lines: string[] = [];
+    const nextHits: Hit[] = [];
     const rule = `${C.line}${"─".repeat(width)}${C.reset}`;
     const stamp = sent
       ? `${C.mint}${C.bold}Sent${C.reset}  ${C.mute}${sentAt}${C.reset}  ${C.aqua}deal opened${C.reset}`
@@ -87,9 +93,9 @@ export async function runTui(id = "northstar-live") {
     lines.push("");
     lines.push(
       g +
-        `${C.bold}${C.paper}Night Desk${C.reset}  ${C.dim}·${C.reset}  ${C.aqua}inbound${C.reset}  ${C.dim}·${C.reset}  ${C.mute}founder → OpenClaw${C.reset}`,
+        `${C.bold}${C.paper}Night Desk${C.reset}  ${C.dim}·${C.reset}  ${C.aqua}inbound${C.reset}  ${C.dim}·${C.reset}  ${C.mute}founder → Acme VC${C.reset}`,
     );
-    lines.push(g + `${C.mute}Send this and the bot opens Northstar on the book.${C.reset}`);
+    lines.push(g + `${C.mute}Maya’s note to the firm. Send it and the bot opens the deal.${C.reset}`);
     lines.push(g + rule);
     lines.push(g + stamp);
     lines.push("");
@@ -103,18 +109,45 @@ export async function runTui(id = "northstar-live") {
     }
     if (sent && dealUrl) {
       lines.push("");
-      lines.push(g + `${C.mute}On the book${C.reset}  ${C.aqua}${dealUrl}${C.reset}`);
+      const label = `On the book  ${dealUrl}`;
+      lines.push(g + `${C.mute}On the book${C.reset}  ${C.aqua}${link(dealUrl)}${C.reset}`);
+      mark(nextHits, "open", gutter, lines.length, Math.min(width, label.length));
+    }
+
+    lines.push("");
+    if (!sent) {
+      const sendLabel = "  Send to Acme VC  ";
+      const sendPad = Math.max(0, Math.floor((width - sendLabel.length) / 2));
+      lines.push(
+        g +
+          " ".repeat(sendPad) +
+          `\x1b[48;5;87m\x1b[38;5;17m${C.bold}${sendLabel}${C.reset}${C.bg}`,
+      );
+      mark(nextHits, "send", gutter + sendPad, lines.length, sendLabel.length);
     }
 
     while (lines.length < rows - 5) lines.push("");
     lines.push(g + rule);
-    lines.push(
-      g +
-        (sent
-          ? `${C.mute}R write it again     Q quit${C.reset}`
-          : `${C.bold}${C.aqua}Enter${C.reset} ${C.paper}send to OpenClaw${C.reset}    ${C.mute}R rewrite     Q quit${C.reset}`),
-    );
+    if (sent) {
+      const again = "R write it again";
+      const quit = "Q quit";
+      lines.push(g + `${C.mute}${again}     ${quit}${C.reset}`);
+      mark(nextHits, "rewrite", gutter, lines.length, again.length);
+      mark(nextHits, "quit", gutter + again.length + 5, lines.length, quit.length);
+    } else {
+      const send = "Click Send";
+      const again = "R rewrite";
+      const quit = "Q quit";
+      lines.push(
+        g +
+          `${C.bold}${C.aqua}${send}${C.reset}    ${C.mute}${again}     ${quit}${C.reset}`,
+      );
+      mark(nextHits, "send", gutter, lines.length, send.length);
+      mark(nextHits, "rewrite", gutter + send.length + 4, lines.length, again.length);
+      mark(nextHits, "quit", gutter + send.length + 4 + again.length + 5, lines.length, quit.length);
+    }
     lines.push(g + `${busy ? C.wait : C.mute}${flash}${C.reset}`);
+    hits = nextHits;
 
     tty.write(`\x1b[H\x1b[J${C.bg}`);
     tty.write(lines.slice(0, rows).join("\n"));
@@ -129,7 +162,7 @@ export async function runTui(id = "northstar-live") {
     sent = true;
     sentAt = clock();
     dealUrl = snap.url;
-    flash = "Deal is on the book. OpenClaw has the pack.";
+    flash = "Deal is on the book. Click the link, or open Pipeline.";
   }
 
   async function act(fn: () => Promise<void>) {
@@ -146,6 +179,34 @@ export async function runTui(id = "northstar-live") {
     }
   }
 
+  function click(x: number, y: number) {
+    const hit = hits.find((item) => x >= item.x && x < item.x + item.w && y >= item.y && y < item.y + item.h);
+    if (!hit) return;
+    if (hit.id === "quit") {
+      shutdown();
+      return;
+    }
+    if (hit.id === "rewrite") {
+      letter = founderLetter();
+      sent = false;
+      sentAt = "";
+      dealUrl = "";
+      flash = "Click Send, or press Enter.";
+      paint();
+      return;
+    }
+    if (hit.id === "open" && dealUrl) {
+      openUrl(dealUrl);
+      flash = "Opened the deal in the browser.";
+      paint();
+      return;
+    }
+    if (hit.id === "send") {
+      if (sent || busy) return;
+      void act(sendInbound);
+    }
+  }
+
   function onKey(key: string) {
     if (key === "\u0003" || key === "q" || key === "Q") {
       shutdown();
@@ -156,7 +217,7 @@ export async function runTui(id = "northstar-live") {
       sent = false;
       sentAt = "";
       dealUrl = "";
-      flash = "Founder note to OpenClaw. Send it to open the deal.";
+      flash = "Click Send, or press Enter.";
       paint();
       return;
     }
@@ -166,24 +227,55 @@ export async function runTui(id = "northstar-live") {
     }
   }
 
+  function onData(chunk: string) {
+    input += chunk;
+    while (input) {
+      if (input.startsWith("\x1b[<")) {
+        const match = input.match(/^\x1b\[<(\d+);(\d+);(\d+)([Mm])/);
+        if (!match) {
+          if (input.length > 24) input = input.slice(1);
+          break;
+        }
+        input = input.slice(match[0].length);
+        if (match[4] === "M" && match[1] === "0") click(Number(match[2]), Number(match[3]));
+        continue;
+      }
+      if (input.startsWith("\x1b")) {
+        const csi = input.match(/^\x1b\[[0-9;?]*[A-Za-z]/) || input.match(/^\x1b.][^\x07]*(\x07|\x1b\\)/);
+        if (csi) {
+          input = input.slice(csi[0].length);
+          continue;
+        }
+        if (input.length < 3) break;
+        input = input.slice(1);
+        continue;
+      }
+      const ch = input[0]!;
+      input = input.slice(1);
+      onKey(ch);
+    }
+  }
+
   function shutdown() {
     stdin.setRawMode?.(false);
     stdin.pause();
-    tty.write(`\x1b[?1049l\x1b[?25h${C.reset}`);
+    tty.write(`\x1b[?1000l\x1b[?1006l\x1b[?1049l\x1b[?25h${C.reset}`);
     process.exit(0);
   }
 
-  tty.write("\x1b[?1049h\x1b[?25l");
+  tty.write("\x1b[?1049h\x1b[?25l\x1b[?1000h\x1b[?1006h");
   stdin.setRawMode?.(true);
   stdin.resume();
   stdin.setEncoding("utf8");
-  stdin.on("data", (chunk: string) => {
-    for (const ch of chunk) onKey(ch);
-  });
+  stdin.on("data", onData);
   process.on("SIGWINCH", () => paint());
   process.on("SIGINT", shutdown);
 
   paint();
+}
+
+function mark(hits: Hit[], id: Hit["id"], gutter: number, lineCount: number, width: number) {
+  hits.push({ id, x: gutter + 1, y: lineCount, w: Math.max(1, width), h: 1 });
 }
 
 function field(label: string, value: string) {
@@ -192,6 +284,15 @@ function field(label: string, value: string) {
 
 function clock() {
   return new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function link(url: string) {
+  return `\x1b]8;;${url}\x1b\\${url}\x1b]8;;\x1b\\`;
+}
+
+function openUrl(url: string) {
+  const cmd = process.platform === "darwin" ? "open" : "xdg-open";
+  spawn(cmd, [url], { stdio: "ignore", detached: true }).unref();
 }
 
 function wrap(text: string, width: number): string[] {

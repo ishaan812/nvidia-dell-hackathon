@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Deal } from "@/lib/diligence/types";
 import type { DealIntelligence } from "@/lib/intelligence/types";
 import { normalizeStage } from "@/lib/intelligence/types";
@@ -10,7 +10,7 @@ import { PageFrame } from "../PageFrame";
 import { StageRail } from "../pipeline/StageRail";
 import { AskTab } from "./AskTab";
 import { DealHeader } from "./DealHeader";
-import { DiligenceTab } from "./DiligenceTab";
+import { DiligenceTab, type DiligencePane } from "./DiligenceTab";
 import { OverviewTab } from "./OverviewTab";
 import { ThesisTab } from "./ThesisTab";
 
@@ -43,33 +43,72 @@ const ALIASES: Record<string, (typeof TABS)[number]["id"]> = {
   analyst: "ask",
 };
 
-type TabId = (typeof TABS)[number]["id"];
+export type TabId = (typeof TABS)[number]["id"];
+
+export function resolveTab(raw?: string | null): TabId {
+  const value = raw ?? "overview";
+  if (TABS.some((tab) => tab.id === value)) return value as TabId;
+  return ALIASES[value] ?? "overview";
+}
+
+export function resolvePane(raw?: string | null): DiligencePane {
+  if (raw === "founder" || raw === "market" || raw === "financials") return raw;
+  return "financials";
+}
 
 type Props = {
   deal: Deal;
   intel: DealIntelligence;
   model?: string;
+  tab?: string | null;
+  pane?: string | null;
 };
 
-export function DealShell({ deal, intel, model }: Props) {
-  const params = useSearchParams();
+export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: Props) {
   const router = useRouter();
-  const raw = params.get("tab") ?? "overview";
-  const tab = (TABS.some((t) => t.id === raw) ? raw : ALIASES[raw] ?? "overview") as TabId;
+  const [tab, setTab] = useState<TabId>(() => resolveTab(tabProp));
+  const [pane, setPane] = useState<DiligencePane>(() => resolvePane(paneProp));
   const stage = normalizeStage(intel.stage);
   const validated = deal.flags.length > 0 || intel.claims.length > 0;
   const decided = Boolean(intel.ic && !intel.pendingGate && stage === "decision_room");
 
   useEffect(() => {
-    if (!intel.pendingGate) return;
-    const tick = window.setInterval(() => router.refresh(), 3000);
-    return () => window.clearInterval(tick);
-  }, [intel.pendingGate, router]);
+    setTab(resolveTab(tabProp));
+  }, [tabProp]);
 
-  function open(id: TabId) {
-    router.replace(id === "diligence" ? `/deals/${deal.id}?tab=diligence&pane=financials` : `/deals/${deal.id}?tab=${id}`, {
-      scroll: false,
-    });
+  useEffect(() => {
+    setPane(resolvePane(paneProp));
+  }, [paneProp]);
+
+  useEffect(() => {
+    let stamp = `${deal.updatedAt}:${intel.stage}:${intel.pendingGate?.id ?? ""}`;
+    const tick = window.setInterval(async () => {
+      try {
+        const res = await fetch(`/api/deals/${deal.id}`, { cache: "no-store" });
+        if (!res.ok) return;
+        const body = (await res.json()) as {
+          summary?: { updatedAt?: string; stage?: string; pendingGate?: { id?: string } };
+        };
+        const next = `${body.summary?.updatedAt ?? ""}:${body.summary?.stage ?? ""}:${body.summary?.pendingGate?.id ?? ""}`;
+        if (next !== stamp) {
+          stamp = next;
+          router.refresh();
+        }
+      } catch {
+        /* keep the open deal */
+      }
+    }, 3000);
+    return () => window.clearInterval(tick);
+  }, [deal.id, deal.updatedAt, intel.pendingGate?.id, intel.stage, router]);
+
+  function open(id: TabId, nextPane?: DiligencePane) {
+    setTab(id);
+    const diligencePane = nextPane ?? pane;
+    if (nextPane) setPane(nextPane);
+    router.replace(
+      id === "diligence" ? `/deals/${deal.id}?tab=diligence&pane=${diligencePane}` : `/deals/${deal.id}?tab=${id}`,
+      { scroll: false },
+    );
   }
 
   const waiting = intel.pendingGate
@@ -128,7 +167,9 @@ export function DealShell({ deal, intel, model }: Props) {
         <main id="deal-main" className="pb-20">
           {tab === "overview" ? <OverviewTab intel={intel} /> : null}
           {tab === "thesis" ? <ThesisTab intel={intel} /> : null}
-          {tab === "diligence" ? <DiligenceTab deal={deal} intel={intel} /> : null}
+          {tab === "diligence" ? (
+            <DiligenceTab deal={deal} intel={intel} pane={pane} onPane={(id) => open("diligence", id)} />
+          ) : null}
           {tab === "ask" ? (
             <AskTab
               dealId={deal.id}

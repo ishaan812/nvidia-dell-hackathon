@@ -1,0 +1,35 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BTSBDG3M0WSRQ4ZWQ2XXP0",
+  "session_id": "436975d4-fa46-41d0-9654-e2ff3df158c0",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T22:11:11.70259Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/decide/route.ts",
+    "apps/web/components/deal/DealVerbs.tsx"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "3c3225b2cef8",
+  "compact_transcript_start": 0,
+  "session_metrics": {
+    "turn_count": 2,
+    "context_tokens": 236737,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T22:11:11.648802Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 10,
+    "human_modified": 42,
+    "human_removed": 0,
+    "total_committed": 10,
+    "total_lines_changed": 95,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}

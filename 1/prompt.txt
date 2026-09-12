@@ -928,3 +928,7 @@ For founders also giev a nice qualitative assessment please, spikes of excellenc
 - the next action column on homepage make it in a different colour to show the call to action
 
 - The market also theres a lot of noise please make it easily readbale in a concise way and give insights
+
+---
+
+push everything to github and tell me what i will neeed ot add to .env on server to make everything work

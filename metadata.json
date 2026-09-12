@@ -1,0 +1,20 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BQZ1JJE5BTRXNR1Q018VKP",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "apps/web/lib/diligence/pipeline.ts",
+    "apps/web/lib/intelligence/fromDeck.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ]
+}

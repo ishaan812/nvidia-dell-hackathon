@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BPE531DDJT6SHZ76PVNWAV",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/founder-photo/route.ts",
+    "apps/web/app/api/deals/[id]/recompute-desk/route.ts",
+    "apps/web/app/api/deals/[id]/research/founder-photos/route.ts",
+    "apps/web/app/api/deals/[id]/research/founder/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/components/deal/DealHeader.tsx",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/FounderPane.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/components/deal/MarketPane.tsx",
+    "apps/web/components/deal/RecomputeButton.tsx",
+    "apps/web/lib/diligence/firecrawl.ts",
+    "apps/web/lib/diligence/founderPhoto.ts",
+    "apps/web/lib/diligence/recompute.ts",
+    "apps/web/lib/diligence/research.ts",
+    "apps/web/lib/format.ts",
+    "apps/web/lib/intelligence/demo.ts",
+    "apps/web/lib/intelligence/mail.ts",
+    "apps/web/lib/intelligence/types.ts",
+    "apps/web/lib/intelligence/viewStory.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 159504,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8682112,
+    "output_tokens": 50490,
+    "api_call_count": 5
+  }
+}

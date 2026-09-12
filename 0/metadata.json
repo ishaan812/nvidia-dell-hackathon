@@ -1,0 +1,122 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BPE531DDJT6SHZ76PVNWAV",
+  "session_id": "7decf42e-48ea-482a-a5c9-7c74af070074",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T20:55:11.025895Z",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "save_step_count": 6,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/founder-photo/route.ts",
+    "apps/web/app/api/deals/[id]/recompute-desk/route.ts",
+    "apps/web/app/api/deals/[id]/research/founder-photos/route.ts",
+    "apps/web/app/api/deals/[id]/research/founder/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/components/deal/DealHeader.tsx",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/FounderPane.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/components/deal/MarketPane.tsx",
+    "apps/web/components/deal/RecomputeButton.tsx",
+    "apps/web/lib/diligence/firecrawl.ts",
+    "apps/web/lib/diligence/founderPhoto.ts",
+    "apps/web/lib/diligence/recompute.ts",
+    "apps/web/lib/diligence/research.ts",
+    "apps/web/lib/format.ts",
+    "apps/web/lib/intelligence/demo.ts",
+    "apps/web/lib/intelligence/mail.ts",
+    "apps/web/lib/intelligence/types.ts",
+    "apps/web/lib/intelligence/viewStory.ts"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "42f8da9eadff",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 159504,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8682112,
+    "output_tokens": 50490,
+    "api_call_count": 5
+  },
+  "session_metrics": {
+    "turn_count": 33,
+    "context_tokens": 231872,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T20:55:10.751642Z",
+    "agent_lines": 609,
+    "agent_removed": 149,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 609,
+    "total_lines_changed": 758,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 266,
+      "agent_lines_removed": 122,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 304,
+      "agent_lines_removed": 130,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 269,
+      "agent_lines_removed": 124,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 576,
+      "agent_lines_removed": 135,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 609,
+      "agent_lines_removed": 149,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

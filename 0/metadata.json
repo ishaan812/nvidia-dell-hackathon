@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BQ38KAJNNN2EC2MVQHGJ6D",
+  "session_id": "d9fee342-1184-4b2f-a83c-30495d87a4ed",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T21:06:42.298438Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/decide/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/components/deal/DealHeader.tsx",
+    "apps/web/components/deal/DealVerbs.tsx",
+    "apps/web/components/deal/FounderThread.tsx",
+    "apps/web/lib/intelligence/demo.ts",
+    "apps/web/lib/intelligence/verbs.ts",
+    "apps/web/lib/intelligence/viewStory.ts"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "3e4bb7a89dc0",
+  "checkpoint_transcript_start": 348,
+  "transcript_lines_at_start": 348,
+  "compact_transcript_start": 76,
+  "session_metrics": {
+    "turn_count": 7,
+    "context_tokens": 233273,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T21:06:42.233618Z",
+    "agent_lines": 307,
+    "agent_removed": 78,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 307,
+    "total_lines_changed": 385,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import type { Flag } from "@/lib/diligence/types";
 import { STAGE_LABELS, normalizeStage, type DealIntelligence } from "@/lib/intelligence/types";
 import { headerScores, plainAction } from "@/lib/intelligence/viewStory";
+import { DealVerbs } from "./DealVerbs";
 import { RecomputeButton } from "./RecomputeButton";
 import { ScoreValue } from "./ScoreValue";
 
@@ -23,6 +24,7 @@ export function DealHeader({ dealId, intel, flags, waiting }: Props) {
       </p>
       <h1>{intel.profile.company}</h1>
       <p className="deal-head-next">{plainAction(intel.nextAction.title)}</p>
+      <DealVerbs dealId={dealId} intel={intel} />
       <RecomputeButton dealId={dealId} />
       <ul className="score-plain">
         {scores.map((row) => (

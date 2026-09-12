@@ -93,7 +93,7 @@ function gateTriage(): PendingGate {
 function gateFounder(): PendingGate {
   return {
     id: "founder",
-    prompt: "Waiting on the ARR restatement (monthly billed + contracted).",
+    prompt: "Ball is with the founder. Apply the reply to keep moving, or ask more.",
     options: ["apply reply", "ask more"],
   };
 }
@@ -309,37 +309,54 @@ function stamp(intel: DealIntelligence, title: string, body: string, source = "P
   });
 }
 
+function founderName(intel: DealIntelligence) {
+  return intel.profile.founders[0] || "Founder";
+}
+
 function attachNumbers(deal: Deal, intel: DealIntelligence) {
   const { claims, evidence } = claimsFromFlags(deal);
   intel.claims = claims;
   intel.evidence = evidence;
   const arr = deal.graph.rows.find((row) => row.metric === "arr");
-  intel.findings = [
-    {
-      id: "f-live-arr",
-      title: "ARR contradiction",
-      body: arr
-        ? `Deck ${arr.deck} vs model ${arr.room}. Numbers finding, not a thesis finding.`
-        : "Deck and model disagree on ARR.",
-      kind: "contradiction",
-      claimIds: claims.filter((c) => c.metric === "arr").map((c) => c.id),
-      evidenceIds: evidence.map((e) => e.id).slice(0, 1),
-    },
-  ];
+  const owner = founderName(intel);
+  const contradictions = deal.flags.filter((flag) => flag.severity === "contradiction");
+  intel.findings = contradictions.length
+    ? contradictions.slice(0, 3).map((flag) => ({
+        id: `f-${flag.id}`,
+        title: flag.metric ? `${flag.metric} contradiction` : "Room contradiction",
+        body: flag.comment,
+        kind: "contradiction" as const,
+        claimIds: claims.filter((c) => c.metric === flag.metric).map((c) => c.id),
+        evidenceIds: evidence.filter((e) => e.claimId?.endsWith(flag.id)).map((e) => e.id).slice(0, 1),
+      }))
+    : [
+        {
+          id: "f-live-arr",
+          title: "ARR contradiction",
+          body: arr
+            ? `Deck ${arr.deck} vs model ${arr.room}. Numbers finding, not a thesis finding.`
+            : "Open the room against the deck before a first meeting closes.",
+          kind: "contradiction" as const,
+          claimIds: claims.filter((c) => c.metric === "arr").map((c) => c.id),
+          evidenceIds: evidence.map((e) => e.id).slice(0, 1),
+        },
+      ];
   intel.risks = [
     {
       id: "r-live-numbers",
       category: "financial",
-      description: "Material contradictions on ARR and related operating numbers.",
+      description:
+        contradictions[0]?.comment ??
+        "Material gaps between the deck and the data room still sit on the operating numbers.",
       probability: "high",
       impact: "high",
       materiality: "high",
       evidenceConfidence: 80,
       persistence: "transient",
       timeHorizon: "This raise",
-      mitigation: "Restate ARR and send a fully-diluted cap table.",
+      mitigation: "Restate the contested numbers and send the missing primary files.",
       status: "open",
-      owner: "Simon Kalouche",
+      owner,
       evidenceIds: evidence.map((e) => e.id).slice(0, 2),
       cluster: "stated-vs-room",
     },
@@ -347,11 +364,13 @@ function attachNumbers(deal: Deal, intel: DealIntelligence) {
   if (!intel.questions.some((q) => q.id === "q-arr")) {
     intel.questions.push({
       id: "q-arr",
-      question: "Which ARR definition produces $4.2M, and can you restate LTM against the model?",
-      findingId: "f-live-arr",
+      question: arr
+        ? `Which ARR definition produces ${arr.deck}, and can you restate LTM against the model ${arr.room}?`
+        : "Please restate the numbers the deck cites against the files in the room.",
+      findingId: intel.findings[0]?.id,
       reason: "Largest single swing on conviction and valuation.",
-      evidenceRequired: "Monthly billed + contracted roll-forward",
-      owner: "Simon Kalouche",
+      evidenceRequired: "Primary schedule or roll-forward that produces the cited figure",
+      owner,
       status: "asked",
     });
   }
@@ -359,12 +378,12 @@ function attachNumbers(deal: Deal, intel: DealIntelligence) {
   const risk = deal.riskScore ?? riskScore(deal.flags);
   const scores = {
     thesisFit,
-    opportunityQuality: 64,
+    opportunityQuality: intel.scores.opportunityQuality ?? 64,
     risk,
-    uncertainty: 64,
-    evidenceConfidence: 38,
-    valuationAttractiveness: 47,
-    portfolioFit: 74,
+    uncertainty: intel.scores.uncertainty ?? 64,
+    evidenceConfidence: intel.scores.evidenceConfidence ?? 38,
+    valuationAttractiveness: intel.scores.valuationAttractiveness ?? 47,
+    portfolioFit: intel.scores.portfolioFit ?? 74,
     investmentConviction: 0,
   };
   scores.investmentConviction = computeConviction(scores);
@@ -372,57 +391,63 @@ function attachNumbers(deal: Deal, intel: DealIntelligence) {
   intel.scoreBreakdown = {
     convictionNote: "Quality of the company is separate from quality of the numbers.",
   };
-  intel.world = [
-    {
-      claim: "$48B TAM for warehouse autonomy",
-      independent: "Not crawled this pass.",
-      against: "No study in the room.",
-      missing: "Third-party TAM memo",
-      assessment: "Independent TAM still unsupported.",
-      confidence: 20,
-    },
-  ];
-  intel.people = [
-    {
-      title: "Founders",
-      claim: "Simon Kalouche and Erik Nieves.",
-      evidence: "Deck bios only.",
-      assessment: "Not independently verified this pass.",
-    },
-  ];
-  intel.valuation = {
-    entryValuation: "$90M post on $18M",
-    revenueMultiple: "Rich on either ARR figure",
-    comps: "Warehouse autonomy A rounds",
-    companyQualityVsPrice: "Price assumes the deck ARR is real.",
-    attractiveness: 47,
-  };
+  if (!intel.people.length) {
+    intel.people = [
+      {
+        title: "Founders",
+        claim: intel.profile.founders.join(" and ") || `${intel.profile.company} founding team.`,
+        evidence: "Named on the inbound pack.",
+        assessment: "Not independently verified this pass.",
+      },
+    ];
+  }
+  if (!intel.valuation) {
+    intel.valuation = {
+      entryValuation: intel.profile.fundraise,
+      revenueMultiple: arr ? `Price versus ${arr.room || arr.deck}` : "Price versus the room",
+      comps: intel.profile.sector,
+      companyQualityVsPrice: "Price assumes the deck numbers hold.",
+      attractiveness: scores.valuationAttractiveness,
+    };
+  }
 }
 
-function writeIc(intel: DealIntelligence) {
+function writeIc(deal: Deal, intel: DealIntelligence) {
   const conviction = intel.scores.investmentConviction ?? 52;
+  const arr = deal.graph.rows.find((row) => row.metric === "arr");
+  const gaps = deal.flags.filter((flag) => flag.severity === "contradiction" || flag.severity === "missing");
   intel.ic = {
-    executiveSummary:
-      "On-thesis industrial robotics. The room contradicts the deck on ARR. After the founder restatement the definition is clearer; TAM is still unsupported. Advance only with a restated model and a cap-table clean-up.",
-    companyOverview: `${PROFILE.product}. ${PROFILE.fundraise}.`,
+    executiveSummary: gaps.length
+      ? `${intel.profile.company}. The room still disagrees with the deck on ${gaps
+          .map((flag) => flag.metric || flag.id)
+          .slice(0, 3)
+          .join(", ")}. Advance only with restated primary files.`
+      : `${intel.profile.company}. ${intel.profile.product}. ${intel.profile.fundraise}.`,
+    companyOverview: `${intel.profile.product}. ${intel.profile.fundraise}.`,
     thesisFit: intel.thesis.whyItMayStillMatter,
-    opportunityQuality: "Warehouse autonomy is real budget. Traction quality is the open question.",
-    risks: intel.risks.map((r) => r.description).join(" "),
-    uncertainties: "Independent TAM still unsupported. Retention not in the room.",
-    evidenceConfidence: "ARR definition now stated. Other contradictions remain.",
-    valuation: intel.valuation?.companyQualityVsPrice ?? "Price assumes deck ARR.",
+    opportunityQuality: intel.profile.traction || "Traction quality is the open question.",
+    risks: intel.risks.map((r) => r.description).join(" ") || gaps.map((flag) => flag.comment).join(" "),
+    uncertainties: intel.questions.filter((q) => q.status !== "answered").map((q) => q.question).join(" ") ||
+      "Independent corroboration still thin.",
+    evidenceConfidence: intel.founderReplyApplied
+      ? "Founder restated the contested figure. Other gaps may remain."
+      : "Primary files and founder restatement still decide the numbers.",
+    valuation: intel.valuation?.companyQualityVsPrice ?? "Price assumes the deck numbers hold.",
     returnScenarios: "Not modeled as a distribution. Do not treat conviction as P(invest).",
-    portfolioFit: "Fits the industrial book as a smaller check, not the lead.",
-    bullCase: "If $2.8M is contracted and growing, this is a real A with a path to lead logistics spend.",
-    bearCase: "If $4.2M was pipeline, the hire plan and the $90M post both break inside nine months of cash.",
+    portfolioFit: "Fits as a smaller check until the room is clean.",
+    bullCase: arr?.room
+      ? `If ${arr.room} is contracted and growing, the raise can hold.`
+      : "If the room numbers hold, this is a real meeting.",
+    bearCase: arr?.deck
+      ? `If ${arr.deck} was pipeline, the plan and the price both break.`
+      : "If the deck does not survive the room, do not stretch for it.",
     keyAssumptions: [
-      "Restated ARR is billed + contracted",
-      "Nine months of cash is the fact",
-      "We would not lead",
+      "Restated figures match primary files",
+      "We would not lead on this pass",
     ],
     openQuestions: intel.questions.filter((q) => q.status !== "answered").map((q) => q.question),
     recommendation: "advance_with_conditions",
-    recommendationNote: `Conviction ${conviction}. Conditions: restated model in the room, FD cap table, no reserve until both land.`,
+    recommendationNote: `Conviction ${conviction}. Conditions: restated model in the room, missing files landed.`,
     nextBestAction: "The memo is ready. Take the deal, pass, or make an offer.",
   };
   intel.returns = {
@@ -437,7 +462,7 @@ function writeIc(intel: DealIntelligence) {
 
 export async function decideDemo(id: string, gate: string, choice: string): Promise<Snapshot> {
   const loaded = await loadIntelligence(id);
-  if (!loaded) throw new Error(`No live deal ${id}`);
+  if (!loaded) throw new Error(`No deal ${id}`);
   let { deal, intel } = loaded;
   const token = norm(choice);
   const gateId = norm(gate) as PendingGateId | string;
@@ -456,14 +481,14 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
       intel.stage = "validation";
       attachNumbers(deal, intel);
       intel.pendingGate = gateFounder();
-      intel.nextAction = waitingAction("founder", "Highest decision value: if $2.8M is the number, price breaks.");
+      intel.nextAction = waitingAction("founder", "Highest decision value is a restatement of the contested numbers.");
       intel.tasks = [
         {
           id: "t-live-arr",
-          title: "Waiting on ARR restatement",
-          owner: "Simon Kalouche",
+          title: "Waiting on founder restatement",
+          owner: founderName(intel),
           status: "waiting",
-          waitingOn: "Founder — monthly roll-forward",
+          waitingOn: "Founder — primary schedule",
           kind: "document",
         },
       ];
@@ -511,7 +536,7 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
       intel.stage = "validation";
       intel.pendingGate = gateIcOpen();
       intel.nextAction = waitingAction("partner", "Conviction moved. Partner decides whether this goes to IC.");
-      stamp(intel, "Founder answered", "ARR restated. Conviction +5. Independent TAM still unsupported.", "Founder");
+      stamp(intel, "Founder answered", "Reply applied. Conviction moved. Partner decides whether this goes to IC.", "Founder");
       deal.intelligence = intel;
       await saveIntelligence(deal, intel);
       return snapshot(deal, "partner_update");
@@ -521,15 +546,16 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
 
   if (gateId === "ic") {
     if (token === "ask more") {
-      intel.pendingGate = gateIcOpen();
+      intel.pendingGate = gateFounder();
       stamp(intel, "Ask more", "Partner wants another founder pass.");
+      intel.nextAction = waitingAction("founder", "Waiting on the founder again.");
       deal.intelligence = intel;
       await saveIntelligence(deal, intel);
       return snapshot(deal, "founder_question");
     }
     if (token === "go to ic" || token === "open") {
       intel.stage = "decision_room";
-      writeIc(intel);
+      writeIc(deal, intel);
       intel.pendingGate = gateIcDecide();
       intel.nextAction = {
         title: "The memo is ready. Take the deal, pass, or make an offer.",
@@ -547,7 +573,7 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
     }
     const rec = icChoice(token);
     if (!rec) throw new Error("ic choices: go to ic | confirm | pass | term sheet | ask more");
-    if (!intel.ic) writeIc(intel);
+    if (!intel.ic) writeIc(deal, intel);
     const packet = intel.ic;
     if (!packet) throw new Error("IC packet missing");
     packet.recommendation = rec;

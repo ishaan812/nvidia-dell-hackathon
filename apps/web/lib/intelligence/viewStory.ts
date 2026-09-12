@@ -343,6 +343,7 @@ export function responseMap(intel: DealIntelligence, flags: Flag[]) {
 export type PipelineBucket = "attention" | "review" | "waiting" | "updated";
 
 export function pipelineBucket(deal: DealSummary): PipelineBucket {
+  if (deal.pendingGate?.id === "founder") return "waiting";
   if (deal.pendingGate || deal.live) return "attention";
   if (deal.nextAction?.toLowerCase().includes("waiting")) return "waiting";
   if (deal.stage === "decision_room") return "review";

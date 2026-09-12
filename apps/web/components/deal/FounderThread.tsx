@@ -17,7 +17,7 @@ export function FounderThread({ dealId, intel, flags }: Props) {
   const [pending, start] = useTransition();
   const [draft, setDraft] = useState(() => founderDraft(flags));
   const [editing, setEditing] = useState(false);
-  const canSend = dealId === "northstar-robotics" || dealId === "northstar-live";
+  const canSend = intel.pendingGate?.id === "founder" && !intel.founderReplyApplied;
   const map = responseMap(intel, flags);
   const question = intel.questions.find((item) => item.status === "open" || item.status === "asked");
 
@@ -55,12 +55,16 @@ export function FounderThread({ dealId, intel, flags }: Props) {
               disabled={pending || intel.founderReplyApplied || !canSend}
               onClick={() => {
                 start(async () => {
-                  await fetch(`/api/deals/${dealId}/founder-reply`, { method: "POST" });
+                  await fetch(`/api/deals/${dealId}/decide`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ gate: "founder", choice: "apply reply" }),
+                  });
                   router.refresh();
                 });
               }}
             >
-              {intel.founderReplyApplied ? "Reply received" : pending ? "Sending…" : "Send to founder"}
+              {intel.founderReplyApplied ? "Reply received" : pending ? "Applying…" : "Apply founder reply"}
             </button>
           </div>
         </li>

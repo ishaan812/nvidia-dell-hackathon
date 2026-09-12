@@ -1777,6 +1777,43 @@ body {
   color: var(--paper);
 }
 
+.deal-verbs {
+  margin-top: 1.15rem;
+  max-width: 36rem;
+}
+
+.deal-court {
+  color: var(--mute);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.deal-verbs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+}
+
+.deal-verbs-error {
+  margin-top: 0.55rem;
+  color: var(--red, #d36b6b);
+  font-size: 0.875rem;
+}
+
+.desk-btn-quiet {
+  min-height: 2.4rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--paper);
+  font-size: 0.9375rem;
+}
+
+.desk-btn-quiet:disabled {
+  opacity: 0.45;
+}
+
 .recompute-bar {
   display: flex;
   flex-wrap: wrap;

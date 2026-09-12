@@ -331,6 +331,8 @@ export type ResearchHit = {
   title: string;
   url: string;
   description: string;
+  images?: string[];
+  ogImage?: string;
 };
 
 export type FounderSpike = {
@@ -343,6 +345,7 @@ export type FounderResearch = {
   summary: string;
   spikes: FounderSpike[];
   hits: ResearchHit[];
+  photoUrl?: string;
 };
 
 export type MarketInsight = {

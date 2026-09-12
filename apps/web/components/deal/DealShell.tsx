@@ -88,7 +88,7 @@ export function DealShell({ deal, intel, model }: Props) {
       <PageFrame>
         <header className="pb-6 pt-10">
           <AppChrome model={model} />
-          <DealHeader intel={intel} flags={deal.flags} waiting={waiting} />
+          <DealHeader dealId={deal.id} intel={intel} flags={deal.flags} waiting={waiting} />
           <div className="mt-6">
             <StageRail current={stage} validated={validated} decided={decided} />
           </div>

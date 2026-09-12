@@ -109,7 +109,7 @@ function gateIcOpen(): PendingGate {
 function gateIcDecide(): PendingGate {
   return {
     id: "ic",
-    prompt: "Advance with conditions, pass, or term sheet. You decide.",
+    prompt: "Take it with a few conditions, pass, or make an offer. Your call.",
     options: ["confirm", "pass", "term sheet"],
   };
 }
@@ -423,7 +423,7 @@ function writeIc(intel: DealIntelligence) {
     openQuestions: intel.questions.filter((q) => q.status !== "answered").map((q) => q.question),
     recommendation: "advance_with_conditions",
     recommendationNote: `Conviction ${conviction}. Conditions: restated model in the room, FD cap table, no reserve until both land.`,
-    nextBestAction: "Partner confirms, watches, or passes.",
+    nextBestAction: "The memo is ready. Take the deal, pass, or make an offer.",
   };
   intel.returns = {
     scenarios: [
@@ -531,7 +531,15 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
       intel.stage = "decision_room";
       writeIc(intel);
       intel.pendingGate = gateIcDecide();
-      intel.nextAction = waitingAction("partner", "Packet is ready. Confirm, pass, or term sheet.");
+      intel.nextAction = {
+        title: "The memo is ready. Take the deal, pass, or make an offer.",
+        reason: "The numbers are in. This is your call.",
+        decisionImpact: "high",
+        informationValue: "high",
+        cost: "low",
+        time: "hours",
+        urgency: "now",
+      };
       stamp(intel, "Opened Decision Room", "Same engines. The partner decides in the room.");
       deal.intelligence = intel;
       await saveIntelligence(deal, intel);
@@ -564,12 +572,20 @@ export async function decideDemo(id: string, gate: string, choice: string): Prom
 }
 
 function icChoice(token: string): IcRecommendation | null {
-  if (token === "confirm" || token === "advance with conditions" || token === "advance_with_conditions") {
+  if (
+    token === "confirm" ||
+    token === "take it" ||
+    token === "take the deal" ||
+    token === "advance with conditions" ||
+    token === "advance_with_conditions"
+  ) {
     return "advance_with_conditions";
   }
   if (token === "advance") return "advance";
   if (token === "pass") return "pass";
-  if (token === "term sheet" || token === "term_sheet") return "term_sheet";
+  if (token === "term sheet" || token === "term_sheet" || token === "make an offer" || token === "offer") {
+    return "term_sheet";
+  }
   if (token === "watch") return "watch";
   return null;
 }

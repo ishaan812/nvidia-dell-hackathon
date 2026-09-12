@@ -32,7 +32,7 @@ export function MarketPane({ dealId, intel }: { dealId: string; intel: DealIntel
         {deckTam ? <p className="market-deck">Deck says {deckTam}</p> : null}
         {tamClaim?.recomputedValue ? <p className="mt-2 text-mute">From the files: {tamClaim.recomputedValue}.</p> : null}
         {pack?.summary ? <p className="founder-summary mt-4">{pack.summary}</p> : (
-          <Note>Run the search for TAM, open space, and competitors — then we write the read, not the dump.</Note>
+          <Note>Search lands sources first. The model writes TAM, open space, and competitors only after that pass.</Note>
         )}
         <button type="button" className="desk-btn mt-5" disabled={pending} onClick={search}>
           {pending ? "Reading the market…" : pack?.summary ? "Refresh market research" : "Run market search"}

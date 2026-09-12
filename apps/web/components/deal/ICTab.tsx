@@ -14,7 +14,7 @@ export function ICTab({ intel }: { intel: DealIntelligence }) {
       <Section title="Next action">
         <p className="font-serif text-[1.45rem] leading-snug">{plainAction(copy.next)}</p>
         <div className="mt-3">
-          <Note>{copy.why}</Note>
+          <Note>{plainAction(copy.why)}</Note>
         </div>
         {ic ? <p className="mt-4 text-mute">{recommendationLabel(ic.recommendation)}</p> : null}
       </Section>
@@ -27,7 +27,7 @@ export function ICTab({ intel }: { intel: DealIntelligence }) {
         ) : (
           <Note>
             {tooEarly
-              ? "Too early for a packet. Diligence has to land first."
+              ? "Too early for a write-up. Diligence has to land first."
               : copy.view.like || "The case is still being written from the files."}
           </Note>
         )}

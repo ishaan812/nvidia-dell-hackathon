@@ -1,14 +1,30 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { readJson } from "@/lib/http";
 import type { DealIntelligence, FounderResearch, FounderSpike, ResearchHit } from "@/lib/intelligence/types";
 import { Note, Section } from "./ui";
 
 export function FounderPane({ dealId, intel }: { dealId: string; intel: DealIntelligence }) {
   const [pending, start] = useTransition();
+  const [photosPending, startPhotos] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [people, setPeople] = useState<FounderResearch[] | null>(asPeople(intel.research?.founders));
+  const askedPhotos = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (askedPhotos.current === dealId) return;
+    const current = asPeople(intel.research?.founders);
+    if (!current?.some((person) => !person.photoUrl)) return;
+    askedPhotos.current = dealId;
+    startPhotos(async () => {
+      const res = await fetch(`/api/deals/${dealId}/research/founder-photos`, { method: "POST" });
+      const data = await readJson(res);
+      if (!res.ok) return;
+      const next = asPeople(data.people);
+      if (next) setPeople(next);
+    });
+  }, [dealId, intel.research?.founders]);
 
   function search() {
     setError(null);
@@ -27,18 +43,24 @@ export function FounderPane({ dealId, intel }: { dealId: string; intel: DealInte
     <div>
       <Section title="Founder diligence">
         <Note>
-          Public history on each named founder — the spike, then the sources. Unusual backgrounds stay in
-          evaluation.
+          Public history on each named founder. Search lands sources first; the model writes the memo only
+          after it has read them.
         </Note>
         <button type="button" className="desk-btn mt-5" disabled={pending} onClick={search}>
           {pending ? "Reading public history…" : people?.length ? "Refresh founder research" : "Search LinkedIn and public history"}
         </button>
+        {photosPending ? <p className="mt-3 text-mute">Getting LinkedIn portraits…</p> : null}
         {error ? <p className="mt-3 text-flag-red">{error}</p> : null}
       </Section>
 
       {people?.map((person) => (
         <Section key={person.name} title={person.name}>
-          <p className="founder-summary">{person.summary}</p>
+          <div className="founder-card">
+            {person.photoUrl ? (
+              <img className="founder-photo" src={person.photoUrl} alt={person.name} referrerPolicy="no-referrer" />
+            ) : null}
+            <p className="founder-summary">{person.summary}</p>
+          </div>
           {person.spikes.length ? (
             <div className="founder-spikes">
               <h3>Spikes of excellence</h3>
@@ -84,6 +106,7 @@ function asPeople(raw: unknown): FounderResearch[] | null {
         summary: typeof row.summary === "string" ? row.summary : "",
         spikes: asSpikes(row.spikes),
         hits: asHits(row.hits),
+        photoUrl: typeof row.photoUrl === "string" ? row.photoUrl : undefined,
       };
     })
     .filter((item): item is FounderResearch => Boolean(item));

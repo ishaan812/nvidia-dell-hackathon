@@ -384,6 +384,9 @@ export function supportingScores(intel: DealIntelligence) {
 export function plainAction(text?: string | null): string {
   if (!text) return "—";
   return text
+    .replace(/Packet is ready\.\s*Confirm, pass, or term sheet\./i, "The memo is ready. Take the deal, pass, or make an offer.")
+    .replace(/Advance with conditions, pass, or term sheet\.\s*You decide\./i, "Take it with a few conditions, pass, or make an offer. Your call.")
+    .replace(/Partner confirms, watches, or passes\./i, "Take the deal, wait, or pass.")
     .replace(/\bARR\b/g, "Annual Recurring Revenue")
     .replace(/\bIC\b/g, "Investment Committee")
     .replace(/\bTAM\b/g, "Total Market Size");

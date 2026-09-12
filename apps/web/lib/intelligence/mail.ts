@@ -98,17 +98,17 @@ export function buildDraft(kind: DraftKind, deal: Deal, intel: DealIntelligence)
     partner_ic: [
       "Hi —",
       "",
-      "Packet's ready.",
+      "The memo is ready.",
       "",
       intel.ic
         ? `I'd ${labelRec(intel.ic.recommendation).toLowerCase()}. ${intel.ic.recommendationNote}`
-        : "I'd advance with conditions — restated model and a clean cap table before we reserve.",
+        : "I'd take it with a few conditions — restated model and a clean cap table before we reserve.",
       intel.ic ? `The optimistic read: ${intel.ic.bullCase}` : "",
       intel.ic ? `The bad one: ${intel.ic.bearCase}` : "",
       "",
       `Overview: ${url}?tab=overview`,
       "",
-      `Reply "confirm", "pass", or "term sheet". Your call — I'm not assigning a probability.`,
+      `Reply "take it", "pass", or "make an offer". Your call.`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -273,8 +273,8 @@ function priorConviction(intel: DealIntelligence): number | null {
 }
 
 function labelRec(value: string): string {
-  if (value === "advance_with_conditions") return "Advance with conditions";
-  if (value === "term_sheet") return "Term sheet";
+  if (value === "advance_with_conditions") return "Take it with a few conditions";
+  if (value === "term_sheet") return "Make an offer";
   if (value === "pass") return "Pass";
   if (value === "advance") return "Advance";
   if (value === "watch") return "Watch";

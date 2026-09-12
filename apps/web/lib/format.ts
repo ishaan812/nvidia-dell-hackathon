@@ -30,11 +30,11 @@ export function scoreDisplay(value?: number) {
 export function recommendationLabel(value: string) {
   const labels: Record<string, string> = {
     advance: "Advance",
-    advance_with_conditions: "Advance with conditions",
+    advance_with_conditions: "Take it, with conditions",
     watch: "Watch",
     pass: "Pass",
     thesis_exception: "Thesis exception",
-    term_sheet: "Term sheet",
+    term_sheet: "Make an offer",
     take_meeting: "Take meeting",
     request_information: "Request information",
     decline: "Decline",

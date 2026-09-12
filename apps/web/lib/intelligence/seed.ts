@@ -409,13 +409,13 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
   const metrics: Metric[] = [
     { name: "arr", value: 4_200_000, unit: "usd", raw: "$4.2M ARR", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 3, label: "ARR" } },
     { name: "arr", value: 2_800_000, unit: "usd", raw: "$2.8M", sourceKind: "financials", citation: { filename: "northstar-financial-model.xlsx", sheet: "Summary", label: "ARR" } },
-    { name: "runway_months", value: 18, unit: "months", raw: "18 months of runway", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 8 } },
+    { name: "runway_months", value: 18, unit: "months", raw: "18 months of runway", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 5 } },
     { name: "runway_months", value: 9, unit: "months", raw: "9 months", sourceKind: "financials", citation: { filename: "northstar-financial-model.xlsx", sheet: "Cash" } },
-    { name: "headcount", value: 40, unit: "people", raw: "40 people", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 11 } },
+    { name: "headcount", value: 40, unit: "people", raw: "40 people", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 4 } },
     { name: "headcount", value: 27, unit: "people", raw: "27", sourceKind: "financials", citation: { filename: "northstar-financial-model.xlsx", sheet: "Headcount" } },
-    { name: "founder_ownership_pct", value: 15, unit: "pct", raw: "Founders 15%", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 14 } },
+    { name: "founder_ownership_pct", value: 15, unit: "pct", raw: "Founders 15%", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 6 } },
     { name: "founder_ownership_pct", value: 8.4, unit: "pct", raw: "8.4%", sourceKind: "cap_table", citation: { filename: "northstar-cap-table.xlsx", sheet: "Cap" } },
-    { name: "tam", value: 48_000_000_000, unit: "usd", raw: "$48B TAM", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 5 } },
+    { name: "tam", value: 48_000_000_000, unit: "usd", raw: "$48B TAM", sourceKind: "deck", citation: { filename: "northstar-deck.pdf", page: 7 } },
     { name: "burn_monthly", value: 420_000, unit: "usd", raw: "$420k", sourceKind: "financials", citation: { filename: "northstar-financial-model.xlsx", sheet: "Cash" } },
     { name: "cash", value: 3_800_000, unit: "usd", raw: "$3.8M", sourceKind: "financials", citation: { filename: "northstar-financial-model.xlsx", sheet: "Cash" } },
   ];
@@ -439,7 +439,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
     {
       id: "flag-runway_months",
       docId: "deck",
-      page: 8,
+      page: 5,
       type: "highlight",
       severity: "contradiction",
       metric: "runway_months",
@@ -453,7 +453,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
     {
       id: "flag-headcount",
       docId: "deck",
-      page: 11,
+      page: 4,
       type: "highlight",
       severity: "contradiction",
       metric: "headcount",
@@ -467,7 +467,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
     {
       id: "flag-founder_ownership_pct",
       docId: "deck",
-      page: 14,
+      page: 6,
       type: "highlight",
       severity: "contradiction",
       metric: "founder_ownership_pct",
@@ -481,7 +481,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
     {
       id: "flag-tam",
       docId: "deck",
-      page: 5,
+      page: 7,
       type: "highlight",
       severity: "unsupported",
       metric: "tam",
@@ -503,10 +503,10 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
     edges: [{ source: "co", target: "arr", rel: "claims", severity: "contradiction" }],
     rows: [
       { metric: "arr", label: "ARR", deck: "$4.2M", room: "$2.8M", status: "contradiction", flagId: "flag-arr", page: 3 },
-      { metric: "runway_months", label: "Runway", deck: "18 mo", room: "9 mo", status: "contradiction", flagId: "flag-runway_months", page: 8 },
-      { metric: "headcount", label: "Headcount", deck: "40", room: "27", status: "contradiction", flagId: "flag-headcount", page: 11 },
-      { metric: "founder_ownership_pct", label: "Founder ownership", deck: "15%", room: "8.4%", status: "contradiction", flagId: "flag-founder_ownership_pct", page: 14 },
-      { metric: "tam", label: "TAM", deck: "$48B", status: "unsupported", flagId: "flag-tam", page: 5 },
+      { metric: "runway_months", label: "Runway", deck: "18 mo", room: "9 mo", status: "contradiction", flagId: "flag-runway_months", page: 5 },
+      { metric: "headcount", label: "Headcount", deck: "40", room: "27", status: "contradiction", flagId: "flag-headcount", page: 4 },
+      { metric: "founder_ownership_pct", label: "Founder ownership", deck: "15%", room: "8.4%", status: "contradiction", flagId: "flag-founder_ownership_pct", page: 6 },
+      { metric: "tam", label: "TAM", deck: "$48B", status: "unsupported", flagId: "flag-tam", page: 7 },
     ],
   };
 
@@ -567,7 +567,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
         metric: "runway_months",
         kind: "management",
         sourceDocument: "northstar-deck.pdf",
-        page: 8,
+        page: 5,
         sourceType: "management",
         verification: "contradicted",
         confidence: 28,
@@ -583,7 +583,7 @@ function northstar(): { deal: Deal; files: { filename: string; body: string }[];
         metric: "tam",
         kind: "management",
         sourceDocument: "northstar-deck.pdf",
-        page: 5,
+        page: 7,
         sourceType: "unverified",
         verification: "unverified",
         confidence: 15,

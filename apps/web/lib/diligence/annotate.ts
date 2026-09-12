@@ -51,8 +51,10 @@ export async function annotateDeck(deal: Deal, outDir: string): Promise<string |
   const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const reader = await getDocument({ data: new Uint8Array(bytes), useSystemFonts: true }).promise;
 
+  const pageCount = pdf.getPageCount();
   for (const flag of deal.flags) {
     const pageNo = flag.page && flag.page > 0 ? flag.page : 1;
+    if (pageNo > pageCount) continue;
     const page = pdf.getPage(pageNo - 1);
     if (!page) continue;
     const { width, height } = page.getSize();

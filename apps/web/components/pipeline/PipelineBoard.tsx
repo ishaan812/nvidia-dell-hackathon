@@ -111,7 +111,7 @@ export function PipelineBoard({ deals }: Props) {
                 <span>Next</span>
               </div>
               {rows.map((deal) => (
-                <a key={deal.id} href={`/deals/${deal.id}`} className="pipe-row">
+                <a key={deal.id} href={`/deals/${deal.id}`} target="_top" className="pipe-row">
                   <span className="pipe-name">
                     {deal.company || deal.name}
                     {deal.live ? <span className="pipe-flag">Live</span> : null}

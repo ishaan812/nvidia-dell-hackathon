@@ -123,6 +123,7 @@ export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: 
                   ? `/deals/${deal.id}?tab=diligence&pane=${pane}`
                   : `/deals/${deal.id}?tab=${item.id}`
               }
+              target="_top"
               className={`deal-tab ${tab === item.id ? "is-on" : ""}`}
             >
               {item.label}
@@ -142,6 +143,7 @@ export function DealShell({ deal, intel, model, tab: tabProp, pane: paneProp }: 
             <a
               key={item.id}
               href={`/deals/${deal.id}?tab=${item.id}`}
+              target="_top"
               className={`deal-tab ${tab === item.id ? "is-on" : ""}`}
             >
               {item.label}

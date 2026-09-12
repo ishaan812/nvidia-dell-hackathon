@@ -26,6 +26,7 @@ export function DiligenceTab({ deal, intel, pane }: Props) {
           <a
             key={item.id}
             href={`/deals/${deal.id}?tab=diligence&pane=${item.id}`}
+            target="_top"
             className={pane === item.id ? "is-on" : ""}
           >
             {item.label}

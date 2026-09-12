@@ -1,9 +1,1 @@
-dont do rsync bro push to github then pull there please everything should go through github
-
----
-
-cleanup now only keep 6 main entires 5 deals earlier + helion
-
----
-
 So what we can do through the TUI the partner shoukd also be able to do it through the UI Please add action verbs if its founders turn to reply or ball in his court so we can move through the deal pipelien with UI too

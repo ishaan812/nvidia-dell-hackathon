@@ -181,18 +181,21 @@ export async function answerQuery(
     content: turn.content,
   }));
 
-  const prose = await chat([
-    {
-      role: "system",
-      content:
-        "You are an associate answering a partner about one sealed deal. Use only the supplied context from this deal's files. Cite claims as [1], [2] matching the numbered blocks. If you do not know, say so. After the answer, write RELATED and three short follow-up questions.",
-    },
-    ...prior,
-    {
-      role: "user",
-      content: `Question: ${question}\n\nFlags:\n${flagNotes}\n\nContext:\n${context}`,
-    },
-  ]);
+  const prose = await chat(
+    [
+      {
+        role: "system",
+        content:
+          "You are an associate answering a partner about one sealed deal. Use only the supplied context from this deal's files. Cite claims as [1], [2] matching the numbered blocks. If you do not know, say so. After the answer, write RELATED and three short follow-up questions.",
+      },
+      ...prior,
+      {
+        role: "user",
+        content: `Question: ${question}\n\nFlags:\n${flagNotes}\n\nContext:\n${context}`,
+      },
+    ],
+    { model: settings().diligenceModel },
+  );
 
   const parsed = parseRelated(
     prose ||

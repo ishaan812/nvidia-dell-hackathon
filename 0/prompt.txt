@@ -1,0 +1,1 @@
+dont do rsync bro push to github then pull there please everything should go through github

@@ -1,0 +1,1 @@
+Add an ask tab on each deal dashboard, using https://github.com/miurla/morphic  like UI just copuy the UI and add the tab so we can interface with glimmer muse our model properly and chat about with the deal with citations and all that

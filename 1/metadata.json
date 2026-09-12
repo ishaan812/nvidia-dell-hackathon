@@ -1,0 +1,73 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BGS61XDY5804ECND4109XF",
+  "session_id": "7decf42e-48ea-482a-a5c9-7c74af070074",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T19:16:20.706905Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    "apps/web/app/api/deals/[id]/query/route.ts",
+    "apps/web/app/deals/[id]/deck/page.tsx",
+    "apps/web/app/deals/[id]/page.tsx",
+    "apps/web/app/deals/[id]/preview/page.tsx",
+    "apps/web/app/deals/[id]/room/page.tsx",
+    "apps/web/app/globals.css",
+    "apps/web/app/thesis/page.tsx",
+    "apps/web/components/AppChrome.tsx",
+    "apps/web/components/AskPanel.tsx",
+    "apps/web/components/DealLobby.tsx",
+    "apps/web/components/DealRoom.tsx",
+    "apps/web/components/ModelBadge.tsx",
+    "apps/web/components/deal/AskTab.tsx",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/components/pipeline/PipelineHome.tsx",
+    "apps/web/lib/diligence/paths.ts",
+    "apps/web/lib/diligence/rag.ts",
+    "apps/web/lib/diligence/types.ts"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "262b72f391bf",
+  "checkpoint_transcript_start": 190,
+  "transcript_lines_at_start": 190,
+  "compact_transcript_start": 40,
+  "token_usage": {
+    "input_tokens": 105027,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1777920,
+    "output_tokens": 21804,
+    "api_call_count": 1
+  },
+  "session_metrics": {
+    "turn_count": 16,
+    "context_tokens": 233942,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T19:16:20.59878Z",
+    "agent_lines": 902,
+    "agent_removed": 97,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 902,
+    "total_lines_changed": 999,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

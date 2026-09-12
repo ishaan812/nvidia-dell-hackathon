@@ -8,6 +8,7 @@ type Props = {
   highlight?: string;
   sheet?: string;
   compact?: boolean;
+  grid?: WorkbookGrid | null;
 };
 
 function colLetter(index: number) {
@@ -65,14 +66,24 @@ function sheetHasHit(sheet: WorkbookSheet, highlight?: string): boolean {
   return sheet.rows.some((row) => row.cells.some((cell) => numbersMatch(cell.text, highlight)));
 }
 
-export function WorkbookViewer({ href, highlight, sheet, compact = false }: Props) {
-  const [grid, setGrid] = useState<WorkbookGrid | null>(null);
+export function WorkbookViewer({ href, highlight, sheet, compact = false, grid: initial }: Props) {
+  const [grid, setGrid] = useState<WorkbookGrid | null>(initial ?? null);
   const [sheetName, setSheetName] = useState(sheet ?? "");
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const workbookHref = href.replace("/file?", "/workbook?");
 
   useEffect(() => {
+    function pickSheet(data: WorkbookGrid) {
+      const named = sheet && data.sheets.find((item) => item.name === sheet);
+      const marked = highlight ? data.sheets.find((item) => sheetHasHit(item, highlight)) : undefined;
+      setSheetName(named?.name ?? marked?.name ?? data.sheets[0]?.name ?? "");
+    }
+    if (initial) {
+      setGrid(initial);
+      pickSheet(initial);
+      return;
+    }
     let dead = false;
     setGrid(null);
     setError(null);
@@ -82,11 +93,7 @@ export function WorkbookViewer({ href, highlight, sheet, compact = false }: Prop
         if (!res.ok) throw new Error(data.error || "Could not open workbook");
         if (!dead) {
           setGrid(data);
-          const named = sheet && data.sheets.find((item) => item.name === sheet);
-          const marked = highlight
-            ? data.sheets.find((item) => sheetHasHit(item, highlight))
-            : undefined;
-          setSheetName(named?.name ?? marked?.name ?? data.sheets[0]?.name ?? "");
+          pickSheet(data);
         }
       })
       .catch((err: Error) => {
@@ -95,7 +102,7 @@ export function WorkbookViewer({ href, highlight, sheet, compact = false }: Prop
     return () => {
       dead = true;
     };
-  }, [workbookHref, sheet, highlight]);
+  }, [workbookHref, sheet, highlight, initial]);
 
   const current: WorkbookSheet | undefined =
     grid?.sheets.find((item) => item.name === sheetName) ?? grid?.sheets[0];

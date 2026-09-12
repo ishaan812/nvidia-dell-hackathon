@@ -13,6 +13,7 @@ type Slide = {
 
 type Props = {
   src: string;
+  slides?: Slide[];
   flags?: Flag[];
   activeId?: string | null;
   onSelect?: (id: string) => void;
@@ -38,12 +39,16 @@ function lineHit(line: string, quote: string): boolean {
   return a.includes(b) || b.includes(a);
 }
 
-export function PptxViewer({ src, flags = [], activeId, onSelect, compact = false }: Props) {
+export function PptxViewer({ src, slides: initial, flags = [], activeId, onSelect, compact = false }: Props) {
   const host = useRef<HTMLDivElement>(null);
-  const [slides, setSlides] = useState<Slide[]>([]);
+  const [slides, setSlides] = useState<Slide[]>(initial ?? []);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initial?.length) {
+      setSlides(initial);
+      return;
+    }
     let dead = false;
     setError(null);
     setSlides([]);
@@ -59,7 +64,7 @@ export function PptxViewer({ src, flags = [], activeId, onSelect, compact = fals
     return () => {
       dead = true;
     };
-  }, [src]);
+  }, [src, initial]);
 
   useEffect(() => {
     if (!activeId) return;

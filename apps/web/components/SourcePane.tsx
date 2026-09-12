@@ -1,4 +1,4 @@
-import type { FlagView } from "@/lib/diligence/types";
+import type { FlagView, WorkbookGrid } from "@/lib/diligence/types";
 import { FilePreview } from "./FilePreview";
 
 const SEV = {
@@ -10,9 +10,10 @@ const SEV = {
 type Props = {
   dealId: string;
   flag: FlagView | null;
+  workbook?: WorkbookGrid | null;
 };
 
-export function SourcePane({ dealId, flag }: Props) {
+export function SourcePane({ dealId, flag, workbook }: Props) {
   if (!flag) {
     return (
       <div className="px-6 py-7">
@@ -61,6 +62,7 @@ export function SourcePane({ dealId, flag }: Props) {
             href={href ?? undefined}
             openHref={openHref ?? undefined}
             compact
+            grid={workbook}
           />
         </div>
       ) : null}

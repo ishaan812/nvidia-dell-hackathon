@@ -1,6 +1,6 @@
 "use client";
 
-import type { SourcePreview } from "@/lib/diligence/types";
+import type { SourcePreview, WorkbookGrid } from "@/lib/diligence/types";
 import { NativePdf } from "./NativePdf";
 import { PptxViewer } from "./PptxViewer";
 import { WordViewer } from "./WordViewer";
@@ -13,9 +13,10 @@ type Props = {
   compact?: boolean;
   fill?: boolean;
   onClose?: () => void;
+  grid?: WorkbookGrid | null;
 };
 
-export function FilePreview({ preview, href, openHref, compact = false, fill = false, onClose }: Props) {
+export function FilePreview({ preview, href, openHref, compact = false, fill = false, onClose, grid }: Props) {
   const open = openHref ?? href;
   const isPdf = /\.pdf$/i.test(preview.filename);
   const isPptx = /\.pptx$/i.test(preview.filename);
@@ -59,6 +60,7 @@ export function FilePreview({ preview, href, openHref, compact = false, fill = f
             highlight={preview.highlight}
             sheet={preview.sheet}
             compact={compact}
+            grid={grid}
           />
         ) : null}
         {isDoc ? (

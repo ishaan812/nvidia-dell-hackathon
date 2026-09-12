@@ -276,6 +276,12 @@ export async function startDemo(id = LIVE_DEAL_ID): Promise<Snapshot> {
   deal.company = deal.company || "Northstar Robotics";
   deal.intelligence = await sourceIntel(deal);
   await saveDeal(deal);
+  try {
+    const { ensureAnnotatedDeck } = await import("../diligence/annotate");
+    await ensureAnnotatedDeck(deal);
+  } catch (error) {
+    console.error("Could not mark the live deck", error);
+  }
   return snapshot(deal, "partner_triage");
 }
 

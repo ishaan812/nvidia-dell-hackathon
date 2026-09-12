@@ -11,10 +11,11 @@ const ORDER = { contradiction: 0, unsupported: 1, missing: 2 };
 type Props = {
   flags: FlagView[];
   activeId: string | null;
-  onSelect: (id: string) => void;
+  hrefFor: (id: string) => string;
+  onSelect?: (id: string) => void;
 };
 
-export function FlagList({ flags, activeId, onSelect }: Props) {
+export function FlagList({ flags, activeId, hrefFor, onSelect }: Props) {
   const sorted = flags.toSorted(
     (a, b) => ORDER[a.severity] - ORDER[b.severity] || (a.page ?? 99) - (b.page ?? 99),
   );
@@ -31,11 +32,12 @@ export function FlagList({ flags, activeId, onSelect }: Props) {
             const on = activeId === flag.id;
             return (
               <li key={flag.id} className="flag-row">
-                <button
-                  type="button"
-                  onClick={() => onSelect(flag.id)}
-                  aria-pressed={on}
-                  className={`w-full border-l-2 px-5 py-4 text-left ${meta.rule} ${on ? "bg-white/6" : ""}`}
+                <a
+                  href={hrefFor(flag.id)}
+                  target="_top"
+                  aria-current={on ? "true" : undefined}
+                  onClick={() => onSelect?.(flag.id)}
+                  className={`block w-full border-l-2 px-5 py-4 text-left ${meta.rule} ${on ? "bg-white/6" : ""}`}
                 >
                   <div className="flex items-baseline justify-between gap-3">
                     <span className={`font-mono text-[11px] ${meta.color}`}>{meta.label}</span>
@@ -44,7 +46,7 @@ export function FlagList({ flags, activeId, onSelect }: Props) {
                     </span>
                   </div>
                   <p className="mt-1.5 text-[14px] leading-5 text-paper/85">{flag.comment}</p>
-                </button>
+                </a>
               </li>
             );
           })}

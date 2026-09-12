@@ -1,38 +1,34 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import type { DealRoomView } from "@/lib/diligence/types";
+import type { PptxSlide } from "@/lib/diligence/pptx";
+import type { DealRoomView, WorkbookGrid } from "@/lib/diligence/types";
 import { riskTone } from "@/lib/format";
 import { BrandLogo } from "./BrandLogo";
 import { ModelBadge } from "./ModelBadge";
 import { FlagList } from "./FlagList";
+import { PptxViewer } from "./PptxViewer";
 import { SideDesk, type SidePane } from "./SideDesk";
-
-const DeckViewer = dynamic(() => import("./DeckViewer").then((mod) => mod.DeckViewer), {
-  ssr: false,
-  loading: () => <p className="p-8 font-mono text-[12px] text-black/45">Opening slides…</p>,
-});
-
-const PptxViewer = dynamic(() => import("./PptxViewer").then((mod) => mod.PptxViewer), {
-  ssr: false,
-  loading: () => <p className="p-8 font-mono text-[12px] text-black/45">Opening slides…</p>,
-});
 
 type Props = {
   deal: DealRoomView;
   model?: string;
+  flagId?: string | null;
+  slides?: PptxSlide[];
+  workbook?: WorkbookGrid | null;
 };
 
-export function DealRoom({ deal, model }: Props) {
-  const router = useRouter();
+export function DealRoom({ deal, model, flagId, slides, workbook }: Props) {
   const [pending, startTransition] = useTransition();
   const [pane, setPane] = useState<SidePane>("source");
-  const [activeId, setActiveId] = useState<string | null>(deal.flags[0]?.id ?? null);
+  const [activeId, setActiveId] = useState<string | null>(flagId ?? deal.flags[0]?.id ?? null);
   const checks = deal.flags.filter((flag) => flag.severity !== "missing").length;
   const active = deal.flags.find((flag) => flag.id === activeId) ?? null;
+  const deckName = deal.activeDeck ?? deal.decks[0]?.filename ?? "";
+  const isPptx = /\.pptx$/i.test(deckName);
+  const page = active?.page && active.page > 0 ? active.page : 1;
+  const annotated = `/api/deals/${deal.id}/annotated#page=${page}&view=FitH&zoom=page-width`;
+  const original = `/api/deals/${deal.id}/deck${deckName ? `?name=${encodeURIComponent(deckName)}` : ""}`;
 
   function openFlag(id: string) {
     setActiveId(id);
@@ -42,7 +38,7 @@ export function DealRoom({ deal, model }: Props) {
   function recompute() {
     startTransition(async () => {
       const res = await fetch(`/api/deals/${deal.id}/recompute`, { method: "POST" });
-      if (res.ok) router.refresh();
+      if (res.ok) window.location.reload();
     });
   }
 
@@ -51,12 +47,13 @@ export function DealRoom({ deal, model }: Props) {
       <header className="flex items-center justify-between gap-6 border-b border-white/10 px-6 py-3">
         <div className="flex min-w-0 items-center gap-4">
           <BrandLogo compact size={18} />
-          <Link
+          <a
             href={`/deals/${deal.id}`}
+            target="_top"
             className="shrink-0 text-[14px] text-paper/80 underline-offset-2 hover:text-paper hover:underline"
           >
             Back to data room
-          </Link>
+          </a>
           <h1 className="truncate font-serif text-[28px] leading-none">{deal.company || deal.name}</h1>
         </div>
         <div className="flex items-baseline gap-5 font-mono text-[11px] text-paper/45">
@@ -71,9 +68,9 @@ export function DealRoom({ deal, model }: Props) {
             <label className="flex items-center gap-2 text-paper/70">
               Deck
               <select
-                value={deal.activeDeck ?? deal.decks[0]?.filename}
+                defaultValue={deckName}
                 onChange={(event) => {
-                  router.push(`/deals/${deal.id}/deck?name=${encodeURIComponent(event.target.value)}`);
+                  window.location.href = `/deals/${deal.id}/deck?name=${encodeURIComponent(event.target.value)}`;
                 }}
                 className="border border-white/20 bg-transparent px-2 py-1 text-paper"
               >
@@ -85,13 +82,10 @@ export function DealRoom({ deal, model }: Props) {
               </select>
             </label>
           ) : null}
-          <a
-            href={`/api/deals/${deal.id}/deck${deal.activeDeck ? `?name=${encodeURIComponent(deal.activeDeck)}` : ""}`}
-            className="hover:text-paper"
-          >
+          <a href={original} target="_blank" rel="noreferrer" className="hover:text-paper">
             original
           </a>
-          <a href={`/api/deals/${deal.id}/annotated`} className="hover:text-paper">
+          <a href={`/api/deals/${deal.id}/annotated`} target="_blank" rel="noreferrer" className="hover:text-paper">
             marked pdf
           </a>
           <button
@@ -106,25 +100,37 @@ export function DealRoom({ deal, model }: Props) {
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-[260px_minmax(0,1fr)_400px]">
-        <FlagList flags={deal.flags} activeId={activeId} onSelect={openFlag} />
-        <main className="min-h-0 min-w-0 overflow-y-auto bg-[#d8dee4]">
-          {/\.pptx$/i.test(deal.activeDeck ?? deal.decks[0]?.filename ?? "") ? (
-            <PptxViewer
-              src={`/api/deals/${deal.id}/slides?name=${encodeURIComponent(deal.activeDeck ?? deal.decks[0]?.filename ?? "")}`}
-              flags={deal.flags}
-              activeId={activeId}
-              onSelect={openFlag}
-            />
+        <FlagList
+          flags={deal.flags}
+          activeId={activeId}
+          hrefFor={(id) =>
+            `/deals/${deal.id}/deck?name=${encodeURIComponent(deckName)}&flag=${encodeURIComponent(id)}`
+          }
+          onSelect={openFlag}
+        />
+        <main className="min-h-0 h-full min-w-0 overflow-hidden bg-[#d8dee4]">
+          {isPptx ? (
+            <div className="h-full overflow-y-auto">
+              <PptxViewer
+                src={`/api/deals/${deal.id}/slides?name=${encodeURIComponent(deckName)}`}
+                slides={slides}
+                flags={deal.flags}
+                activeId={activeId}
+                onSelect={openFlag}
+              />
+            </div>
           ) : (
-            <DeckViewer
-              src={`/api/deals/${deal.id}/deck${deal.activeDeck ? `?name=${encodeURIComponent(deal.activeDeck)}` : ""}`}
-              flags={deal.flags}
-              activeId={activeId}
-              onSelect={openFlag}
-            />
+            <iframe key={annotated} title="Marked deck" src={annotated} className="h-full w-full border-0 bg-[#525659]" />
           )}
         </main>
-        <SideDesk deal={deal} flag={active} pane={pane} onPane={setPane} onOpenFlag={openFlag} />
+        <SideDesk
+          deal={deal}
+          flag={active}
+          pane={pane}
+          onPane={setPane}
+          onOpenFlag={openFlag}
+          workbook={workbook}
+        />
       </div>
     </div>
   );

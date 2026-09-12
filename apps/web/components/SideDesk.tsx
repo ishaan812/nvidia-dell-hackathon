@@ -1,6 +1,6 @@
 "use client";
 
-import type { DealRoomView, FlagView } from "@/lib/diligence/types";
+import type { DealRoomView, FlagView, WorkbookGrid } from "@/lib/diligence/types";
 import { AskPanel } from "./AskPanel";
 import { MemoPanel } from "./MemoPanel";
 import { ReconciliationMap } from "./ReconciliationMap";
@@ -21,9 +21,10 @@ type Props = {
   pane: SidePane;
   onPane: (pane: SidePane) => void;
   onOpenFlag: (id: string) => void;
+  workbook?: WorkbookGrid | null;
 };
 
-export function SideDesk({ deal, flag, pane, onPane, onOpenFlag }: Props) {
+export function SideDesk({ deal, flag, pane, onPane, onOpenFlag, workbook }: Props) {
   return (
     <aside
       id="side-desk"
@@ -44,7 +45,7 @@ export function SideDesk({ deal, flag, pane, onPane, onOpenFlag }: Props) {
       </nav>
       <div className="min-h-0 flex-1 overflow-y-auto">
         {pane === "source" ? (
-          <SourcePane dealId={deal.id} flag={flag} />
+          <SourcePane dealId={deal.id} flag={flag} workbook={workbook} />
         ) : pane === "compare" ? (
           <ReconciliationMap
             rows={deal.reconcile}

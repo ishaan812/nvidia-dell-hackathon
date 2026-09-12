@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { readFile } from "node:fs/promises";
 import { notFound } from "next/navigation";
 import { BrandLogo } from "@/components/BrandLogo";
 import { FilePreview } from "@/components/FilePreview";
 import { ModelBadge } from "@/components/ModelBadge";
+import { PptxViewer } from "@/components/PptxViewer";
+import { resolveDealSource, previewFile } from "@/lib/diligence/evidence";
 import { settings } from "@/lib/diligence/paths";
-import { previewFile } from "@/lib/diligence/evidence";
+import { parsePptx } from "@/lib/diligence/pptx";
 import { loadDeal } from "@/lib/diligence/store";
+import { readWorkbookGrid } from "@/lib/diligence/workbook";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +37,11 @@ export default async function FilePreviewPage({
   const preview = await previewFile(deal, name);
   if (!preview) notFound();
   const href = `/api/deals/${id}/file?name=${encodeURIComponent(name)}`;
+  const file = resolveDealSource(deal, name);
+  const grid =
+    file && /\.(xlsx?|csv)$/i.test(name) ? await readWorkbookGrid(file, name).catch(() => null) : null;
+  const slides =
+    file && /\.pptx$/i.test(name) ? await parsePptx(await readFile(file)).catch(() => undefined) : undefined;
 
   return (
     <div className="preview-page">
@@ -41,15 +49,20 @@ export default async function FilePreviewPage({
         <BrandLogo compact size={18} />
         <div className="flex items-center gap-5">
           <ModelBadge name={settings().llmModel} />
-          <Link href={`/deals/${id}`} className="text-[15px] text-paper/75 underline-offset-2 hover:underline">
+          <a href={`/deals/${id}`} target="_top" className="text-[15px] text-paper/75 underline-offset-2 hover:underline">
             Back to the data room
-          </Link>
-          <Link href={`/deals/${id}/deck`} className="text-[15px] text-paper/75 underline-offset-2 hover:underline">
+          </a>
+          <a
+            href={`/deals/${id}/deck`}
+            target="_top"
+            className="text-[15px] text-paper/75 underline-offset-2 hover:underline"
+          >
             Back to the deck
-          </Link>
+          </a>
         </div>
       </div>
-      <FilePreview fill preview={preview} href={href} />
+      {slides?.length ? <PptxViewer src={`/api/deals/${id}/slides?name=${encodeURIComponent(name)}`} slides={slides} /> : null}
+      <FilePreview fill preview={preview} href={href} grid={grid} />
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { resolveDealSource } from "./evidence";
 import { resolveExisting } from "./files";
+import { dirs } from "./paths";
 import { findRunIndexes, pdfRunBox, type TextRun } from "./textMatch";
 import type { Deal } from "./types";
 
@@ -37,7 +39,7 @@ export async function annotateDeck(deal: Deal, outDir: string): Promise<string |
     deal.docs.find((d) => d.filename === deal.deckFilename && (d.role === "deck" || d.kind === "deck") && /\.pdf$/i.test(d.filename)) ??
     deal.docs.find((d) => (d.role === "deck" || d.kind === "deck") && /\.pdf$/i.test(d.path || d.filename));
   if (!deck) return null;
-  const src = resolveExisting(deck.path, deck.filename);
+  const src = resolveDealSource(deal, deck.filename) ?? resolveExisting(deck.path, deck.filename);
   if (!src) return null;
   await mkdir(outDir, { recursive: true });
   const dest = path.join(outDir, "deck.annotated.pdf");
@@ -113,5 +115,21 @@ export async function annotateDeck(deal: Deal, outDir: string): Promise<string |
 
   await writeFile(dest, await pdf.save());
   await copyFile(src, path.join(outDir, path.basename(src)));
+  return dest;
+}
+
+export async function ensureAnnotatedDeck(deal: Deal): Promise<string | null> {
+  const outbox = path.join(dirs().outbox, deal.id, "deck.annotated.pdf");
+  const local = path.join(dirs().data, deal.id, "deck.annotated.pdf");
+  const existing = resolveExisting(outbox) ?? resolveExisting(local);
+  if (existing) return existing;
+  const dest = await annotateDeck(deal, path.join(dirs().outbox, deal.id));
+  if (dest) {
+    try {
+      await copyFile(dest, local);
+    } catch {
+      /* outbox copy is enough */
+    }
+  }
   return dest;
 }

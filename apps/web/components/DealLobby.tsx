@@ -183,19 +183,24 @@ export function DealLobby({ deal, model, embedded = false }: Props) {
                   return (
                     <li key={item.filename} className={`deal-row ${on ? "is-on" : ""}`}>
                       <div className="flex items-start justify-between gap-4 py-4">
-                        <button type="button" onClick={() => openFile(item.filename)} className="min-w-0 text-left">
+                        <a
+                          href={`/deals/${deal.id}/deck?name=${encodeURIComponent(item.filename)}`}
+                          target="_top"
+                          className="min-w-0 text-left"
+                        >
                           <span className="role-badge is-deck">Deck</span>
                           <span className={`mt-2 block font-serif text-[26px] leading-none ${on ? "text-paper" : "text-paper/80"}`}>
                             {item.filename}
                           </span>
-                        </button>
+                        </a>
                         <div className="flex flex-wrap justify-end gap-2">
-                          <Link
+                          <a
                             href={`/deals/${deal.id}/deck?name=${encodeURIComponent(item.filename)}`}
+                            target="_top"
                             className="pressable bg-paper px-4 py-2.5 text-[14px] text-ink hover:bg-white"
                           >
                             {deal.decks.length === 1 ? "Open the deck" : "Open"}
-                          </Link>
+                          </a>
                           <button
                             type="button"
                             disabled={pending}
@@ -233,10 +238,10 @@ export function DealLobby({ deal, model, embedded = false }: Props) {
                 return (
                   <li key={item.filename} className={`deal-row ${on ? "is-on" : ""}`}>
                     <div className="flex items-start justify-between gap-4 py-4">
-                      <button
-                        type="button"
-                        onClick={() => openFile(item.filename)}
-                        aria-pressed={on}
+                      <a
+                        href={`/deals/${deal.id}/preview?name=${encodeURIComponent(item.filename)}`}
+                        target="_top"
+                        aria-current={on ? "true" : undefined}
                         className="min-w-0 flex-1 text-left"
                       >
                         <div className="flex items-baseline justify-between gap-4">
@@ -250,7 +255,7 @@ export function DealLobby({ deal, model, embedded = false }: Props) {
                           {item.sheets.length ? ` · ${item.sheets.join(" · ")}` : ""}
                           {item.metrics.length ? ` · ${item.metrics.join(", ")}` : ""}
                         </p>
-                      </button>
+                      </a>
                       {slides ? (
                         <button
                           type="button"

@@ -91,16 +91,14 @@ async function finishDeal(
     deal.intelligence = await openSourceIntelligence(deal);
     push("ready", "Opened a Source deal on the pipeline");
   }
-  if (deal.intelligence && !deal.intelligence.research) {
-    push("ready", "Starting founder and market reads from the deck");
-    try {
-      deal = await ensureSourceResearch(deal);
-    } catch (error) {
-      push("ready", `Public research skipped: ${(error as Error).message}`);
-    }
-  }
   push("ready", `${deal.flags.length} findings · risk ${deal.riskScore}`);
   await saveDeal(deal);
+  if (deal.intelligence && !deal.intelligence.research) {
+    push("ready", "Starting founder and market reads from the deck");
+    void ensureSourceResearch(deal).catch((error) => {
+      console.error("source research", deal.id, error);
+    });
+  }
   return deal;
 }
 

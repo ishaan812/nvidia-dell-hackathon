@@ -1,12 +1,11 @@
-import { draftDemo, startDemo, statusDemo } from "./demo";
-import { mailboxEnv, type MailDraft } from "./mail";
+import { startDemo } from "./demo";
+import { mailboxEnv } from "./mail";
 
 const C = {
   reset: "\x1b[0m",
   bold: "\x1b[1m",
   dim: "\x1b[2m",
   aqua: "\x1b[38;5;87m",
-  sea: "\x1b[38;5;49m",
   mint: "\x1b[38;5;121m",
   paper: "\x1b[38;5;255m",
   mute: "\x1b[38;5;145m",
@@ -17,15 +16,54 @@ const C = {
   bgOff: "\x1b[49m",
 };
 
+type Letter = {
+  fromName: string;
+  from: string;
+  toName: string;
+  to: string;
+  subject: string;
+  body: string;
+};
+
+function founderLetter(): Letter {
+  const box = mailboxEnv();
+  return {
+    fromName: "Maya Chen",
+    from: box.founder,
+    toName: "Night Desk",
+    to: box.desk,
+    subject: "Northstar Robotics — Series A materials",
+    body: [
+      "Hi Night Desk —",
+      "",
+      "Sending the Northstar pack for a first look.",
+      "",
+      "We're warehouse autonomy — pallet movers for existing buildings.",
+      "Raising $18M Series A at $90M post.",
+      "",
+      "Attached",
+      "  northstar-deck.pdf",
+      "  northstar-financial-model.xlsx",
+      "  northstar-cap-table.xlsx",
+      "  GROUND_TRUTH.md",
+      "",
+      "Happy to walk ARR and the raise whenever you want time.",
+      "",
+      "Maya",
+      "Northstar Robotics",
+    ].join("\n"),
+  };
+}
+
 export async function runTui(id = "northstar-live") {
   process.env.DEMO_CHANNEL = "tui";
   if (process.env.DEMO_FAST == null) process.env.DEMO_FAST = "1";
 
-  const box = mailboxEnv();
-  let draft: MailDraft | null = null;
+  let letter = founderLetter();
   let sent = false;
   let sentAt = "";
-  let flash = "Writing the first note…";
+  let dealUrl = "";
+  let flash = "Founder note to OpenClaw. Send it to open the deal.";
   let busy = false;
 
   const tty = process.stdout;
@@ -41,31 +79,31 @@ export async function runTui(id = "northstar-live") {
     const gutter = Math.max(0, Math.floor((cols - width) / 2));
     const g = " ".repeat(gutter);
     const lines: string[] = [];
-
     const rule = `${C.line}${"─".repeat(width)}${C.reset}`;
-    const stamp = sent ? `${C.mint}${C.bold}Sent${C.reset}  ${C.mute}${sentAt}${C.reset}` : `${C.wait}Draft${C.reset}`;
+    const stamp = sent
+      ? `${C.mint}${C.bold}Sent${C.reset}  ${C.mute}${sentAt}${C.reset}  ${C.aqua}deal opened${C.reset}`
+      : `${C.wait}Draft${C.reset}`;
 
     lines.push("");
     lines.push(
       g +
-        `${C.bold}${C.paper}Night Desk${C.reset}  ${C.dim}·${C.reset}  ${C.aqua}first note${C.reset}  ${C.dim}·${C.reset}  ${C.mute}Northstar Robotics${C.reset}`,
+        `${C.bold}${C.paper}Night Desk${C.reset}  ${C.dim}·${C.reset}  ${C.aqua}inbound${C.reset}  ${C.dim}·${C.reset}  ${C.mute}founder → OpenClaw${C.reset}`,
     );
-    lines.push(g + `${C.mute}OpenClaw  →  partner inbox${C.reset}`);
+    lines.push(g + `${C.mute}Send this and the bot opens Northstar on the book.${C.reset}`);
     lines.push(g + rule);
     lines.push(g + stamp);
     lines.push("");
-
-    if (draft) {
-      lines.push(g + field("From", `Night Desk  <${draft.from}>`));
-      lines.push(g + field("To", draft.to));
-      lines.push(g + field("Subject", draft.subject));
-      lines.push(g + rule);
+    lines.push(g + field("From", `${letter.fromName}  <${letter.from}>`));
+    lines.push(g + field("To", `${letter.toName}  <${letter.to}>`));
+    lines.push(g + field("Subject", letter.subject));
+    lines.push(g + rule);
+    lines.push("");
+    for (const line of wrap(letter.body, width)) {
+      lines.push(g + `${C.paper}${line}${C.reset}`);
+    }
+    if (sent && dealUrl) {
       lines.push("");
-      for (const line of wrap(draft.body.trim(), width)) {
-        lines.push(g + `${C.paper}${line}${C.reset}`);
-      }
-    } else {
-      lines.push(g + `${C.mute}Opening the inbound pack…${C.reset}`);
+      lines.push(g + `${C.mute}On the book${C.reset}  ${C.aqua}${dealUrl}${C.reset}`);
     }
 
     while (lines.length < rows - 5) lines.push("");
@@ -73,8 +111,8 @@ export async function runTui(id = "northstar-live") {
     lines.push(
       g +
         (sent
-          ? `${C.mute}R rewrite the note     Q quit${C.reset}`
-          : `${C.bold}${C.aqua}Enter${C.reset} ${C.paper}send${C.reset}    ${C.mute}R rewrite     Q quit${C.reset}`),
+          ? `${C.mute}R write it again     Q quit${C.reset}`
+          : `${C.bold}${C.aqua}Enter${C.reset} ${C.paper}send to OpenClaw${C.reset}    ${C.mute}R rewrite     Q quit${C.reset}`),
     );
     lines.push(g + `${busy ? C.wait : C.mute}${flash}${C.reset}`);
 
@@ -84,23 +122,19 @@ export async function runTui(id = "northstar-live") {
     if (lines.length < rows) tty.write("\n");
   }
 
-  async function writeFirstNote() {
-    try {
-      await statusDemo(id);
-    } catch {
-      await startDemo(id);
-    }
-    const { draft: next } = await draftDemo(id, "partner_triage");
-    draft = next;
-    sent = false;
-    sentAt = "";
-    flash = `To ${box.partner}. Read it, then send.`;
+  async function sendInbound() {
+    flash = "OpenClaw is opening the room…";
+    paint();
+    const snap = await startDemo(id);
+    sent = true;
+    sentAt = clock();
+    dealUrl = snap.url;
+    flash = "Deal is on the book. OpenClaw has the pack.";
   }
 
   async function act(fn: () => Promise<void>) {
     if (busy) return;
     busy = true;
-    flash = "Working…";
     paint();
     try {
       await fn();
@@ -118,15 +152,17 @@ export async function runTui(id = "northstar-live") {
       return;
     }
     if (key === "r" || key === "R") {
-      void act(writeFirstNote);
+      letter = founderLetter();
+      sent = false;
+      sentAt = "";
+      dealUrl = "";
+      flash = "Founder note to OpenClaw. Send it to open the deal.";
+      paint();
       return;
     }
     if (key === "\r" || key === "\n" || key === " " || key === "s" || key === "S") {
-      if (!draft || sent || busy) return;
-      sent = true;
-      sentAt = clock();
-      flash = "On the partner desk.";
-      paint();
+      if (sent || busy) return;
+      void act(sendInbound);
     }
   }
 
@@ -142,13 +178,12 @@ export async function runTui(id = "northstar-live") {
   stdin.resume();
   stdin.setEncoding("utf8");
   stdin.on("data", (chunk: string) => {
-    for (const key of chunk) onKey(key);
+    for (const ch of chunk) onKey(ch);
   });
   process.on("SIGWINCH", () => paint());
   process.on("SIGINT", shutdown);
 
   paint();
-  await act(writeFirstNote);
 }
 
 function field(label: string, value: string) {

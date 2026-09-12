@@ -30,11 +30,11 @@ function founderLetter(): Letter {
   return {
     fromName: "Maya Chen",
     from: box.founder,
-    toName: "Night Desk",
+    toName: "Acme VC",
     to: box.desk,
     subject: "Northstar Robotics — Series A materials",
     body: [
-      "Hi Night Desk —",
+      "Hi Acme VC —",
       "",
       "Sending the Northstar pack for a first look.",
       "",

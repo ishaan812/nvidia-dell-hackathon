@@ -6,7 +6,7 @@ import { normalizeStage } from "../intelligence/types";
 import { headerScores } from "../intelligence/viewStory";
 import { resolveExisting } from "./files";
 import { dirs } from "./paths";
-import { assertInsideDeal } from "./sandbox";
+import { isInsideDeal } from "./sandbox";
 import type { Deal, DealSummary } from "./types";
 
 function dealPath(id: string) {
@@ -63,8 +63,7 @@ export async function saveDeal(deal: Deal): Promise<void> {
     decks.find((doc) => doc.filename === deal.deckFilename) ?? decks[0];
   if (primary) {
     const src = resolveExisting(primary.path, primary.filename);
-    if (src) {
-      if (deal.sandbox) assertInsideDeal(deal.id, src);
+    if (src && isInsideDeal(deal.id, src)) {
       await copyFile(src, path.join(folder, "deck.pdf"));
       deal.deckFilename = primary.filename;
     }
@@ -102,7 +101,11 @@ export async function listDeals(): Promise<DealSummary[]> {
   );
   const deals = loaded.filter((deal): deal is Deal => deal !== null);
   for (const deal of deals) {
-    if (await attachSourceIfMissing(deal)) await saveDeal(deal);
+    try {
+      if (await attachSourceIfMissing(deal)) await saveDeal(deal);
+    } catch (error) {
+      console.error("could not open Source deal", deal.id, error);
+    }
   }
   return deals.map(summarize).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }

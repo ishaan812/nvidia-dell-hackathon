@@ -7,10 +7,15 @@ export function dealRoot(dealId: string) {
   return path.resolve(dirs().data, dealId);
 }
 
-export function assertInsideDeal(dealId: string, filePath: string): string {
+export function isInsideDeal(dealId: string, filePath: string): boolean {
   const root = dealRoot(dealId);
   const resolved = path.resolve(filePath);
-  if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+  return resolved === root || resolved.startsWith(root + path.sep);
+}
+
+export function assertInsideDeal(dealId: string, filePath: string): string {
+  const resolved = path.resolve(filePath);
+  if (!isInsideDeal(dealId, resolved)) {
     throw new Error("Path is outside this deal's room");
   }
   return resolved;

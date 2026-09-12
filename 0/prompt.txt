@@ -1,0 +1,122 @@
+How can we show the pipeline running fully using the openclaw bot, with human in the loop? think of an interactiev demo and hwo we could do it
+
+---
+
+Ideally we plan to do the whole thing using email th ehuman in the loop so openclaw gets emails from startup founders emails the responsible partner with analysis and to check the dashboard and so on think of that too
+
+---
+
+hwo can we give this an email and cna you also tell em what is the openclaw even being used for right now
+
+---
+
+lets do both preffered and fallback how do we mailbox signed in what service will we use
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+nwo to run the demo hwo to amke it work how do i connect it with a spare google email i have
+
+---
+
+how to test using TUI
+
+---
+
+nice but after that how i want a TUI where i can see the whole process on both ends change roles and so on full process live
+
+---
+
+IMPORTANT ARCHITECTURAL REVISION:
+
+Keep the existing product concept, analytical engines, scoring framework,
+risk framework, evidence system, document system, valuation system,
+portfolio analysis, five diligence checks, plausibility analysis,
+question system, version control, timeline, and "What Changed My Mind?"
+features exactly as specified.
+
+ONLY change the deal workflow from 9 user-facing stages to 5:
+
+1. SOURCE
+2. TRIAGE
+3. VALIDATION
+4. PROCESS
+5. DECISION ROOM
+
+SOURCE and TRIAGE remain conceptually the same.
+
+Combine the former NUMBERS + WORLD + PEOPLE + PRODUCT stages into
+VALIDATION.
+
+VALIDATION should contain:
+- Financial analysis
+- Market analysis
+- Customer analysis
+- Competition
+- Product
+- Team
+- External / real-world validation
+- Benchmarking
+- Plausibility analysis
+- Evidence checks
+
+The former FOUNDER LOOP must NOT be a stage.
+It becomes a continuous cross-stage mechanism consisting of:
+- Pending Items
+- Open Questions
+- Founder Responses
+- New Evidence
+- Automatic Re-analysis
+
+PROCESS is the operational layer:
+- Meetings
+- Notes
+- Documents
+- Tasks
+- Owners
+- Pending Items
+- Questions
+- Next Meeting
+- Activity History
+
+PROCESS can operate alongside any analytical stage.
+
+The former IC + CLOSE/PASS become DECISION ROOM.
+
+DECISION ROOM is interactive rather than a static report.
+It contains:
+- Investment Case
+- Risk
+- Uncertainty
+- Evidence Confidence
+- Thesis Fit
+- Valuation
+- Return Scenarios
+- Portfolio Fit
+- Interactive AI Analyst
+- IC Summary
+- Final Decision
+
+Do not remove any analytical functionality merely because the number
+of workflow stages has been reduced.
+
+The goal is to SIMPLIFY THE USER EXPERIENCE, not simplify the
+underlying intelligence.
+
+The five stages describe WHERE THE DEAL IS.
+The analytical engines describe WHAT THE SYSTEM IS DOING.
+Pending Items / Questions describe WHAT WE ARE WAITING FOR.
+The Decision Room describes WHAT WE CURRENTLY BELIEVE AND WHAT WE
+SHOULD DO.
+
+
+Change teh TUI inetrface and all to reflect this make the status trackign UI aslo better, the stages that are done should have some indication that they are done and so on.
+
+---
+
+Make TUI brighter blue green and please make emails human liek and teh UI easy to understand and demo

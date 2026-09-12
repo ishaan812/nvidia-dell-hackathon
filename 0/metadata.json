@@ -1,0 +1,138 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BE5TES5BTAZKQBA4A1RJDH",
+  "session_id": "7decf42e-48ea-482a-a5c9-7c74af070074",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T18:30:49.197218Z",
+  "branch": "main",
+  "checkpoints_count": 9,
+  "save_step_count": 5,
+  "files_touched": [
+    ".env.example",
+    "README.md",
+    "apps/web/app/api/deals/[id]/founder-reply/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/components/deal/NumbersTab.tsx",
+    "apps/web/components/deal/OverviewTab.tsx",
+    "apps/web/components/deal/ProcessTab.tsx",
+    "apps/web/components/deal/QuestionsTab.tsx",
+    "apps/web/components/deal/ValidationTab.tsx",
+    "apps/web/components/pipeline/PipelineBoard.tsx",
+    "apps/web/components/pipeline/PipelineHome.tsx",
+    "apps/web/components/pipeline/StageRail.tsx",
+    "apps/web/lib/diligence/pipeline.ts",
+    "apps/web/lib/diligence/store.ts",
+    "apps/web/lib/diligence/types.ts",
+    "apps/web/lib/intelligence/demo.ts",
+    "apps/web/lib/intelligence/mail.ts",
+    "apps/web/lib/intelligence/seed.ts",
+    "apps/web/lib/intelligence/stage.ts",
+    "apps/web/lib/intelligence/tui.ts",
+    "apps/web/lib/intelligence/types.ts",
+    "docs/GB10.md",
+    "docs/HITL-DEMO.md",
+    "openclaw/skills/deal-desk/SKILL.md"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "e2cd2c3429bf",
+  "checkpoint_transcript_start": 76,
+  "transcript_lines_at_start": 76,
+  "compact_transcript_start": 13,
+  "token_usage": {
+    "input_tokens": 227408,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10828736,
+    "output_tokens": 68688,
+    "api_call_count": 5
+  },
+  "session_metrics": {
+    "turn_count": 14,
+    "context_tokens": 233942,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T18:30:49.004365Z",
+    "agent_lines": 1549,
+    "agent_removed": 198,
+    "human_added": 389,
+    "human_modified": 3,
+    "human_removed": 0,
+    "total_committed": 1941,
+    "total_lines_changed": 2139,
+    "agent_percentage": 81.67367928938756,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1210,
+      "agent_lines_removed": 7,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1210,
+      "agent_lines_removed": 7,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 393,
+      "user_lines_removed": 3,
+      "agent_lines_added": 1210,
+      "agent_lines_removed": 7,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1,
+        "apps/web/lib/intelligence/demo.ts": 7,
+        "apps/web/lib/intelligence/mail.ts": 5,
+        "apps/web/lib/intelligence/tui.ts": 353,
+        "docs/HITL-DEMO.md": 27
+      },
+      "user_removed_per_file": {
+        "apps/web/lib/intelligence/demo.ts": 1,
+        "apps/web/lib/intelligence/mail.ts": 2
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1916,
+      "agent_lines_removed": 201,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1944,
+      "agent_lines_removed": 201,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

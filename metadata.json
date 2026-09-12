@@ -3,11 +3,49 @@
   "checkpoint_id": "01M2BMZMYY3H77P3P0GA5HFKMT",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 13,
   "files_touched": [
+    ".env.example",
+    "apps/web/app/api/deals/[id]/research/founder/route.ts",
+    "apps/web/app/api/deals/[id]/research/market/route.ts",
+    "apps/web/app/globals.css",
     "apps/web/components/AskPanel.tsx",
+    "apps/web/components/DealLobby.tsx",
+    "apps/web/components/PageFrame.tsx",
     "apps/web/components/deal/AskTab.tsx",
-    "apps/web/components/deal/ICTab.tsx"
+    "apps/web/components/deal/DealHeader.tsx",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/DiligenceTab.tsx",
+    "apps/web/components/deal/FinancialsPane.tsx",
+    "apps/web/components/deal/FounderPane.tsx",
+    "apps/web/components/deal/FounderThread.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/components/deal/MarketPane.tsx",
+    "apps/web/components/deal/Meter.tsx",
+    "apps/web/components/deal/NumbersTab.tsx",
+    "apps/web/components/deal/OverviewTab.tsx",
+    "apps/web/components/deal/ProcessTab.tsx",
+    "apps/web/components/deal/ScoreValue.tsx",
+    "apps/web/components/deal/StoryList.tsx",
+    "apps/web/components/deal/ThesisTab.tsx",
+    "apps/web/components/deal/TimelineTab.tsx",
+    "apps/web/components/deal/ValidationTab.tsx",
+    "apps/web/components/deal/WorldTab.tsx",
+    "apps/web/components/pipeline/PipelineBoard.tsx",
+    "apps/web/components/pipeline/PipelineHome.tsx",
+    "apps/web/lib/diligence/firecrawl.ts",
+    "apps/web/lib/diligence/paths.ts",
+    "apps/web/lib/diligence/research.ts",
+    "apps/web/lib/diligence/store.ts",
+    "apps/web/lib/diligence/types.ts",
+    "apps/web/lib/intelligence/demo.ts",
+    "apps/web/lib/intelligence/mail.ts",
+    "apps/web/lib/intelligence/seed.ts",
+    "apps/web/lib/intelligence/types.ts",
+    "apps/web/lib/intelligence/viewStory.ts",
+    "apps/web/scripts/refresh-demo-research.ts",
+    "apps/web/scripts/refresh-founder-assessments.ts",
+    "apps/web/scripts/refresh-market-assessments.ts"
   ],
   "sessions": [
     {
@@ -16,13 +54,20 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 219585,
+    "input_tokens": 879205,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 432896,
-    "output_tokens": 2858,
-    "api_call_count": 1
+    "cache_read_tokens": 21684544,
+    "output_tokens": 126847,
+    "api_call_count": 12
   }
 }

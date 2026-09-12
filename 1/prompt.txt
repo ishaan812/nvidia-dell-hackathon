@@ -1,0 +1,930 @@
+The interactive analyst thing w ehave can be replaced by this new UI make sure it runs well on light and dark mode
+
+---
+
+naaah on local make it run with gemma pls
+
+---
+
+I want you to refine the UX/UI of the EXISTING VC investment intelligence application.
+
+IMPORTANT:
+- DO NOT rebuild the application.
+- DO NOT change the underlying product architecture.
+- DO NOT change the existing five-stage workflow.
+- DO NOT remove or rewrite the existing intelligence, analysis, scoring logic, data models, or backend functionality.
+- This is primarily a UX/UI refinement.
+- Preserve the existing functionality and improve how the information is presented and understood.
+- The goal is to make the product feel like a brilliant VC associate sitting beside the investor, not like an AI dashboard.
+
+The existing workflow is:
+
+1. SOURCE
+2. TRIAGE
+3. VALIDATION
+4. PROCESS
+5. DECISION
+
+PROCESS is an operational/control layer and can run alongside the analytical workflow. Do not treat it as a rigid sequential stage.
+
+==================================================
+1. CORE UX PRINCIPLE
+==================================================
+
+The current application exposes too much internal system architecture.
+
+The investor should see the INVESTMENT STORY, not the software architecture.
+
+The interface should answer immediately:
+
+- Where are we?
+- What happened?
+- What did we learn?
+- What concerns us?
+- What do we still need?
+- Who needs to act?
+- What happens next?
+
+A deal should be understandable within 5–10 seconds.
+
+Use progressive disclosure:
+
+LEVEL 1:
+What matters?
+
+LEVEL 2:
+Why does it matter?
+
+LEVEL 3:
+Show the evidence, calculation, source, or detailed reasoning.
+
+Do not put every piece of information on the first screen.
+
+==================================================
+2. VISUAL DESIGN
+==================================================
+
+Make the UI:
+
+- simple
+- clean
+- minimal
+- premium
+- institutional
+- highly readable
+- spacious
+- restrained
+
+Avoid:
+
+- excessive cards
+- giant metric widgets
+- unnecessary badges
+- excessive icons
+- decorative charts
+- gradients
+- neon colors
+- oversized headings
+- dashboard clutter
+- too many competing visual elements
+
+Use typography, spacing, alignment, subtle borders, and hierarchy to create structure.
+
+The product should feel closer to a premium institutional investment tool than a generic SaaS dashboard.
+
+==================================================
+3. DEAL HEADER
+==================================================
+
+The top of each deal should immediately communicate:
+
+Company
+Current Stage
+Investment Conviction
+Risk
+Evidence Confidence
+Next Best Action
+
+Do not display a wall of metrics.
+
+The header should be extremely easy to scan.
+
+==================================================
+4. THREE PRIMARY VISUAL METERS
+==================================================
+
+Do NOT use qualitative text labels as the primary representation of the three top-level signals.
+
+Instead, represent them using compact pictorial visualizations similar to elegant speedometers / semicircular gauges.
+
+The three primary visual signals are:
+
+1. INVESTMENT CONVICTION
+2. RISK
+3. EVIDENCE CONFIDENCE
+
+These should be compact and visually intuitive.
+
+The underlying numerical score remains in the backend.
+
+The number can be shown subtly, but the visual meter is the PRIMARY representation.
+
+The investor should be able to understand the situation visually without interpreting a dashboard full of numbers.
+
+--------------------------------------------------
+INVESTMENT CONVICTION
+--------------------------------------------------
+
+Use a compact semicircular gauge / speedometer.
+
+The gauge should visually communicate movement from weak → strong.
+
+The exact underlying score can remain numerical.
+
+Example:
+
+Investment Conviction
+[semicircular gauge]
+72
+↑ +8 since last review
+
+Clicking / expanding the gauge should show:
+
+- current score
+- previous score
+- what changed
+- why it changed
+- supporting evidence
+
+Important:
+Investment Conviction is NOT the probability that the investor will invest.
+
+It is the synthesized assessment of how compelling the investment currently is given the opportunity, evidence, risks, valuation, thesis fit, and portfolio considerations.
+
+--------------------------------------------------
+RISK
+--------------------------------------------------
+
+Use a separate compact visual gauge.
+
+The gauge should visually communicate:
+
+Low → Higher Risk
+
+Example:
+
+Risk
+[semicircular gauge]
+Elevated
+
+Primary concern:
+Financial reporting inconsistency
+
+Do not rely on color alone.
+
+--------------------------------------------------
+EVIDENCE CONFIDENCE
+--------------------------------------------------
+
+Use a third compact visual gauge.
+
+The gauge should visually communicate:
+
+Weak Evidence → Strong Evidence
+
+Example:
+
+Evidence Confidence
+[semicircular gauge]
+Moderate
+
+This is important because opportunity quality and evidence quality are different things.
+
+For example:
+
+Investment Conviction = Strong
+Evidence Confidence = Low
+
+The system should make it immediately clear that:
+
+"The company looks attractive, but the evidence base is still incomplete."
+
+--------------------------------------------------
+IMPORTANT GAUGE RULE
+--------------------------------------------------
+
+DO NOT create visual gauges for every metric.
+
+Only use these three top-level visual meters:
+
+- Investment Conviction
+- Risk
+- Evidence Confidence
+
+Other dimensions should remain simple supporting indicators or rows:
+
+- Opportunity Quality
+- Thesis Fit
+- Valuation Attractiveness
+- Portfolio Fit
+- Market
+- Product
+- Team
+- Financials
+
+These can be expanded for detail.
+
+==================================================
+5. CURRENT VIEW
+==================================================
+
+Near the top of each deal, create a concise AI-generated:
+
+CURRENT VIEW
+
+This should explain the current investment case in plain English.
+
+It should answer:
+
+- Why do we like this company?
+- What concerns us?
+- What evidence is driving our current view?
+- What remains unresolved?
+- What should happen next?
+
+This should read like a strong VC associate briefing a partner.
+
+Do not make it a long AI essay.
+
+Keep it concise and decision-oriented.
+
+==================================================
+6. NEEDS YOUR ATTENTION
+==================================================
+
+Create a highly focused:
+
+NEEDS YOUR ATTENTION
+
+section.
+
+Only show the highest-priority actions.
+
+Examples:
+
+Founder clarification needed on revenue discrepancy
+Financial model requires validation
+Customer evidence still pending
+Next partner meeting tomorrow
+
+Each item should clearly communicate:
+
+WHAT
+WHY
+WHO NEEDS TO ACT
+NEXT ACTION
+
+Do not show every open task here.
+
+==================================================
+7. WHAT CHANGED
+==================================================
+
+Create:
+
+WHAT CHANGED SINCE YOUR LAST VISIT
+
+Only show MATERIAL changes.
+
+Examples:
+
++ Revenue definition clarified
++ 3 financial discrepancies resolved
++ Customer retention independently validated
+- Market estimate remains unsupported
+
+Do not show trivial system activity.
+
+The investor should immediately understand what changed in the investment picture.
+
+==================================================
+8. DEAL STORY / TIMELINE
+==================================================
+
+Create a clear chronological DEAL STORY.
+
+Every meaningful activity must explicitly identify:
+
+WHO
+WHAT
+WHEN
+WHY / IMPACT
+
+Use explicit actor labels:
+
+YOU / INVESTMENT TEAM
+FOUNDER
+AGENT
+EXTERNAL
+
+Examples:
+
+AGENT
+Found 4 inconsistencies in financial reporting.
+
+YOU
+Requested clarification from Founder.
+
+FOUNDER
+Uploaded revised financial model.
+
+AGENT
+Re-ran financial validation.
+
+AGENT
+3 discrepancies resolved; 1 remains unresolved.
+
+Do NOT use vague activity labels such as:
+
+"Reply applied"
+"Analysis completed"
+"Conviction updated"
+
+The timeline should tell the story of the deal.
+
+==================================================
+9. FOUNDER VS INVESTOR COMMUNICATION
+==================================================
+
+Make the distinction between internal investor activity and founder communication extremely obvious.
+
+There are three separate concepts:
+
+FINDING
+What the system detected.
+
+QUESTION
+What needs to be answered.
+
+FOUNDER MESSAGE
+The actual external communication.
+
+Show the relationship clearly:
+
+Finding
+↓
+Question
+↓
+Founder Message
+↓
+Founder Response
+↓
+Updated Finding
+
+Do not mix internal notes with external founder communication.
+
+External messages should NOT be automatically sent by default.
+
+The agent should draft the message.
+
+The investor should control sending:
+
+[EDIT]
+[SEND TO FOUNDER]
+
+==================================================
+10. DISCREPANCIES
+==================================================
+
+When multiple discrepancies exist in the same document, DO NOT send separate communications for each discrepancy.
+
+Detect ALL material discrepancies.
+
+Show ALL discrepancies individually.
+
+Then GROUP related discrepancies under a common underlying issue.
+
+Example:
+
+UNDERLYING ISSUE
+Financial reporting inconsistency
+
+Individual findings:
+
+Revenue
+Deck: $4.2M
+Financial model: $2.8M
+
+Runway
+Deck: 18 months
+Financial model: 9 months
+
+Headcount
+Deck: 40
+Financial model: 27
+
+Founder ownership
+Deck: 15%
+Cap table: 8.4%
+
+This hierarchy should be:
+
+Underlying Issue
+→ Related Findings
+→ Individual Discrepancies
+→ Evidence
+
+Grouping should simplify the story WITHOUT hiding the individual discrepancies.
+
+==================================================
+11. CONSOLIDATED FOUNDER REQUEST
+==================================================
+
+After detecting discrepancies:
+
+1. Detect all discrepancies
+2. Group related discrepancies
+3. Assess materiality
+4. Determine which require founder clarification
+5. Draft ONE consolidated founder request
+6. Allow investor to edit
+7. Investor sends
+8. Map the founder response back to each individual finding
+9. Re-run only relevant analyses
+
+Example:
+
+FOUNDER RESPONSE
+
+Revenue discrepancy
+Partially resolved
+
+Runway discrepancy
+Still open
+
+Headcount discrepancy
+Resolved
+
+Ownership discrepancy
+Resolved
+
+Do not treat one founder response as resolving an entire group automatically.
+
+Each finding must retain its own status.
+
+==================================================
+12. PENDING ITEMS VS OPEN QUESTIONS
+==================================================
+
+Keep these concepts distinct.
+
+PENDING ITEM =
+Something we need to RECEIVE.
+
+Examples:
+Updated financial model
+Customer cohort data
+Cap table
+Contract
+
+OPEN QUESTION =
+Something we need ANSWERED.
+
+Examples:
+Why does revenue differ?
+What explains the churn increase?
+How was the market size estimated?
+
+These should not be mixed.
+
+"Waiting" is a STATUS, not a stage.
+
+==================================================
+13. NEW EVIDENCE
+==================================================
+
+When new evidence arrives, the system should automatically identify what analyses are affected.
+
+For example:
+
+Founder uploads revised financial model.
+
+The system should:
+
+- identify relevant discrepancies
+- update evidence
+- re-run relevant validations
+- update affected findings
+- update risk where appropriate
+- update uncertainty where appropriate
+- update evidence confidence
+- update investment conviction when justified
+- create a clear "What Changed" entry
+
+Do not blindly re-run everything.
+
+Re-analyze only what the new evidence can actually affect.
+
+==================================================
+14. VALIDATION
+==================================================
+
+Validation should combine:
+
+- financial validation
+- market validation
+- customer validation
+- competition
+- product
+- team
+- external reality checks
+- quantitative plausibility
+- benchmarking
+- evidence verification
+
+The purpose is not simply to summarize the pitch.
+
+The purpose is to determine:
+
+"What appears true?"
+"What is supported?"
+"What is inconsistent?"
+"What is plausible?"
+"What remains uncertain?"
+
+==================================================
+15. QUANTITATIVE VALIDATION
+==================================================
+
+Material quantitative claims should be independently checked.
+
+Examples:
+
+- Total Market Size
+- Reachable Market Size
+- revenue forecasts
+- customer counts
+- growth assumptions
+- margins
+- runway
+- valuation
+- return scenarios
+
+For important claims compare:
+
+1. Management value
+2. Supporting source data
+3. Recomputed value
+4. External benchmark
+5. Comparable companies
+6. Historical trend
+7. Agent estimate
+8. Reasonable range
+9. Confidence
+
+Clearly distinguish:
+
+FACT
+MANAGEMENT ASSUMPTION
+EXTERNAL DATA
+AGENT ESTIMATE
+SCENARIO
+ASSUMPTION
+
+Do NOT fabricate statistical certainty.
+
+Use percentile/range language such as 80th or 90th percentile only when there is an actual defensible underlying distribution, benchmark, model, or scenario basis.
+
+==================================================
+16. CORE VALIDATION CHECKS
+==================================================
+
+Retain these core checks:
+
+1. Claim-to-evidence verification
+2. Cross-document contradiction detection
+3. Stated-vs-recomputed values
+4. Historical-vs-forecast consistency
+5. Population completeness
+
+Every material finding should be traceable to:
+
+Claim
+→ Evidence
+→ Source
+→ Document / Page
+
+Do not treat the pitch deck as equivalent to primary evidence.
+
+==================================================
+17. RISK
+==================================================
+
+Risk should NOT be a single arbitrary score that determines the investment decision.
+
+Separate:
+
+- Risk
+- Uncertainty
+- Evidence Confidence
+- Opportunity Quality
+- Thesis Fit
+- Valuation Attractiveness
+- Portfolio Fit
+- Investment Conviction
+
+Avoid double-counting correlated risks.
+
+For example, four symptoms of the same underlying financial reporting problem should not become four independent risk penalties.
+
+==================================================
+18. DECISION ROOM
+==================================================
+
+The DECISION stage should feel like a true:
+
+DECISION ROOM
+
+not a static AI report.
+
+Top of Decision Room:
+
+Company
+Investment Conviction gauge
+Risk gauge
+Evidence Confidence gauge
+
+Then:
+
+CURRENT VIEW
+
+WHY WE LIKE IT
+
+WHAT CONCERNS US
+
+WHAT WE DON'T KNOW
+
+WHAT WOULD CHANGE OUR VIEW
+
+NEXT BEST ACTION
+
+The investor should be able to understand the decision case without opening every analytical section.
+
+==================================================
+19. NEXT BEST ACTION
+==================================================
+
+Always prioritize ONE primary next action.
+
+Example:
+
+NEXT BEST ACTION
+
+Validate customer retention data before advancing to Investment Committee review.
+
+Why this matters:
+Current conviction is being limited by uncertainty around retention.
+
+Secondary actions can be expanded.
+
+Do not show ten equally weighted recommendations.
+
+==================================================
+20. INTERACTIVE ANALYST
+==================================================
+
+The interactive analyst is an INTERNAL VC analytical assistant.
+
+It is not a generic chatbot.
+
+It should answer questions using the deal's evidence, analysis, history, and current state.
+
+Useful suggested prompts:
+
+"Why is conviction at this level?"
+"What concerns us most?"
+"Challenge the investment case."
+"What assumptions are most aggressive?"
+"What would change our view?"
+"Show me the downside case."
+"Compare this with my other deals."
+"What should I investigate next?"
+
+Responses should clearly distinguish:
+
+Verified evidence
+Inference
+Assumption
+Scenario
+Uncertainty
+
+Never make an AI interpretation appear to be a verified fact.
+
+==================================================
+21. THESIS FIT
+==================================================
+
+The investor's thesis is a LENS / PRIOR, not an automatic rejection gate.
+
+The system should determine:
+
+- Strong thesis fit
+- Moderate thesis fit
+- Weak thesis fit
+- Outside normal investment preference
+
+But an unusual company should NOT automatically be rejected.
+
+Instead, flag it as a potential:
+
+"Thesis Exception"
+
+and continue evaluating the actual investment opportunity.
+
+==================================================
+22. PLAIN LANGUAGE
+==================================================
+
+Use plain English throughout the product.
+
+Avoid unnecessary acronyms.
+
+Use:
+
+Total Market Size
+Reachable Market Size
+Annual Recurring Revenue
+Customer Acquisition Cost
+Customer Lifetime Value
+Investment Committee
+
+instead of unexplained acronyms.
+
+The interface should be understandable without requiring the investor to decode terminology.
+
+==================================================
+23. HOMEPAGE / MAIN DASHBOARD
+==================================================
+
+The homepage should prioritize ACTION rather than metrics.
+
+Primary sections:
+
+NEEDS YOUR ATTENTION
+
+READY FOR REVIEW
+
+WAITING
+
+RECENTLY UPDATED
+
+A deal row should NOT contain ten metrics.
+
+Show only:
+
+Company
+Stage
+Investment Conviction visual signal
+Risk visual signal
+Next Action
+
+Everything else can be expanded.
+
+==================================================
+24. ACTOR SYSTEM
+==================================================
+
+Every meaningful activity must identify who performed it.
+
+Use:
+
+YOU / INVESTMENT TEAM
+FOUNDER
+AGENT
+EXTERNAL
+
+This should be consistent across:
+
+Timeline
+Findings
+Questions
+Tasks
+Communications
+Evidence
+Decision updates
+
+The investor should never be confused about whether something was:
+
+- discovered by the agent
+- requested by the investor
+- provided by the founder
+- sourced externally
+
+==================================================
+25. FINAL UX STANDARD
+==================================================
+
+The application should feel like:
+
+"A brilliant VC associate sitting beside me and keeping the entire
+investment process organized, analytical, evidence-based, and
+decision-ready."
+
+It should NOT feel like:
+
+"An AI dashboard showing me every internal system state."
+
+Prioritize:
+
+Clarity
+Hierarchy
+Chronology
+Actionability
+Evidence
+Context
+Decision support
+
+Over:
+
+More metrics
+More cards
+More charts
+More badges
+More AI-generated text
+
+The investor should always be able to answer:
+
+WHERE ARE WE?
+WHAT HAPPENED?
+WHAT DID WE LEARN?
+WHAT WORRIES US?
+WHAT DON'T WE KNOW?
+WHAT ARE WE WAITING FOR?
+WHO NEEDS TO ACT?
+WHAT SHOULD I DO NEXT?
+
+Make these UX changes without rebuilding or changing the underlying
+application intelligence.
+
+---
+
+Gemma · this deal only
+
+What would you like to know?
+Ask about Northstar Robotics. Answers come from the files, with citations.
+
+Why is conviction at this level?
+What concerns us most?
+Challenge the investment case.
+What assumptions are most aggressive?
+Ask this deal
+Ask anything about this room…
+
+
+on decision room page, should not be tehre please remove it
+
+---
+
+Thesis:
+The thesis is a lens, not a gate. An unusual company stays in evaluation.
+Remove all these sublines. and define what part fo the thesis teh company is touching and so on, like where is it fittign deeper but concise descirption (2-3 lines) and a checkbox entry where we can say these are the things it shares with our thesis.
+
+Also have a thesis fit score. 
+
+For the overview it will be the deal story plus the decision room only. It should give you an overview of the entire deal, where the partner also knows the next action and knows the entire deal story.
+Please delete the process tab and decision room tab. We need to rename the validation tab to due diligence. Due diligence will have three sub-tabs underneath it:
+- Founder: We will do a LinkedIn search on the founder, do due diligence on the founder himself, and look for spikes of excellence in their history.
+- Financials: We will do the due diligence that we are already doing right now.
+- Market: Market will be market-based research, which we will do using Firecrawl. I will give you a Firecrawl key. TAM analysis
+We also have a Data Room tab. The Data Room tab is basically our data room. We don't need to go to a different page to look at that data room. Whatever we have in the data room right now should be in the Data Room tab. Just keep the ask as it is. Otherwise just revert the whole thing as I have mentioned.
+
+Metrics: (Display on top without any graphs)
+
+Thesis Fit Score, Conviction (founder-market fit + who is on the cap table ), Opportunity (TAM Analysis and market size, oppen space, competitor analysis and so on),  Due Diligine score (Financials, Data discrepancy between data room and deck)
+
+---
+
+firecrawl api key:
+REDACTED
+
+---
+
+can you recompute for all 5 and also use names of people randowm founders you find on linked in for the demo, also make teh hoempage dispaly our metrics only no grpahs pls
+
+---
+
+Make teh data room tab just to pen the dat room ina. full page to open in a new tab (show icon for this)
+
+---
+
+Add colour coding for the metrics please align better in the UI on homepage as well
+
+---
+
+For founders also giev a nice qualitative assessment please, spikes of excellence for each founder and refien the usmmaries (cite links below for them)
+
+---
+
+- the next action column on homepage make it in a different colour to show the call to action
+
+- The market also theres a lot of noise please make it easily readbale in a concise way and give insights

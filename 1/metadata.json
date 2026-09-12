@@ -1,0 +1,205 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2BMZMYY3H77P3P0GA5HFKMT",
+  "session_id": "7decf42e-48ea-482a-a5c9-7c74af070074",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-12T20:29:47.512557Z",
+  "branch": "main",
+  "checkpoints_count": 11,
+  "save_step_count": 11,
+  "files_touched": [
+    ".env.example",
+    "apps/web/app/api/deals/[id]/research/founder/route.ts",
+    "apps/web/app/api/deals/[id]/research/market/route.ts",
+    "apps/web/app/globals.css",
+    "apps/web/components/AskPanel.tsx",
+    "apps/web/components/DealLobby.tsx",
+    "apps/web/components/PageFrame.tsx",
+    "apps/web/components/deal/AskTab.tsx",
+    "apps/web/components/deal/DealHeader.tsx",
+    "apps/web/components/deal/DealShell.tsx",
+    "apps/web/components/deal/DiligenceTab.tsx",
+    "apps/web/components/deal/FinancialsPane.tsx",
+    "apps/web/components/deal/FounderPane.tsx",
+    "apps/web/components/deal/FounderThread.tsx",
+    "apps/web/components/deal/ICTab.tsx",
+    "apps/web/components/deal/MarketPane.tsx",
+    "apps/web/components/deal/Meter.tsx",
+    "apps/web/components/deal/NumbersTab.tsx",
+    "apps/web/components/deal/OverviewTab.tsx",
+    "apps/web/components/deal/ProcessTab.tsx",
+    "apps/web/components/deal/ScoreValue.tsx",
+    "apps/web/components/deal/StoryList.tsx",
+    "apps/web/components/deal/ThesisTab.tsx",
+    "apps/web/components/deal/TimelineTab.tsx",
+    "apps/web/components/deal/ValidationTab.tsx",
+    "apps/web/components/deal/WorldTab.tsx",
+    "apps/web/components/pipeline/PipelineBoard.tsx",
+    "apps/web/components/pipeline/PipelineHome.tsx",
+    "apps/web/lib/diligence/firecrawl.ts",
+    "apps/web/lib/diligence/paths.ts",
+    "apps/web/lib/diligence/research.ts",
+    "apps/web/lib/diligence/store.ts",
+    "apps/web/lib/diligence/types.ts",
+    "apps/web/lib/intelligence/demo.ts",
+    "apps/web/lib/intelligence/mail.ts",
+    "apps/web/lib/intelligence/seed.ts",
+    "apps/web/lib/intelligence/types.ts",
+    "apps/web/lib/intelligence/viewStory.ts",
+    "apps/web/scripts/refresh-demo-research.ts",
+    "apps/web/scripts/refresh-founder-assessments.ts",
+    "apps/web/scripts/refresh-market-assessments.ts"
+  ],
+  "agent": "Cursor",
+  "model": "cursor-grok-4.6-high-fast",
+  "turn_id": "705e4bd5c506",
+  "checkpoint_transcript_start": 216,
+  "transcript_lines_at_start": 216,
+  "compact_transcript_start": 42,
+  "token_usage": {
+    "input_tokens": 659620,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 21251648,
+    "output_tokens": 123989,
+    "api_call_count": 11
+  },
+  "session_metrics": {
+    "turn_count": 27,
+    "context_tokens": 233549,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-12T20:29:47.201361Z",
+    "agent_lines": 2622,
+    "agent_removed": 700,
+    "human_added": 1,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 2623,
+    "total_lines_changed": 3323,
+    "agent_percentage": 99.96990671080349,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 86,
+      "agent_lines_removed": 52,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 105,
+      "agent_lines_removed": 60,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1351,
+      "agent_lines_removed": 531,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1332,
+      "agent_lines_removed": 534,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1923,
+      "agent_lines_removed": 678,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1923,
+      "agent_lines_removed": 678,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2129,
+      "agent_lines_removed": 713,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2102,
+      "agent_lines_removed": 683,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2194,
+      "agent_lines_removed": 698,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2438,
+      "agent_lines_removed": 698,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 1,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2622,
+      "agent_lines_removed": 700,
+      "user_added_per_file": {
+        ".impeccable/hook.cache.json": 1
+      }
+    }
+  ]
+}

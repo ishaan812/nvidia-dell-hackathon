@@ -43,10 +43,16 @@ export function FounderPane({ dealId, intel }: { dealId: string; intel: DealInte
     <div>
       <Section title="Founder diligence">
         <Note>
-          Public history on each named founder. Search lands sources first; the model writes the memo only
-          after it has read them.
+          {intel.profile.founders.length
+            ? "Public history on each founder named in the deck. Search lands sources first; the model writes only after it has read them."
+            : "No founders named in the deck. We do not search the company name."}
         </Note>
-        <button type="button" className="desk-btn mt-5" disabled={pending} onClick={search}>
+        <button
+          type="button"
+          className="desk-btn mt-5"
+          disabled={pending || !intel.profile.founders.length}
+          onClick={search}
+        >
           {pending ? "Reading public history…" : people?.length ? "Refresh founder research" : "Search LinkedIn and public history"}
         </button>
         {photosPending ? <p className="mt-3 text-mute">Getting LinkedIn portraits…</p> : null}

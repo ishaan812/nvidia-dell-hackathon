@@ -2,12 +2,14 @@ import type { Deal } from "./types";
 import { firecrawlScrapePage, firecrawlSearch, type SearchHit } from "./firecrawl";
 import { attachFounderPhotos } from "./founderPhoto";
 import { chat } from "./llm";
+import { hasMarketSignal } from "../intelligence/fromDeck";
 import type { FounderResearch, FounderSpike, MarketInsight, MarketResearch, ResearchHit } from "../intelligence/types";
 
 export async function researchFounders(deal: Deal): Promise<FounderResearch[]> {
   const intel = deal.intelligence;
   if (!intel) return [];
-  const names = intel.profile.founders.length ? intel.profile.founders : [intel.profile.company];
+  if (!intel.profile.founders.length) return [];
+  const names = intel.profile.founders;
   const people: FounderResearch[] = [];
   for (const name of names) {
     const hits = await enrichHits(await searchFounderHits(name, intel.profile.company, intel.profile.sector), 2);
@@ -20,7 +22,8 @@ export async function assessStoredFounders(deal: Deal): Promise<FounderResearch[
   const intel = deal.intelligence;
   if (!intel) return [];
   const stored = intel.research?.founders ?? [];
-  const names = intel.profile.founders.length ? intel.profile.founders : [intel.profile.company];
+  if (!intel.profile.founders.length) return [];
+  const names = intel.profile.founders;
   const people: FounderResearch[] = [];
   for (const name of names) {
     const prior = stored.find((item) => item.name === name);
@@ -168,6 +171,12 @@ export async function researchMarket(deal: Deal): Promise<MarketResearch> {
   const intel = deal.intelligence;
   if (!intel) {
     return emptyMarket();
+  }
+  if (!hasMarketSignal(deal, intel.profile)) {
+    return {
+      ...emptyMarket(),
+      summary: "No sector, product, or TAM in the deck. We did not invent a market.",
+    };
   }
   const { sector, product } = intel.profile;
   const tam = await enrichHits(cleanMarketHits(await firecrawlSearch(`${sector} total addressable market size ${product}`, 4)), 1);

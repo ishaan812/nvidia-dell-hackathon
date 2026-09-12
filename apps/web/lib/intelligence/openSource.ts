@@ -1,6 +1,7 @@
 import { formatMetric, pick } from "../diligence/metrics";
 import type { Deal, Metric } from "../diligence/types";
 import { claimsFromFlags } from "./fromFlags";
+import { fillProfileFromDeck } from "./fromDeck";
 import type { CompanyProfile, DealIntelligence } from "./types";
 
 function companyName(deal: Deal): string {
@@ -41,7 +42,7 @@ function profileFromRoom(deal: Deal): CompanyProfile {
 
 export async function openSourceIntelligence(deal: Deal): Promise<DealIntelligence> {
   const now = new Date().toISOString();
-  const profile = profileFromRoom(deal);
+  const profile = await fillProfileFromDeck(deal, profileFromRoom(deal));
   const { claims, evidence } = claimsFromFlags(deal);
   const files = deal.docs.length
     ? `${deal.docs.length} file${deal.docs.length === 1 ? "" : "s"}`

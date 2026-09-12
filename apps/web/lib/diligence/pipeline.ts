@@ -13,6 +13,7 @@ import { dirs } from "./paths";
 import { applyRoles, deckDocs, rolesFromDocs } from "./roles";
 import { addToWorkspace, dealRoot, isolateDeal } from "./sandbox";
 import { openSourceIntelligence } from "../intelligence/openSource";
+import { ensureSourceResearch } from "./sourceResearch";
 import { saveDeal } from "./store";
 import type { Deal, DealEvent, DealSandbox, FileRole } from "./types";
 
@@ -89,6 +90,14 @@ async function finishDeal(
   if (!deal.intelligence) {
     deal.intelligence = await openSourceIntelligence(deal);
     push("ready", "Opened a Source deal on the pipeline");
+  }
+  if (deal.intelligence && !deal.intelligence.research) {
+    push("ready", "Starting founder and market reads from the deck");
+    try {
+      deal = await ensureSourceResearch(deal);
+    } catch (error) {
+      push("ready", `Public research skipped: ${(error as Error).message}`);
+    }
   }
   push("ready", `${deal.flags.length} findings · risk ${deal.riskScore}`);
   await saveDeal(deal);

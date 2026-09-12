@@ -1,0 +1,5 @@
+Okay our USB setup is back, have downlaoded muse glimmer locally transfer using USB to the dell GB 10 and make it work, test befor ecoming back to me
+
+---
+
+to connect using ssh also use dell@10.48.2.160 now we changed teh network password is istill 123456

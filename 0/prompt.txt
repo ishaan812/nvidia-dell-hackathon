@@ -1,0 +1,17 @@
+when deal gets created in source itself we should start due dilligence process on founders and market based on the deck whatever info we do not have we dont need to do. make sure this happens
+
+---
+
+teh server just crashed cna you check everything is running, i ran teh web server and ollama something im missing i think we might hav ecrashed it
+
+---
+
+why doe steh due dilligence not work properly and take this long
+
+---
+
+okay for due filligence lets just use gemma 3b please and run it in deal source itself pls (dont display this anywhere)
+
+---
+
+move the ask thing also to gemma 3b

@@ -1,5 +1,6 @@
 import { copyFile, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { attachSourceIfMissing } from "../intelligence/openSource";
 import { effectiveScores } from "../intelligence/scores";
 import { normalizeStage } from "../intelligence/types";
 import { headerScores } from "../intelligence/viewStory";
@@ -99,8 +100,9 @@ export async function listDeals(): Promise<DealSummary[]> {
   const loaded = await Promise.all(
     entries.filter((entry) => entry.isDirectory()).map((entry) => loadDeal(entry.name)),
   );
-  return loaded
-    .filter((deal): deal is Deal => deal !== null)
-    .map(summarize)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const deals = loaded.filter((deal): deal is Deal => deal !== null);
+  for (const deal of deals) {
+    if (await attachSourceIfMissing(deal)) await saveDeal(deal);
+  }
+  return deals.map(summarize).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }

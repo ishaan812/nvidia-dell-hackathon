@@ -13,6 +13,8 @@ async function localPipeline() {
   const folder = await buildNorthstar();
   const deal = await runDeal(folder, "Northstar Robotics");
   assert.equal(deal.status, "ready");
+  assert.ok(deal.intelligence, "every room must open a Source deal");
+  assert.equal(deal.intelligence?.stage, "source");
   assert.ok(deal.docs.length >= 4, `expected 4 docs, got ${deal.docs.length}`);
   assert.ok(path.isAbsolute(deal.docs[0].path), "doc paths must be absolute");
   const ids = deal.flags.map((f) => f.id).sort();

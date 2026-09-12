@@ -12,6 +12,7 @@ import { extractMetrics } from "./metrics";
 import { dirs } from "./paths";
 import { applyRoles, deckDocs, rolesFromDocs } from "./roles";
 import { addToWorkspace, dealRoot, isolateDeal } from "./sandbox";
+import { openSourceIntelligence } from "../intelligence/openSource";
 import { saveDeal } from "./store";
 import type { Deal, DealEvent, DealSandbox, FileRole } from "./types";
 
@@ -85,6 +86,10 @@ async function finishDeal(
   deal.status = "ready";
   deal.error = undefined;
   deal.updatedAt = new Date().toISOString();
+  if (!deal.intelligence) {
+    deal.intelligence = await openSourceIntelligence(deal);
+    push("ready", "Opened a Source deal on the pipeline");
+  }
   push("ready", `${deal.flags.length} findings · risk ${deal.riskScore}`);
   await saveDeal(deal);
   return deal;
